@@ -162,9 +162,25 @@ export const useUpdatePaymentGateway = () => {
   return useMutation(updatePaymentGateway)
 }
 
-export const updatePaymentGateway = async () => {
-  const { headers } = await http.patch(API_ENDPOINTS.PAYMENT_GATEWAY)
-  const { client_id, client_secret } = headers
-  return { client_id, client_secret }
+export const updatePaymentGateway = async (userData) => {
+  const { data } = await http.patch(API_ENDPOINTS.PAYMENT_GATEWAY, userData)
+  return data
+}
 
+export const getPaymentGateway = async () => {
+  const { data } = await http.get(API_ENDPOINTS.PAYMENT_GATEWAY)
+  return data;
+}
+
+export const useGetPaymentGateway = () => {
+  return useQuery('payment-gateway', getPaymentGateway)
+}
+
+export const getPaymentGatewayClient = async () => {
+  const { data } = await http.get(API_ENDPOINTS.PAYMENT_GATEWAY_CLIENT)
+  return data
+}
+
+export const useGetPaymentGatewayClient = () => {
+  return useQuery('payment-gateway-client', getPaymentGatewayClient)
 }

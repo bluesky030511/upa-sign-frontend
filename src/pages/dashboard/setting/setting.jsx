@@ -286,6 +286,29 @@ const Settings = () => {
                 <Link to="change-password">Change Password</Link>
               </Button>
             </div>
+            {user.role === 'ADMIN' ?
+              <div className="change-payment-gateway-wrap">
+                <Button
+                  sx={{
+                    textTransform: "none",
+                    "& a": {
+                      fontFamily: fonts.medium,
+                      color: colors.foreBlack,
+                      fontSize: 12,
+                      transition: "color 0.2s ease-in-out",
+                    },
+                    "&:hover": {
+                      bgcolor: "transparent",
+                    },
+                    "&:hover a": {
+                      color: colors.themeBlue,
+                    },
+                  }}
+                >
+                  <Link to="payment-gateway">Change Payment Gateway</Link>
+                </Button>
+              </div>
+              : ''}
             <div className="btn-container">
               <PrimaryButton type="submit" isLoading={isLoading}>
                 Save
@@ -383,6 +406,12 @@ const SettingsWrapper = styled.div`
     }
 
     .change-password-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .change-payment-gateway-wrap {
       display: flex;
       justify-content: flex-end;
       margin-top: 8px;
