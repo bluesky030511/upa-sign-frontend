@@ -84,15 +84,36 @@ const headCells = [
     type: "string",
   },
   {
+    id: "role",
+    label: "Role",
+    align: "center",
+    width: "25%",
+    type: "string",
+  },
+  {
     id: "status",
-    label: "Status",
+    label: "Verified",
+    align: "center",
+    width: "25%",
+    type: "string",
+  },
+  {
+    id: "invite_count",
+    label: "Invite Count",
+    align: "center",
+    width: "25%",
+    type: "string",
+  },
+  {
+    id: "invite_count",
+    label: "Subscription",
     align: "center",
     width: "25%",
     type: "string",
   },
   {
     id: "lastseen",
-    label: "Last Seen",
+    label: "Last Login",
     align: "center",
     width: "25%",
     type: "date",
@@ -287,6 +308,7 @@ const Users = () => {
                         {isSuccess &&
                           visibleRows.map((row, index) => {
                             const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
+                            const expiredAt = row.subscription.length > 0 ?  format(new Date(row.subscription[0].expiredAt), "dd MMM, yyyy hh:mm a") : ''
                             const date = format(
                               new Date(row.createdAt),
                               "dd MMM, yyyy hh:mm a"
@@ -303,7 +325,16 @@ const Users = () => {
                                   {row.email}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
-                                  {`${row.status}`}
+                                  {row.role}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {`${row.status === 'APPROVED' ? 'VERIFIED' : row.status} `}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.invite_count}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.subscription.length > 0 ? expiredAt : 'No Subscription'}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
                                   {lastSeen}

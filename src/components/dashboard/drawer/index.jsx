@@ -111,7 +111,7 @@ const LeftDrawer = (props) => {
                 item={{ name: 'Users', icon: <Settings /> }}
               />
             ) }
-            {user.role === "AGENT" && (
+            {(user.role === "AGENT" || user.role === "ADMIN") && (
               <>
                 <CustomLink
                   to="/profile"

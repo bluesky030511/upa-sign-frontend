@@ -22,7 +22,8 @@ export const API_ENDPOINTS = {
   NEWSLETTER: "/newsletter",
   PLACEHOLDER: '/placeholder',
   USERS: '/account/users',
-  PAYMENT_GATEWAY: '/account/payment-gateway'
+  PAYMENT_GATEWAY: '/account/payment-gateway',
+  PAYMENT_GATEWAY_CLIENT: '/account/payment-gateway-client',
 };
 
 export const PLAN_KEYS = {
