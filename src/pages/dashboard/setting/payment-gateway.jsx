@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from 'react-hook-form';
@@ -8,34 +8,53 @@ import PrimaryButton from '../../../components/buttons/primary-button';
 import ErrorAlert from '../../../components/alerts/error-alert';
 import styled from "styled-components";
 import { colors, fonts } from "../../../utils/theme";
-import { useUpdatePaymentGateway } from '../../../hooks/data-hook';
+import { useGetPaymentGateway, useUpdatePaymentGateway } from '../../../hooks/data-hook';
+import { useToast } from '../../../context/toast.context';
 
 const schema = yup.object({
   client_id: yup.string().required('Please enter client id'),
   client_secret: yup.string().required('please enter client secret')
 })
 
-
-
 const PaymentGateway = () => {
-  // const { user } = useUI();
+  const { showSuccessToast, showErrorToast } = useToast();
   const {
     mutate: UpdatePaymentGateway,
     isLoading,
     error,
     isError
   } = useUpdatePaymentGateway();
+
+  const { data, isSuccess } = useGetPaymentGateway()
   
-  const onSubmit = async () => {
-  
+  const onSubmit = async ({ client_id, client_secret }) => {
+    UpdatePaymentGateway({
+      client_id,
+      client_secret
+    }, {
+      onSuccess: () => {
+        showSuccessToast('Payment gateway updated');
+      },
+      onError: (error) => {
+        showErrorToast('Can\'t update payment gateway');
+      }
+    })
   }
-  const { control, handleSubmit } = useForm({
+
+  const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
       client_id: '',
       client_secret: ''
     },
     resolver: yupResolver(schema)
   })
+
+  useEffect(() => {
+    if(isSuccess) {
+      setValue('client_id', data.client_id)
+      setValue('client_secret', data.client_secret)
+    }
+  }, [isSuccess])
 
   return (
     <Wrapper>
