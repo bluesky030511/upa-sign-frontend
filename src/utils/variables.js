@@ -4,6 +4,7 @@ export const SHOWN = "shown";
 // export const BASE_URL = "https://api.upasign.com";
 export const BASE_URL = 'http://localhost:5000'
 export const LIVE_URL = "https://upasign.com";
+export const S3_BUCKET_URL = "https://upa-sign-storage.s3.us-east-1.amazonaws.com/document";
 
 export const API_ENDPOINTS = {
   //Auth End points
