@@ -93,7 +93,7 @@ const headCells = [
   },
   {
     id: "totalInvite",
-    label: "Total Customers",
+    label: "Invitations",
     align: "center",
     width: "25%",
     type: "numeric",
@@ -330,7 +330,7 @@ const DocumentsListing = () => {
                             </StyledTableCell>
                             {user.isAgent && (
                               <StyledTableCell align="center">
-                                {row.totalInvite}
+                                {row.invite.length}
                               </StyledTableCell>
                             )}
                             {!user.isAgent && (
