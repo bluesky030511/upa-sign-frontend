@@ -20,7 +20,7 @@ import { useUI } from "../../context/ui.context";
 import TemplateModal from "../../components/modals/template-modal";
 import GuideLinesModal from "../../components/modals/guidelines-modal";
 import { useToast } from "../../context/toast.context";
-import { API_ENDPOINTS, LIVE_URL } from "../../utils/variables";
+import { API_ENDPOINTS, S3_BUCKET_URL } from "../../utils/variables";
 import ContractModal from "../../components/modals/contract-modal";
 import SubscriptionAlert from "../../components/alerts/subscription-alert";
 import { useSubscription } from "../../context/subscription.context";
@@ -268,7 +268,7 @@ const Templates = () => {
                                 <IconButton
                                   aria-label="upload picture"
                                   component="a"
-                                  href={`${LIVE_URL}${API_ENDPOINTS.DOCUMENT}/${template.id}/${template.filename}`}
+                                  href={`${S3_BUCKET_URL}/${template.id}/${template.filename}`}
                                   sx={{
                                     position: "absolute",
                                     top: 2,
