@@ -8,6 +8,7 @@ import Menu from "@mui/material/Menu";
 import ConfirmationModal from '../modals/confirmation-modal';
 import PlaceholderConfirmationModal from '../modals/placeholder-confirmation-modal';
 import PlaceholderModal from '../modals/placeholder-modal';
+import { Link } from "react-router-dom";
 
 const PlaceholderDropdown = ({ id, dataKey, name, value, customerFilled, refetch}) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -138,11 +139,11 @@ const PlaceholderDropdown = ({ id, dataKey, name, value, customerFilled, refetch
             },
           }}
         >
-          <a
+          <Link
             onClick={openPlaceholderEditModal}
           >
             Edit
-          </a>
+          </Link>
         </MenuItem>
         <MenuItem
           sx={{
@@ -158,11 +159,11 @@ const PlaceholderDropdown = ({ id, dataKey, name, value, customerFilled, refetch
             },
           }}
         >
-          <a
+          <Link
             onClick={openPlaceholderConfirmationModal}
           >
             Delete
-          </a>
+          </Link>
         </MenuItem>
       </Menu>
     </>

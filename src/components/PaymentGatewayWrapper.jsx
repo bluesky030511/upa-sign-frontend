@@ -22,6 +22,6 @@ export const PaymentGatewayWrapper = ({ children }) => {
   }, [isSuccess])
 
   return(
-    client_id != '' ? <PayPalScriptProvider options={paypalOptions}>{children} </PayPalScriptProvider> : ''
+    client_id !== '' ? <PayPalScriptProvider options={paypalOptions}>{children} </PayPalScriptProvider> : ''
   ) 
 }
