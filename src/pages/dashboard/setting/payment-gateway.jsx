@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from 'react-hook-form';
-import { useUI } from '../../../context/ui.context';
 import PrimaryInput from '../../../components/inputs/primary-input';
 import PrimaryButton from '../../../components/buttons/primary-button';
 import ErrorAlert from '../../../components/alerts/error-alert';
