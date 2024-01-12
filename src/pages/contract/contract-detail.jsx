@@ -59,6 +59,7 @@ const ContractDetail = () => {
               {data && (
                 <a
                   href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${file}`}
+                  target="_blank"
                 >
                   <PrimaryButton
                     sx={{
