@@ -184,3 +184,23 @@ export const getPaymentGatewayClient = async () => {
 export const useGetPaymentGatewayClient = () => {
   return useQuery('payment-gateway-client', getPaymentGatewayClient)
 }
+
+
+
+export const getSubscriptions = async (id) => {
+  const { data } = await http.get(`${API_ENDPOINTS.SUBSCRIPTION}/${id}`)
+  return data;
+}
+
+export const useGetSubscriptions = (id) => {
+  return useQuery('user-subscriptions', () => getSubscriptions(id))
+}
+
+export const deleteSubscription = async (id) => {
+  const { data } = await http.delete(`${API_ENDPOINTS.SUBSCRIPTION}/${id}`)
+  return data;
+}
+
+export const useDeleteSubscription = () => {
+  return useMutation(deleteSubscription)
+}

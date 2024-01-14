@@ -1,19 +1,21 @@
-import React, { useMemo, useState } from 'react'
-import DashboardLayout from "../../components/dashboard/layout";
-import styled from "styled-components";
-import { colors, fonts } from "../../utils/theme";
-import SubscriptionAlert from '../../components/alerts/subscription-alert';
-import { useUI } from '../../context/ui.context';
-import { Box, Paper, Table, TableContainer, TableHead, TableRow, TableSortLabel, TableBody, Button, TablePagination } from '@mui/material';
-import SearchInput from '../../components/inputs/search-input';
-import { useGetUsers } from '../../hooks/data-hook';
-import EmptyFeedback from '../../shared-components/empty/empty-feedback';
-import { Loader } from '../../shared-components/loader/loader';
+import React, { useMemo, useState } from 'react';
 import { styled as muiStyled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import { visuallyHidden } from "@mui/utils";
+import styled from "styled-components";
+import { colors, fonts } from "../../../utils/theme";
+import { Box, Paper, Table, TableContainer, TableHead, TableRow, TableSortLabel, TableBody, Button, TablePagination } from '@mui/material';
 import { compareDesc, format } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { useUI } from '../../../context/ui.context';
+import { visuallyHidden } from "@mui/utils";
+import { useGetSubscriptions } from '../../../hooks/data-hook';
+import EmptyFeedback from '../../../shared-components/empty/empty-feedback';
+import SearchInput from '../../../components/inputs/search-input';
+import { useParams } from 'react-router-dom';
+import { Loader } from '../../../shared-components/loader/loader';
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import SubscriptionConfirmationModal from '../../../components/modals/subscription-confirmation-modal';
+import { usePostSubscription } from '../../../hooks/user-hook';
+import { useToast } from '../../../context/toast.context';
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -70,57 +72,50 @@ export const StyledTableRow = muiStyled(TableRow)(({ theme }) => ({
 
 const headCells = [
   {
-    id: "firstname",
-    label: "Name",
+    id: "createdAt",
+    label: "Created At",
     align: "center",
     width: "25%",
-    type: "string",
+    type: "date",
   },
   {
-    id: "email",
-    label: "Email",
+    id: "expiryAt",
+    label: "Expiry At",
     align: "center",
     width: "25%",
-    type: "string",
+    type: "date",
   },
   {
-    id: "role",
-    label: "Role",
+    id: "price",
+    label: "Price",
     align: "center",
     width: "25%",
     type: "string",
   },
   {
     id: "status",
-    label: "Verified",
+    label: "Status",
     align: "center",
     width: "25%",
     type: "string",
   },
   {
-    id: "invite_count",
-    label: "Invite Count",
+    id: "type",
+    label: "Type",
     align: "center",
     width: "25%",
     type: "string",
   },
   {
-    id: "invite_count",
-    label: "Subscription",
+    id: "transactionId",
+    label: "Transaction ID",
     align: "center",
     width: "25%",
     type: "string",
   },
   {
-    id: "lastseen",
-    label: "Last Login",
-    align: "center",
-    width: "25%",
-    type: "date",
-  },
-  {
-    id: "createdAt",
-    label: "Created At",
+    id: "couponCode",
+    label: "Coupon Code",
     align: "center",
     width: "25%",
     type: "date",
@@ -177,6 +172,9 @@ export const descendingComparator = (a, b, orderBy, type) => {
   }
 
   if (type === "string") {
+    if(!b[orderBy] || !a[orderBy]) {
+      return 0
+    }
     if (b[orderBy].toUpperCase() < a[orderBy].toUpperCase()) {
       return -1;
     }
@@ -225,21 +223,26 @@ function filterList(list, query) {
   const regex = new RegExp(`${query.trim()}`, "i");
   return list.filter(
     (item) =>
-      item.firstname.search(regex) >= 0 ||
-      item.email.search(regex) >= 0 ||
-      item.role.search(regex) >= 0
+      // item.transactionId.search(regex) >= 0 ||
+      item.expiredAt.search(regex) >= 0 ||
+      item.createdAt.search(regex) >= 0
   );
 }
 
-const Users = () => {
+
+const Subscriptions = () => {
   const { user } = useUI();
+  const { id } = useParams();
   const [searchText, setSearchText] = useState("");
-  const { isFetching, isSuccess, data } = useGetUsers();
+  const { isFetching, isSuccess, data, refetch } = useGetSubscriptions(id);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("firstname");
+  const [orderBy, setOrderBy] = useState("created_at");
   const [type, setType] = useState("string");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [confirmationModal, setConfirmationModal] = useState(false)
+  const { showErrorToast, showSuccessToast } = useToast()
+  const { mutate: CreateSubscription, isLoading } = usePostSubscription()
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -254,10 +257,13 @@ const Users = () => {
     setSearchText(e.target.value);
   };
 
+  const handleConfirmationModalClose = () => {
+    setConfirmationModal(false);
+  }
+
   const visibleRows = useMemo(() => {
     if (data) {
       const filteredList = filterList(data, searchText);
-      // return filteredList;
       return stableSort(
         filteredList,
         getComparator(order, orderBy, type)
@@ -273,125 +279,159 @@ const Users = () => {
     setType(type);
   };
 
+  const onCreate = () => {
+    CreateSubscription(
+      {
+        agentId: id,
+        price: '0',
+        type: 'ADMIN'
+      }, {
+      onSuccess: () => {
+        showSuccessToast('Can\'t create subscription')
+        refetch()
+      },
+      onError: () => {
+        showErrorToast('Can\'t create subscription')
+      }
+    })
+  }
+
   return (
-    <DashboardLayout>
-      <>
-        <SubscriptionAlert />
-        {user && (user.role === 'ADMIN') && (
-          <ListingWrapper>
-            <div className="search-container">
-              <SearchInput
-                placeholder="Search"
-                id="search-contracts"
-                value={searchText}
-                onChange={handleSearch}
-              />
-            </div>
-            {
-              isFetching ? (
-                <div className="loader-container">
-                  <Loader size={48} />
-                </div>
-              ) : data && data.length ? (
-                <Paper sx={{ boxShadow: 'none', overflow: 'hidden' }}>
-                  <TableContainer
-                    component={Paper}
-                    sx={{
-                      boxShadow: "none",
-                      borderRadius: 0,
-                      width: "100%",
-                      height: "max-content",
-                    }}
+    <>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Button
+          variant="contained"
+          disabled={isLoading}
+          sx={{
+            bgcolor: colors.themeBlue,
+            textTransform: "none",
+            fontFamily: fonts.medium,
+          }}
+          startIcon={<AddRoundedIcon />}
+          onClick={onCreate}
+        >
+          Create Subscription
+        </Button>
+      </Box>
+      {user && (user.role === 'ADMIN') && (
+
+        <ListingWrapper>
+          <div className="search-container">
+            <SearchInput
+              placeholder="Search"
+              id="search-contracts"
+              value={searchText}
+              onChange={handleSearch}
+            />
+          </div>
+          {
+            isFetching ? (
+              <div className="loader-container">
+                <Loader size={48} />
+              </div>
+            ) : data && data.length ? (
+              <Paper sx={{ boxShadow: 'none', overflow: 'hidden' }}>
+                <TableContainer
+                  component={Paper}
+                  sx={{
+                    boxShadow: "none",
+                    borderRadius: 0,
+                    width: "100%",
+                    height: "max-content",
+                  }}
+                >
+                  <Table
+                    sx={{ minWidth: 700, height: "max-content" }}
+                    aria-label="customized table"
                   >
-                    <Table
-                      sx={{ minWidth: 700, height: "max-content" }}
-                      aria-label="customized table"
-                    >
-                      <EnhancedTableHead
-                        order={order}
-                        orderBy={orderBy}
-                        rowCount={data.length}
-                        onRequestSort={handleRequestSort}
-                      />
-                      <TableBody>
-                        {isSuccess &&
-                          visibleRows.map((row, index) => {
-                            const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
-                            const expiredAt = row.subscription.length > 0 ? format(new Date(row.subscription[0].expiredAt), "dd MMM, yyyy hh:mm a") : ''
-                            const date = format(
-                              new Date(row.createdAt),
-                              "dd MMM, yyyy hh:mm a"
-                            );
-                            return (
+                    <EnhancedTableHead
+                      order={order}
+                      orderBy={orderBy}
+                      rowCount={data.length}
+                      onRequestSort={handleRequestSort}
+                    />
+                    <TableBody>
+                      {isSuccess &&
+                        visibleRows.map((row, index) => {
+                          // const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
+                          const expiredAt = format(new Date(row.expiredAt), "dd MMM, yyyy hh:mm a");
+                          const date = format(
+                            new Date(row.createdAt),
+                            "dd MMM, yyyy hh:mm a"
+                          );
+                          return (
+                            <>
+                              <SubscriptionConfirmationModal
+                                key={`subscription-confirmation-${row.id}`}
+                                open={confirmationModal}
+                                refetch={refetch}
+                                id={row.id}
+                                handleClose={handleConfirmationModalClose}
+                              />
                               <StyledTableRow key={index}>
                                 <StyledTableCell align="center">
                                   {index + 1}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
-                                  {row.firstname + ' ' + row.lastname}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.email}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.role}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {`${row.status === 'APPROVED' ? 'VERIFIED' : row.status}`}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.invite_count}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  <Link to={`/profile/${row.id}/subscriptions`} >
-                                    {row.subscription.length > 0 ? expiredAt : 'No Subscription'}
-                                  </Link>
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {lastSeen}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
                                   {date}
                                 </StyledTableCell>
                                 <StyledTableCell align="center">
-                                  <Button href={`/profile/${row.id}`} variant='contained' className='btn'>Edit</Button>
+                                  {expiredAt}
                                 </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.price}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.status}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.type}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.transactionId}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  {row.couponCode}
+                                </StyledTableCell>
+                                <StyledTableCell align="center">
+                                  <Button onClick={() => { setConfirmationModal(true) }} variant='contained' className='btn'>delete</Button>
+                                </StyledTableCell>
+
                               </StyledTableRow>
-                            );
-                          })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 15]}
-                    component="div"
-                    count={data.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage="Users per page"
+                            </>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 15]}
+                  component="div"
+                  count={data.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="Users per page"
+                />
+              </Paper>
+            ) : (
+              <div>
+                <div className="loader-container">
+                  <EmptyFeedback
+                    message="You don't have any subscriptions yet"
+                  // btnText='Create Placeholder'
+                  // action={() => setPlaceholderModal(true)}
                   />
-                </Paper>
-              ) : (
-                <div>
-                  <div className="loader-container">
-                    <EmptyFeedback
-                      message="You don't have any users yet"
-                    // btnText='Create Placeholder'
-                    // action={() => setPlaceholderModal(true)}
-                    />
-                  </div>
                 </div>
-              )}
-          </ListingWrapper>
-        )}
-      </>
-    </DashboardLayout>
+              </div>
+            )}
+        </ListingWrapper>
+      )}
+    </>
   )
 }
-
-export default Users;
+export default Subscriptions;
 
 const ListingWrapper = styled.div`
   background-color: ${colors.white};
