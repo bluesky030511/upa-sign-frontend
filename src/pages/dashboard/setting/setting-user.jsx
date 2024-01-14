@@ -91,7 +91,7 @@ const SettingUser = () => {
         setValue(property, data[property]);
       }
     }
-  }, [data])
+  }, [data, setValue])
 
   return (
     <SettingsWrapper>

@@ -189,7 +189,7 @@ const Faqs = () => {
         target.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, []);
+  }, [state]);
 
   return (
     <>

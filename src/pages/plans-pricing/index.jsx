@@ -90,7 +90,7 @@ const PlansPricing = () => {
         target.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, []);
+  }, [state]);
 
   return (
     <Layout full>

@@ -161,7 +161,7 @@ const DocumentDetails = () => {
       ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }
     return [];
-  }, [data, searchText, order, orderBy, page, rowsPerPage]);
+  }, [data, searchText, order, orderBy, page, rowsPerPage, type]);
 
   const handleRequestSort = (event, property, type) => {
     const isAsc = orderBy === property && order === "asc";

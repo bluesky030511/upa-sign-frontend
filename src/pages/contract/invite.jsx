@@ -11,13 +11,13 @@ import styled from "styled-components";
 import ContactForm from "../../components/steps/ContactForm";
 import InsuranceForm from "../../components/steps/InsuranceForm";
 import SignModal from "../../components/modals/sign-modal";
-import { useUI } from "../../context/ui.context";
+// import { useUI } from "../../context/ui.context";
 import { Loader } from "../../shared-components/loader/loader";
 import PageLoader from "../../shared-components/loader/page-loader";
 
 const Invite = () => {
   const [searchParam] = useSearchParams();
-  const { setUser, removeUser } = useUI();
+  // const { setUser, removeUser } = useUI();
   let accessToken = searchParam.get("accessToken");
   localStorage.setItem(TOKEN, accessToken);
   let contractId = searchParam.get("contractId");
