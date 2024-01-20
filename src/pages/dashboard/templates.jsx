@@ -20,11 +20,12 @@ import { useUI } from "../../context/ui.context";
 import TemplateModal from "../../components/modals/template-modal";
 import GuideLinesModal from "../../components/modals/guidelines-modal";
 import { useToast } from "../../context/toast.context";
-import { S3_BUCKET_URL } from "../../utils/variables";
+import { API_ENDPOINTS, S3_BUCKET_URL } from "../../utils/variables";
 import ContractModal from "../../components/modals/contract-modal";
 import SubscriptionAlert from "../../components/alerts/subscription-alert";
 import { useSubscription } from "../../context/subscription.context";
 import { isSubscribed } from "../../utils/helper";
+import ContractDetailsModal from "../../components/modals/contract-details-modal";
 
 const Templates = () => {
   const { user } = useUI();
@@ -35,7 +36,9 @@ const Templates = () => {
   const [open, setOpen] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
   const [contractModal, setContractModal] = useState(false);
+  const [contractDetailsModal, setContractDetailsModal] = useState(false);
   const [templateId, setTemplateId] = useState(null);
+  const [modalTemplate, setModalTemplate] = useState();
   const queryClient = useQueryClient();
 
   const handleClose = () => {
@@ -44,6 +47,15 @@ const Templates = () => {
 
   const handleOpen = () => {
     setOpen(true);
+  };
+
+  const openDetails = (template) => {
+    console.log(template);
+    setModalTemplate(template);
+    setContractDetailsModal(true);
+  };
+  const closeDetails = () => {
+    setContractDetailsModal(false);
   };
 
   const handleShowGuideLine = () => {
@@ -73,6 +85,11 @@ const Templates = () => {
     });
   };
 
+  const handleDownload = () => {
+    alert(45);
+  };
+  console.log(user);
+  console.log(!isSubscribed(subscription));
   return (
     <DashboardLayout>
       {isFetching ? (
@@ -103,11 +120,17 @@ const Templates = () => {
             handleClose={handleCloseContractModal}
             id={templateId}
           />
+          <ContractDetailsModal
+            open={contractDetailsModal}
+            handleClose={closeDetails}
+            id={templateId}
+            data={modalTemplate}
+          />
           <GuideLinesModal
             open={showGuidelines}
             handleClose={handleCloseGuideLine}
           />
-          <SubscriptionAlert />
+          {user.role === "ADMIN" ? null : <SubscriptionAlert />}
           {user && (user.role === "ADMIN" || user.role === "AGENT") && (
             <Box
               sx={{
@@ -182,7 +205,7 @@ const Templates = () => {
               data.map((template, index) => (
                 <Grid item key={index}>
                   <div className="template-btn">
-                    <figure>
+                    <figure onClick={() => openDetails(template)}>
                       <div className="overlay">
                         <div className="inner-content">
                           {user.role === "AGENT" && (
@@ -262,30 +285,39 @@ const Templates = () => {
                                 )}
                               </Button>
                             )}
-                          {user.role === "ADMIN" ||
-                            (user.role === "AGENT" && (
-                              <Tooltip title="Download">
-                                <IconButton
-                                  aria-label="upload picture"
-                                  component="a"
-                                  href={`${S3_BUCKET_URL}/${template.id}/${template.filename}`}
+                          {user.role === "ADMIN" || user.role === "AGENT" ? (
+                            <Tooltip title="Download">
+                              <IconButton
+                                aria-label="upload picture"
+                                component="a"
+                                // href={`${S3_BUCKET_URL}/${template.id}/${template.filename}`}
+                                onClick={() =>
+                                  handleDownload(
+                                    `${S3_BUCKET_URL}/${template.id}/${template.filename}`
+                                  )
+                                }
+                                sx={{
+                                  position: "absolute",
+                                  top: 2,
+                                  right: 2,
+                                }}
+                                disabled={
+                                  !(
+                                    isSubscribed(subscription) ||
+                                    user.role === "ADMIN"
+                                  )
+                                }
+                              >
+                                <FileDownloadOutlinedIcon
                                   sx={{
-                                    position: "absolute",
-                                    top: 2,
-                                    right: 2,
+                                    color: isSubscribed(subscription)
+                                      ? colors.themeBlue
+                                      : colors.fadeBlack,
                                   }}
-                                  disabled={!isSubscribed(subscription)}
-                                >
-                                  <FileDownloadOutlinedIcon
-                                    sx={{
-                                      color: isSubscribed(subscription)
-                                        ? colors.themeBlue
-                                        : colors.fadeBlack,
-                                    }}
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            ))}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          ) : null}
                         </div>
                       </div>
                       <img src={FileInvoice} alt="template" />
