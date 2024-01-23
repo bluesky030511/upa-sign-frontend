@@ -51,9 +51,6 @@ import NotFound from "../pages/error/not-found";
 import PlaceHolders from "../pages/dashboard/placeholders";
 import Users from "../pages/dashboard/users";
 import PaymentGateway from "../pages/dashboard/setting/payment-gateway";
-import SettingUser from "../pages/dashboard/setting/setting-user";
-import ChangeUserPassword from "../pages/dashboard/setting/change-user-password";
-import Subscriptions from "../pages/dashboard/setting/subscriptions";
 
 export const MainRoutes = () => {
   const { user } = useUI();
@@ -170,39 +167,6 @@ export const MainRoutes = () => {
         {
           path: "",
           element: <Settings />,
-        },
-        {
-          path: ":id",
-          element: (
-            <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
-                <SettingUser />
-              ) : (
-                <Navigate to="/not-found" />
-              )}
-            </ProtectedRoute>),
-        },
-        {
-          path: ":id/change-password",
-          element: (
-            <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
-                <ChangeUserPassword />
-              ) : (
-                <Navigate to="/not-found" />
-              )}
-            </ProtectedRoute>),
-        },
-        {
-          path: ":id/subscriptions",
-          element: (
-            <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
-                <Subscriptions />
-              ) : (
-                <Navigate to="/not-found" />
-              )}
-            </ProtectedRoute>),
         },
         {
           path: "change-password",

@@ -4,6 +4,7 @@ const defaultContext = {
   user: {
     loggedIn: false,
     isAgent: false,
+    role: "",
   },
 };
 
