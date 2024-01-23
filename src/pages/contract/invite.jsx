@@ -1,25 +1,25 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { API_ENDPOINTS, BASE_URL, TOKEN } from "../../utils/variables";
+import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
 import { useMutation, useQuery } from "react-query";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import { Box } from "@mui/material";
 import styled from "styled-components";
+
 import ContactForm from "../../components/steps/ContactForm";
 import InsuranceForm from "../../components/steps/InsuranceForm";
 import SignModal from "../../components/modals/sign-modal";
-// import { useUI } from "../../context/ui.context";
+import { useUI } from "../../context/ui.context";
 import { Loader } from "../../shared-components/loader/loader";
 import PageLoader from "../../shared-components/loader/page-loader";
 
 const Invite = () => {
   const [searchParam] = useSearchParams();
-  // const { setUser, removeUser } = useUI();
+  const { setUser, removeUser } = useUI();
   let accessToken = searchParam.get("accessToken");
-  localStorage.setItem(TOKEN, accessToken);
   let contractId = searchParam.get("contractId");
   const [inviteData, setInviteData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
@@ -65,13 +65,17 @@ const Invite = () => {
   };
   const { data, isFetching } = useQuery("contract-invite", getContract, {
     onSuccess: (data) => {
-      if(Array.isArray(data.invite)) {
-        if (
-          Boolean(data?.invite[0]?.approvedAt) &&
-          Boolean(data?.invite[0]?.file[0])
-        ) {
-          navigate(`detail/${contractId}/${accessToken}`);
-        }
+      removeUser();
+      setUser({
+        loggedIn: false,
+        isAgent: false,
+        isShadow: true,
+      });
+      if (
+        Boolean(data.invite[0].approvedAt) &&
+        Boolean(data.invite[0].file[0])
+      ) {
+        navigate(`detail/${contractId}/${accessToken}`);
       }
     },
   });

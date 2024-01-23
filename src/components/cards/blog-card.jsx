@@ -16,6 +16,7 @@ const BlogCard = ({
   small,
   large,
 }) => {
+  console.log("ID => ", id);
   return (
     <BlogWrapper>
       {Boolean(image) && (
