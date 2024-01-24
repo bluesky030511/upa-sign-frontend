@@ -1,19 +1,29 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState } from "react";
 import DashboardLayout from "../../components/dashboard/layout";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
-import SubscriptionAlert from '../../components/alerts/subscription-alert';
-import { useUI } from '../../context/ui.context';
-import { Box, Paper, Table, TableContainer, TableHead, TableRow, TableSortLabel, TableBody, Button, TablePagination } from '@mui/material';
-import SearchInput from '../../components/inputs/search-input';
-import { useGetUsers } from '../../hooks/data-hook';
-import EmptyFeedback from '../../shared-components/empty/empty-feedback';
-import { Loader } from '../../shared-components/loader/loader';
+import SubscriptionAlert from "../../components/alerts/subscription-alert";
+import { useUI } from "../../context/ui.context";
+import {
+  Box,
+  Paper,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  TableBody,
+} from "@mui/material";
+import SearchInput from "../../components/inputs/search-input";
+import { useGetUsers } from "../../hooks/data-hook";
+import EmptyFeedback from "../../shared-components/empty/empty-feedback";
+import { Loader } from "../../shared-components/loader/loader";
 import { styled as muiStyled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import { visuallyHidden } from "@mui/utils";
 import { compareDesc, format } from 'date-fns';
 import { Link } from '@mui/material';
+
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -183,7 +193,6 @@ export const descendingComparator = (a, b, orderBy, type) => {
     if (b[orderBy].toUpperCase() > a[orderBy].toUpperCase()) {
       return 1;
     }
-
   }
   if (type === "date") {
     return compareDesc(new Date(b[orderBy]), new Date(a[orderBy]));
@@ -191,20 +200,15 @@ export const descendingComparator = (a, b, orderBy, type) => {
   return 0;
 };
 
-
 export const getComparator = (order, orderBy, type) => {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy, type)
     : (a, b) => -descendingComparator(a, b, orderBy, type);
 };
 
-
 const stableSort = (array, comparator) => {
   if (Array.isArray(array)) {
-    const stabilizedThis = array.map((el, index) => [
-      { ...el },
-      index,
-    ]);
+    const stabilizedThis = array.map((el, index) => [{ ...el }, index]);
     stabilizedThis.sort((a, b) => {
       const order = comparator(a[0], b[0]);
       if (order !== 0) {
@@ -226,29 +230,20 @@ function filterList(list, query) {
   return list.filter(
     (item) =>
       item.firstname.search(regex) >= 0 ||
-      item.email.search(regex) >= 0 ||
-      item.role.search(regex) >= 0
+      item.lastname.search(regex) >= 0 ||
+      item.email.search(regex) >= 0
   );
 }
 
 const Users = () => {
   const { user } = useUI();
   const [searchText, setSearchText] = useState("");
-  const { isFetching, isSuccess, data } = useGetUsers();
+  const { isFetching, isSuccess, data, refetch } = useGetUsers();
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("firstname");
   const [type, setType] = useState("string");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   const handleSearch = (e) => {
     setSearchText(e.target.value);
@@ -264,7 +259,7 @@ const Users = () => {
       ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }
     return [];
-  }, [data, searchText, order, orderBy, page, rowsPerPage, type]);
+  }, [data, searchText, order, orderBy, page, rowsPerPage]);
 
   const handleRequestSort = (event, property, type) => {
     const isAsc = orderBy === property && order === "asc";
@@ -317,6 +312,7 @@ const Users = () => {
                         visibleRows.map((row, index) => {
                           const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
                           const expiredAt = row.subscription.length > 0 ? format(new Date(row.subscription[0].expiredAt), "dd MMM, yyyy hh:mm a") : ''
+
                           const date = format(
                             new Date(row.createdAt),
                             "dd MMM, yyyy hh:mm a"

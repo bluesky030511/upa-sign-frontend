@@ -115,40 +115,43 @@ export const useDeleteTemplate = () => {
 };
 
 export const getPlaceholders = async () => {
-  const { data } = await http.get(API_ENDPOINTS.PLACEHOLDER)
+  const { data } = await http.get(API_ENDPOINTS.PLACEHOLDER);
   return data;
-}
+};
 
 export const useGetPlaceholders = () => {
-  return useQuery('placeholders', getPlaceholders)
-}
+  return useQuery("placeholders", getPlaceholders);
+};
 
 export const createPlaceholder = async (userData) => {
   const { data } = await http.post(API_ENDPOINTS.PLACEHOLDER, userData);
   return data;
-}
+};
 
 export const useCreatePlaceholder = () => {
-  return useMutation(createPlaceholder); 
-}  
+  return useMutation(createPlaceholder);
+};
 
 export const updatePlaceholder = async (userData) => {
-  const { data } = await http.patch(`${API_ENDPOINTS.PLACEHOLDER}/${userData.id}`, userData);
+  const { data } = await http.patch(
+    `${API_ENDPOINTS.PLACEHOLDER}/${userData.id}`,
+    userData
+  );
   return data;
-}
+};
 
 export const useUpdatePlaceholder = () => {
-  return useMutation(updatePlaceholder); 
-}
+  return useMutation(updatePlaceholder);
+};
 
 export const deletePlaceholder = async (id) => {
-  const { data } = await http.delete(`${API_ENDPOINTS.PLACEHOLDER}/${id}`)
+  const { data } = await http.delete(`${API_ENDPOINTS.PLACEHOLDER}/${id}`);
   return data;
-}
+};
 
 export const useDeletePlaceholder = () => {
-  return useMutation(deletePlaceholder)
-}
+  return useMutation(deletePlaceholder);
+};
 
 export const getPlaceholdersByContractId = async (id) => {
   const { data } = await http.get(`${API_ENDPOINTS.PLACEHOLDER}/contract/${id}`)
@@ -160,56 +163,36 @@ export const useGetPlaceholdersByContractId = (id) => {
 }
 
 export const useGetUsers = () => {
-  return useQuery('users',getUsers)
-}
+  return useQuery("users", getUsers);
+};
 export const getUsers = async () => {
-  const { data } = await http.get(API_ENDPOINTS.USERS)
+  const { data } = await http.get(API_ENDPOINTS.USERS);
   return data;
-}
+};
 
 export const useUpdatePaymentGateway = () => {
-  return useMutation(updatePaymentGateway)
-}
+  return useMutation(updatePaymentGateway);
+};
 
 export const updatePaymentGateway = async (userData) => {
-  const { data } = await http.patch(API_ENDPOINTS.PAYMENT_GATEWAY, userData)
-  return data
-}
+  const { data } = await http.patch(API_ENDPOINTS.PAYMENT_GATEWAY, userData);
+  return data;
+};
 
 export const getPaymentGateway = async () => {
-  const { data } = await http.get(API_ENDPOINTS.PAYMENT_GATEWAY)
+  const { data } = await http.get(API_ENDPOINTS.PAYMENT_GATEWAY);
   return data;
-}
+};
 
 export const useGetPaymentGateway = () => {
-  return useQuery('payment-gateway', getPaymentGateway)
-}
+  return useQuery("payment-gateway", getPaymentGateway);
+};
 
 export const getPaymentGatewayClient = async () => {
-  const { data } = await http.get(API_ENDPOINTS.PAYMENT_GATEWAY_CLIENT)
-  return data
-}
+  const { data } = await http.get(API_ENDPOINTS.PAYMENT_GATEWAY_CLIENT);
+  return data;
+};
 
 export const useGetPaymentGatewayClient = () => {
-  return useQuery('payment-gateway-client', getPaymentGatewayClient)
-}
-
-
-
-export const getSubscriptions = async (id) => {
-  const { data } = await http.get(`${API_ENDPOINTS.SUBSCRIPTION}/${id}`)
-  return data;
-}
-
-export const useGetSubscriptions = (id) => {
-  return useQuery('user-subscriptions', () => getSubscriptions(id))
-}
-
-export const deleteSubscription = async (id) => {
-  const { data } = await http.delete(`${API_ENDPOINTS.SUBSCRIPTION}/${id}`)
-  return data;
-}
-
-export const useDeleteSubscription = () => {
-  return useMutation(deleteSubscription)
-}
+  return useQuery("payment-gateway-client", getPaymentGatewayClient);
+};

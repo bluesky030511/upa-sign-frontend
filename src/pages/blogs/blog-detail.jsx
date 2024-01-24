@@ -33,7 +33,7 @@ const BlogDetail = () => {
         target.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, [currentIndex, state]);
+  }, [currentIndex]);
   if (Boolean(blog)) {
     return (
       <Layout>

@@ -247,7 +247,7 @@ const PlaceHolders = () => {
         ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }
     return [];
-  }, [data, searchText, order, orderBy, page, rowsPerPage, type]);
+  }, [data, searchText, order, orderBy, page, rowsPerPage]);
 
   const handleRequestSort = (event, property, type) => {
     const isAsc = orderBy === property && order === "asc";
@@ -303,7 +303,7 @@ const PlaceHolders = () => {
         handlePaymentModalOpen();
       }, 1500);
     }
-  });
+  }, []);
 
   return (
     <DashboardLayout>

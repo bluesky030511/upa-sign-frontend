@@ -29,5 +29,3 @@ cmd
 old-deployment
 deployment
 # *.tf
-package-lock.json
-yarn.lock
