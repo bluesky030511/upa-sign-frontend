@@ -51,6 +51,9 @@ import NotFound from "../pages/error/not-found";
 import PlaceHolders from "../pages/dashboard/placeholders";
 import Users from "../pages/dashboard/users";
 import PaymentGateway from "../pages/dashboard/setting/payment-gateway";
+import SettingUser from "../pages/dashboard/setting/setting-user";
+import ChangeUserPassword from "../pages/dashboard/setting/change-user-password";
+import Subscriptions from "../pages/dashboard/setting/subscriptions";
 
 export const MainRoutes = () => {
   const { user } = useUI();

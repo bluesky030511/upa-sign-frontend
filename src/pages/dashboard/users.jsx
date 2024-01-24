@@ -13,6 +13,8 @@ import {
   TableRow,
   TableSortLabel,
   TableBody,
+  TablePagination,
+  Button,
 } from "@mui/material";
 import SearchInput from "../../components/inputs/search-input";
 import { useGetUsers } from "../../hooks/data-hook";
@@ -248,6 +250,17 @@ const Users = () => {
   const handleSearch = (e) => {
     setSearchText(e.target.value);
   };
+
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
 
   const visibleRows = useMemo(() => {
     if (data) {
