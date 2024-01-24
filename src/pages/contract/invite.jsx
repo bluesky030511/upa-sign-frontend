@@ -26,7 +26,7 @@ const Invite = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
   const navigate = useNavigate();
-  const { data: placeholders } = useGetPlaceholdersByContractId(contractId)
+  const { data: placeholders } = useGetPlaceholdersByContractId(contractId, accessToken)
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
