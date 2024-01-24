@@ -15,6 +15,7 @@ import SignModal from "../../components/modals/sign-modal";
 import { useUI } from "../../context/ui.context";
 import { Loader } from "../../shared-components/loader/loader";
 import PageLoader from "../../shared-components/loader/page-loader";
+import { useGetPlaceholdersByContractId } from "../../hooks/data-hook";
 
 const Invite = () => {
   const [searchParam] = useSearchParams();
@@ -25,7 +26,7 @@ const Invite = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
   const navigate = useNavigate();
-
+  const { data: placeholders } = useGetPlaceholdersByContractId(contractId)
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
@@ -102,9 +103,17 @@ const Invite = () => {
   );
 
   const signContract = async (input) => {
+    const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 'claimNo', 'dateOfLoss', 'causeOfLoss', 'status' ]
+    let additionalFields = {}
+    Object.keys(input.data).forEach(key => {
+      if(!knownFields.includes(key)) {
+        additionalFields[key] = input.data[key]
+        delete input.data[key]
+      }
+    })
     const { data } = await axios.post(
       `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
-      input.data,
+      {...input.data, additionalFields},
       {
         headers: {
           Accept: "application/json",
@@ -164,6 +173,7 @@ const Invite = () => {
             handleNext={handleNext}
             handleInviteData={handleInviteData}
             inviteData={inviteData}
+            additionalFields={placeholders}
           />
         )}
         {activeStep === 1 && (

@@ -153,6 +153,15 @@ export const useDeletePlaceholder = () => {
   return useMutation(deletePlaceholder);
 };
 
+export const getPlaceholdersByContractId = async (id) => {
+  const { data } = await http.get(`${API_ENDPOINTS.PLACEHOLDER}/contract/${id}`)
+  return data;
+}
+
+export const useGetPlaceholdersByContractId = (id) => {
+  return useQuery('placeholders-by-contract-id', () => getPlaceholdersByContractId(id))
+}
+
 export const useGetUsers = () => {
   return useQuery("users", getUsers);
 };

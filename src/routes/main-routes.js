@@ -129,12 +129,51 @@ export const MainRoutes = () => {
       element: (
         <ProtectedRoute>
           {user.role === "ADMIN" ? (
-            <Users />
+            <SettingRoot />
           ) : (
             <Navigate to="not-found" />
           )}
         </ProtectedRoute>
-      )
+      ),
+      children: [
+        {
+          path: "",
+          element: <Users />,
+        },
+        {
+          path: ":id",
+          element: (
+            <ProtectedRoute>
+              {user.role === 'ADMIN' ? (
+                <SettingUser />
+              ) : (
+                <Navigate to="/not-found" />
+              )}
+            </ProtectedRoute>),
+        },
+        {
+          path: ":id/change-password",
+          element: (
+            <ProtectedRoute>
+              {user.role === 'ADMIN' ? (
+                <ChangeUserPassword />
+              ) : (
+                <Navigate to="/not-found" />
+              )}
+            </ProtectedRoute>),
+        },
+        {
+          path: ":id/subscriptions",
+          element: (
+            <ProtectedRoute>
+              {user.role === 'ADMIN' ? (
+                <Subscriptions />
+              ) : (
+                <Navigate to="/not-found" />
+              )}
+            </ProtectedRoute>),
+        },
+      ]
     },
     {
       path: "/templates",

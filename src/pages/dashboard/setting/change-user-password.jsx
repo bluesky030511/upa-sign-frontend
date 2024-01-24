@@ -48,7 +48,7 @@ const ChangeUserPassword = () => {
       {
         onSuccess: () => {
           showSuccessToast("Password changed successfully!");
-          navigate(`/profile/${id}`);
+          navigate(`/users/${id}`);
         },
       }
     );
