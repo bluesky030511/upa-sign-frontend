@@ -13,7 +13,7 @@ import { styled as muiStyled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import { visuallyHidden } from "@mui/utils";
 import { compareDesc, format } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { Link } from '@mui/material';
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -274,120 +274,118 @@ const Users = () => {
   };
 
   return (
-    <DashboardLayout>
-      <>
-        <SubscriptionAlert />
-        {user && (user.role === 'ADMIN') && (
-          <ListingWrapper>
-            <div className="search-container">
-              <SearchInput
-                placeholder="Search"
-                id="search-contracts"
-                value={searchText}
-                onChange={handleSearch}
-              />
-            </div>
-            {
-              isFetching ? (
-                <div className="loader-container">
-                  <Loader size={48} />
-                </div>
-              ) : data && data.length ? (
-                <Paper sx={{ boxShadow: 'none', overflow: 'hidden' }}>
-                  <TableContainer
-                    component={Paper}
-                    sx={{
-                      boxShadow: "none",
-                      borderRadius: 0,
-                      width: "100%",
-                      height: "max-content",
-                    }}
+    <>
+      <SubscriptionAlert />
+      {user && (user.role === 'ADMIN') && (
+        <ListingWrapper>
+          <div className="search-container">
+            <SearchInput
+              placeholder="Search"
+              id="search-contracts"
+              value={searchText}
+              onChange={handleSearch}
+            />
+          </div>
+          {
+            isFetching ? (
+              <div className="loader-container">
+                <Loader size={48} />
+              </div>
+            ) : data && data.length ? (
+              <Paper sx={{ boxShadow: 'none', overflow: 'hidden' }}>
+                <TableContainer
+                  component={Paper}
+                  sx={{
+                    boxShadow: "none",
+                    borderRadius: 0,
+                    width: "100%",
+                    height: "max-content",
+                  }}
+                >
+                  <Table
+                    sx={{ minWidth: 700, height: "max-content" }}
+                    aria-label="customized table"
                   >
-                    <Table
-                      sx={{ minWidth: 700, height: "max-content" }}
-                      aria-label="customized table"
-                    >
-                      <EnhancedTableHead
-                        order={order}
-                        orderBy={orderBy}
-                        rowCount={data.length}
-                        onRequestSort={handleRequestSort}
-                      />
-                      <TableBody>
-                        {isSuccess &&
-                          visibleRows.map((row, index) => {
-                            const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
-                            const expiredAt = row.subscription.length > 0 ? format(new Date(row.subscription[0].expiredAt), "dd MMM, yyyy hh:mm a") : ''
-                            const date = format(
-                              new Date(row.createdAt),
-                              "dd MMM, yyyy hh:mm a"
-                            );
-                            return (
-                              <StyledTableRow key={index}>
-                                <StyledTableCell align="center">
-                                  {index + 1}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.firstname + ' ' + row.lastname}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.email}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.role}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {`${row.status === 'APPROVED' ? 'VERIFIED' : row.status}`}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {row.invite_count}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  <Link to={`/profile/${row.id}/subscriptions`} >
-                                    {row.subscription.length > 0 ? expiredAt : 'No Subscription'}
-                                  </Link>
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {lastSeen}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  {date}
-                                </StyledTableCell>
-                                <StyledTableCell align="center">
-                                  <Button href={`/profile/${row.id}`} variant='contained' className='btn'>Edit</Button>
-                                </StyledTableCell>
-                              </StyledTableRow>
-                            );
-                          })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 15]}
-                    component="div"
-                    count={data.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage="Users per page"
-                  />
-                </Paper>
-              ) : (
-                <div>
-                  <div className="loader-container">
-                    <EmptyFeedback
-                      message="You don't have any users yet"
-                    // btnText='Create Placeholder'
-                    // action={() => setPlaceholderModal(true)}
+                    <EnhancedTableHead
+                      order={order}
+                      orderBy={orderBy}
+                      rowCount={data.length}
+                      onRequestSort={handleRequestSort}
                     />
-                  </div>
+                    <TableBody>
+                      {isSuccess &&
+                        visibleRows.map((row, index) => {
+                          const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
+                          const expiredAt = row.subscription.length > 0 ? format(new Date(row.subscription[0].expiredAt), "dd MMM, yyyy hh:mm a") : ''
+                          const date = format(
+                            new Date(row.createdAt),
+                            "dd MMM, yyyy hh:mm a"
+                          );
+                          return (
+                            <StyledTableRow key={index}>
+                              <StyledTableCell align="center">
+                                {index + 1}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {row.firstname + ' ' + row.lastname}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {row.email}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {row.role}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {`${row.status === 'APPROVED' ? 'VERIFIED' : row.status}`}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {row.invite_count}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                <Link underline="hover" href={`/users/${row.id}/subscriptions`} >
+                                  {row.subscription.length > 0 ? expiredAt : 'No Subscription'}
+                                </Link>
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {lastSeen}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {date}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                <Button href={`/users/${row.id}`} variant='contained' className='btn'>Edit</Button>
+                              </StyledTableCell>
+                            </StyledTableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 15]}
+                  component="div"
+                  count={data.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="Users per page"
+                />
+              </Paper>
+            ) : (
+              <div>
+                <div className="loader-container">
+                  <EmptyFeedback
+                    message="You don't have any users yet"
+                  // btnText='Create Placeholder'
+                  // action={() => setPlaceholderModal(true)}
+                  />
                 </div>
-              )}
-          </ListingWrapper>
-        )}
-      </>
-    </DashboardLayout>
+              </div>
+            )}
+        </ListingWrapper>
+      )}
+    </>
   )
 }
 

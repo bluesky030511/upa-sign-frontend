@@ -132,44 +132,16 @@ export const MainRoutes = () => {
       element: (
         <ProtectedRoute>
           {user.role === "ADMIN" ? (
-            <Users />
-          ) : (
-            <Navigate to="not-found" />
-          )}
-        </ProtectedRoute>
-      )
-    },
-    {
-      path: "/templates",
-      element: (
-        <ProtectedRoute>
-          {user.isAgent ? <Templates /> : <Navigate to="/not-found" />}
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/tutorial",
-      element: (
-        <ProtectedRoute>
-          {user.isAgent ? <Tutorial /> : <Navigate to="/not-found" />}
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/profile",
-      element: (
-        <ProtectedRoute>
-          {user.role === "AGENT" || user.role === 'ADMIN' ? (
             <SettingRoot />
           ) : (
-            <Navigate to="/not-found" />
+            <Navigate to="not-found" />
           )}
         </ProtectedRoute>
       ),
       children: [
         {
           path: "",
-          element: <Settings />,
+          element: <Users />,
         },
         {
           path: ":id",
@@ -203,6 +175,40 @@ export const MainRoutes = () => {
                 <Navigate to="/not-found" />
               )}
             </ProtectedRoute>),
+        },
+      ]
+    },
+    {
+      path: "/templates",
+      element: (
+        <ProtectedRoute>
+          {user.isAgent ? <Templates /> : <Navigate to="/not-found" />}
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/tutorial",
+      element: (
+        <ProtectedRoute>
+          {user.isAgent ? <Tutorial /> : <Navigate to="/not-found" />}
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/profile",
+      element: (
+        <ProtectedRoute>
+          {user.role === "AGENT" || user.role === 'ADMIN' ? (
+            <SettingRoot />
+          ) : (
+            <Navigate to="/not-found" />
+          )}
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          path: "",
+          element: <Settings />,
         },
         {
           path: "change-password",
