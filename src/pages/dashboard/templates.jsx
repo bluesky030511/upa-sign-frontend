@@ -85,11 +85,6 @@ const Templates = () => {
     });
   };
 
-  const handleDownload = () => {
-    alert(45);
-  };
-  console.log(user);
-  console.log(!isSubscribed(subscription));
   return (
     <DashboardLayout>
       {isFetching ? (
@@ -290,12 +285,7 @@ const Templates = () => {
                               <IconButton
                                 aria-label="upload picture"
                                 component="a"
-                                // href={`${S3_BUCKET_URL}/${template.id}/${template.filename}`}
-                                onClick={() =>
-                                  handleDownload(
-                                    `${S3_BUCKET_URL}/${template.id}/${template.filename}`
-                                  )
-                                }
+                                href={`${S3_BUCKET_URL}/${template.id}/${template.filename}`}
                                 sx={{
                                   position: "absolute",
                                   top: 2,
