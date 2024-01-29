@@ -200,7 +200,11 @@ const Templates = () => {
               data.map((template, index) => (
                 <Grid item key={index}>
                   <div className="template-btn">
-                    <figure onClick={() => openDetails(template)}>
+                    <figure
+                      onClick={() =>
+                        user.role === "ADMIN" ? openDetails(template) : null
+                      }
+                    >
                       <div className="overlay">
                         <div className="inner-content">
                           {user.role === "AGENT" && (

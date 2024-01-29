@@ -270,7 +270,7 @@ const Users = () => {
   return (
     <DashboardLayout>
       <>
-        <SubscriptionAlert />
+        {user.role === "ADMIN" ? null : <SubscriptionAlert />}
         {user && user.role === "ADMIN" && (
           <ListingWrapper>
             <div className="search-container">
