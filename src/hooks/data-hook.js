@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "react-query";
-import { API_ENDPOINTS } from "../utils/variables";
+import { API_ENDPOINTS, BASE_URL } from "../utils/variables";
 import http from "../utils/http";
+import axios from "axios";
 
 //Get All Contracts
 const getContracts = async () => {
@@ -153,6 +154,20 @@ export const useDeletePlaceholder = () => {
   return useMutation(deletePlaceholder);
 };
 
+export const getPlaceholdersByContractId = async (id, accessToken) => {
+  const { data } = await axios.get(`${BASE_URL}${API_ENDPOINTS.PLACEHOLDER}/contract/${id}`, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+  return data;
+}
+
+export const useGetPlaceholdersByContractId = (id, accessToken) => {
+  return useQuery('placeholders-by-contract-id', () => getPlaceholdersByContractId(id, accessToken))
+}
+
 export const useGetUsers = () => {
   return useQuery("users", getUsers);
 };
@@ -187,3 +202,21 @@ export const getPaymentGatewayClient = async () => {
 export const useGetPaymentGatewayClient = () => {
   return useQuery("payment-gateway-client", getPaymentGatewayClient);
 };
+
+export const getSubscriptions = async (id) => {
+  const { data } = await http.get(`${API_ENDPOINTS.SUBSCRIPTION}/${id}`)
+  return data;
+}
+
+export const useGetSubscriptions = (id) => {
+  return useQuery('user-subscriptions', () => getSubscriptions(id))
+}
+
+export const deleteSubscription = async (id) => {
+  const { data } = await http.delete(`${API_ENDPOINTS.SUBSCRIPTION}/${id}`)
+  return data;
+}
+
+export const useDeleteSubscription = () => {
+  return useMutation(deleteSubscription)
+}

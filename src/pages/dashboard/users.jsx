@@ -13,6 +13,8 @@ import {
   TableRow,
   TableSortLabel,
   TableBody,
+  TablePagination,
+  Button,
 } from "@mui/material";
 import SearchInput from "../../components/inputs/search-input";
 import { useGetUsers } from "../../hooks/data-hook";
@@ -21,8 +23,9 @@ import { Loader } from "../../shared-components/loader/loader";
 import { styled as muiStyled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import { visuallyHidden } from "@mui/utils";
-import { compareDesc, format } from "date-fns";
-import PlaceholderDropdown from "../../components/dropdowns/placeholder-dropdown";
+import { compareDesc, format } from 'date-fns';
+import { Link } from '@mui/material';
+
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -248,6 +251,17 @@ const Users = () => {
     setSearchText(e.target.value);
   };
 
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+
   const visibleRows = useMemo(() => {
     if (data) {
       const filteredList = filterList(data, searchText);
@@ -282,11 +296,12 @@ const Users = () => {
               />
             </div>
             {isFetching ? (
+
               <div className="loader-container">
                 <Loader size={48} />
               </div>
             ) : data && data.length ? (
-              <Paper sx={{ boxShadow: "none", overflow: "hidden" }}>
+              <Paper sx={{ boxShadow: 'none', overflow: 'hidden' }}>
                 <TableContainer
                   component={Paper}
                   sx={{
@@ -309,17 +324,9 @@ const Users = () => {
                     <TableBody>
                       {isSuccess &&
                         visibleRows.map((row, index) => {
-                          const lastSeen = format(
-                            new Date(row.lastseen),
-                            "dd MMM, yyyy hh:mm a"
-                          );
-                          const expiredAt =
-                            row.subscription.length > 0
-                              ? format(
-                                  new Date(row.subscription[0].expiredAt),
-                                  "dd MMM, yyyy hh:mm a"
-                                )
-                              : "";
+                          const lastSeen = format(new Date(row.lastseen), "dd MMM, yyyy hh:mm a")
+                          const expiredAt = row.subscription.length > 0 ? format(new Date(row.subscription[0].expiredAt), "dd MMM, yyyy hh:mm a") : ''
+
                           const date = format(
                             new Date(row.createdAt),
                             "dd MMM, yyyy hh:mm a"
@@ -330,7 +337,7 @@ const Users = () => {
                                 {index + 1}
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                {row.firstname + " " + row.lastname}
+                                {row.firstname + ' ' + row.lastname}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {row.email}
@@ -339,19 +346,15 @@ const Users = () => {
                                 {row.role}
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                {`${
-                                  row.status === "APPROVED"
-                                    ? "VERIFIED"
-                                    : row.status
-                                } `}
+                                {`${row.status === 'APPROVED' ? 'VERIFIED' : row.status}`}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {row.invite_count}
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                {row.subscription.length > 0
-                                  ? expiredAt
-                                  : "No Subscription"}
+                                <Link underline="hover" href={`/users/${row.id}/subscriptions`} >
+                                  {row.subscription.length > 0 ? expiredAt : 'No Subscription'}
+                                </Link>
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {lastSeen}
@@ -360,19 +363,7 @@ const Users = () => {
                                 {date}
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                {user.isAgent ? (
-                                  <PlaceholderDropdown
-                                    id={row.id}
-                                    key={row.id}
-                                    dataKey={row.key}
-                                    refetch={refetch}
-                                    name={row.name}
-                                    value={row.value}
-                                    customerFilled={row.isCustomerFilled}
-                                  />
-                                ) : (
-                                  ""
-                                )}
+                                <Button href={`/users/${row.id}`} variant='contained' className='btn'>Edit</Button>
                               </StyledTableCell>
                             </StyledTableRow>
                           );
@@ -380,24 +371,33 @@ const Users = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 15]}
+                  component="div"
+                  count={data.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="Users per page"
+                />
               </Paper>
             ) : (
               <div>
                 <div className="loader-container">
                   <EmptyFeedback
                     message="You don't have any users yet"
-                    // btnText='Create Placeholder'
-                    // action={() => setPlaceholderModal(true)}
+                  // btnText='Create Placeholder'
+                  // action={() => setPlaceholderModal(true)}
                   />
                 </div>
               </div>
             )}
-          </ListingWrapper>
-        )}
-      </>
-    </DashboardLayout>
-  );
-};
+        </ListingWrapper>
+      )}
+    </>
+  )
+}
 
 export default Users;
 
