@@ -282,20 +282,21 @@ const Users = () => {
   };
 
   return (
-    <>
-      <SubscriptionAlert />
-      {user && (user.role === 'ADMIN') && (
-        <ListingWrapper>
-          <div className="search-container">
-            <SearchInput
-              placeholder="Search"
-              id="search-contracts"
-              value={searchText}
-              onChange={handleSearch}
-            />
-          </div>
-          {
-            isFetching ? (
+    <DashboardLayout>
+      <>
+        {user.role === "ADMIN" ? null : <SubscriptionAlert />}
+        {user && user.role === "ADMIN" && (
+          <ListingWrapper>
+            <div className="search-container">
+              <SearchInput
+                placeholder="Search"
+                id="search-contracts"
+                value={searchText}
+                onChange={handleSearch}
+              />
+            </div>
+            {isFetching ? (
+
               <div className="loader-container">
                 <Loader size={48} />
               </div>
