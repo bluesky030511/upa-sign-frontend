@@ -22,6 +22,7 @@ const schema = yup.object({
   lastname: yup.string().required("Please enter last name"),
   address: yup.string().required("Please enter your address"),
   gender: yup.string().required("Please enter your gender"),
+  status: yup.string().required("Please enter valid status"),
   email: yup
     .string()
     .required("Please enter your email")
@@ -50,6 +51,7 @@ const SettingUser = () => {
       state: "",
       country: "",
       zipCode: "",
+      status: ""
     },
     resolver: yupResolver(schema),
   });
@@ -71,6 +73,7 @@ const SettingUser = () => {
         address: data.address,
         phoneNumber: data.phoneNumber,
         city: data.city,
+        status: data.status,
         state: data.state,
         country: data.country,
         zipCode: data.zipCode,
@@ -178,6 +181,42 @@ const SettingUser = () => {
                     <MenuItem value="">Gender</MenuItem>
                     <MenuItem value="MALE">Male</MenuItem>
                     <MenuItem value="FEMALE">Female</MenuItem>
+                  </Select>
+                  <span className="error-text">
+                    {fieldState.error && fieldState.error.message}
+                  </span>
+                </>
+              )}
+            />
+            <Controller
+              name="status"
+              control={control}
+              render={({ field, fieldState }) => (
+                <>
+                  <Select
+                    displayEmpty
+                    {...field}
+                    fullWidth
+                    sx={{
+                      bgcolor: colors.translucentBlue,
+                      marginTop: "27px",
+                      fontFamily: fonts.medium,
+                      color: colors.fadeBlack,
+                      fontSize: 16,
+                      "& fieldset": {
+                        display: "none",
+                      },
+                    }}
+                    inputProps={{
+                      sx: {
+                        color: colors.foreBlack,
+                      },
+                    }}
+                  >
+                    <MenuItem value="">Status</MenuItem>
+                    <MenuItem value="APPROVED">Verified</MenuItem>
+                    <MenuItem value="PENDING">Pending</MenuItem>
+                    <MenuItem value="DISABLED">Disabled</MenuItem>
                   </Select>
                   <span className="error-text">
                     {fieldState.error && fieldState.error.message}
