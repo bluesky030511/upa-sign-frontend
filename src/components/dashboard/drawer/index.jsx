@@ -16,7 +16,7 @@ import {
   DescriptionOutlined,
   AutoAwesomeMosaicOutlined,
   Settings,
-  PlaceOutlined
+  PlaceOutlined,
 } from "@mui/icons-material";
 import DvrIcon from "@mui/icons-material/Dvr";
 import styled from "styled-components";
@@ -101,17 +101,39 @@ const LeftDrawer = (props) => {
                 />
               </>
             )}
-            <CustomLink
-              to="/templates"
-              item={{ name: "Templates", icon: <AutoAwesomeMosaicOutlined /> }}
-            />
-            { user.role === 'ADMIN' && (
-              <CustomLink 
-                to='/users'
-                item={{ name: 'Users', icon: <Settings /> }}
+
+            {user.role !== "CUSTOMER" && (
+              <>
+                <CustomLink
+                  to="/templates"
+                  item={{
+                    name: "Templates",
+                    icon: <AutoAwesomeMosaicOutlined />,
+                  }}
+                />
+              </>
+            )}
+            {user.role === "CUSTOMER" && (
+              <>
+                <CustomLink
+                  to="/documents"
+                  item={{
+                    name: "Documents",
+                    icon: <AutoAwesomeMosaicOutlined />,
+                  }}
+                />
+              </>
+            )}
+
+            {user.role === "ADMIN" && (
+              <CustomLink
+                to="/users"
+                item={{ name: "Users", icon: <Settings /> }}
               />
-            ) }
-            {(user.role === "AGENT" || user.role === "ADMIN") && (
+            )}
+            {(user.role === "AGENT" ||
+              user.role === "ADMIN" ||
+              user.role === "CUSTOMER") && (
               <>
                 <CustomLink
                   to="/profile"
@@ -131,6 +153,7 @@ const LeftDrawer = (props) => {
 
   const container = window !== undefined ? window().document.body : undefined;
 
+  // alert(user.role);
   return (
     <>
       {!user.isShadow && (

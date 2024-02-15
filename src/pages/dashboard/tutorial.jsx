@@ -5,8 +5,11 @@ import { Link } from "react-router-dom";
 import { getRem } from "../../utils/helper";
 import DashboardLayout from "../../components/dashboard/layout";
 import { colors, fonts } from "../../utils/theme";
+import { useUI } from "../../context/ui.context";
 
 const Tutorial = () => {
+  const { user } = useUI();
+
   return (
     <DashboardLayout>
       <TutorialWrapper>
@@ -22,22 +25,30 @@ const Tutorial = () => {
           <Link to="/">UPA sign</Link>, empowering you to make the most of this
           cutting-edge solution.
         </p>
-        <div className="sub-title">
-          <h4 className="h4">Template Uploading</h4>
-        </div>
-        <div className="video-container">
-          <video controls={true} autoPlay>
-            <source src="https://ai-sign-tech-storage.s3.us-west-2.amazonaws.com/tutorial/upload-templete.mp4" />
-          </video>
-        </div>
-        <div className="sub-title">
-          <h4 className="h4">Creating And Sending Contract</h4>
-        </div>
-        <div className="video-container">
-          <video controls={true}>
-            <source src="https://ai-sign-tech-storage.s3.us-west-2.amazonaws.com/tutorial/create-and-sent-contract.mp4" />
-          </video>
-        </div>
+
+        {user.role !== "CUSTOMER" ? (
+          <>
+            <div className="sub-title">
+              <h4 className="h4">Template Uploading</h4>
+            </div>
+            <div className="video-container">
+              <video controls={true} autoPlay>
+                <source src="https://ai-sign-tech-storage.s3.us-west-2.amazonaws.com/tutorial/upload-templete.mp4" />
+              </video>
+            </div>
+            <div className="sub-title">
+              <h4 className="h4">Creating And Sending Contract</h4>
+            </div>
+            <div className="video-container">
+              <video controls={true}>
+                <source src="https://ai-sign-tech-storage.s3.us-west-2.amazonaws.com/tutorial/create-and-sent-contract.mp4" />
+              </video>
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
+
         <div className="sub-title">
           <h4 className="h4">Siging Contract</h4>
         </div>
@@ -46,7 +57,6 @@ const Tutorial = () => {
             <source src="https://ai-sign-tech-storage.s3.us-west-2.amazonaws.com/tutorial/sign-contract.mp4" />
           </video>
         </div>
-        
       </TutorialWrapper>
     </DashboardLayout>
   );

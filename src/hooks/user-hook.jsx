@@ -93,10 +93,6 @@ export const useGetProfile = ({id, onSuccess, onError}) => {
     });
 };
 
-export const useGetUserProfile = ({id}) => {
-    return useQuery("userProfile", () => getProfile(id));
-  };
-
 export const useGetSubscription = ({
                                        subscriptionSuccess,
                                        subscriptionError,

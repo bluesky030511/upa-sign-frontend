@@ -35,7 +35,7 @@ function CustomNavLink({ children, to }) {
 const Header = () => {
   const { user } = useUI();
   const [open, setOpen] = useState(false);
-
+  // console.log(user.role);
   const toggleDrawer = (event) => {
     if (
       event &&
@@ -108,7 +108,13 @@ const Header = () => {
           >
             {user.loggedIn ? (
               <>
-                <Link to={user.role === "AGENT" ? "/documents" : "/templates"}>
+                <Link
+                  to={
+                    user.role === "AGENT" || user.role === "CUSTOMER"
+                      ? "/documents"
+                      : "/templates"
+                  }
+                >
                   <AuthButton>Dashboard</AuthButton>
                 </Link>
               </>
