@@ -28,7 +28,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const ContractDetailsModal = ({ open, id, handleClose, data }) => {
-
+  console.log("====================================");
+  console.log(data);
+  console.log("====================================");
   return (
     <Dialog
       open={open}
