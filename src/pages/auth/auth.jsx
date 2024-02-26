@@ -52,7 +52,13 @@ const Auth = () => {
     );
   } else {
     return (
-      <Navigate to={user.role === "AGENT" ? "/documents" : "/templates"} />
+      <Navigate
+        to={
+          user.role === "AGENT" || user.role === "CUSTOMER"
+            ? "/documents"
+            : "/templates"
+        }
+      />
     );
   }
 };
