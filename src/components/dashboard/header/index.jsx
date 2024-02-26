@@ -130,24 +130,25 @@ const DashboardHeader = ({ handleDrawerToggle }) => {
                 },
               }}
             >
-              {user.role === "AGENT" && (
-                <MenuItem
-                  sx={{
-                    borderBottom: "1px solid rgba(0,0,0,0.1)",
-                    p: 0,
-                    minHeight: 24,
-                    "& a": {
-                      fontFamily: fonts.medium,
-                      fontSize: "11px",
-                      color: colors.foreBlack,
-                      p: "8px 16px",
-                      width: "100%",
-                    },
-                  }}
-                >
-                  <Link to="/profile">Profile</Link>
-                </MenuItem>
-              )}
+              {user.role === "AGENT" ||
+                (user.role === "CUSTOMER" && (
+                  <MenuItem
+                    sx={{
+                      borderBottom: "1px solid rgba(0,0,0,0.1)",
+                      p: 0,
+                      minHeight: 24,
+                      "& a": {
+                        fontFamily: fonts.medium,
+                        fontSize: "11px",
+                        color: colors.foreBlack,
+                        p: "8px 16px",
+                        width: "100%",
+                      },
+                    }}
+                  >
+                    <Link to="/profile">Profile</Link>
+                  </MenuItem>
+                ))}
               <MenuItem
                 sx={{
                   fontFamily: fonts.medium,

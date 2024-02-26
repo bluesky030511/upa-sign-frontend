@@ -51,9 +51,6 @@ import NotFound from "../pages/error/not-found";
 import PlaceHolders from "../pages/dashboard/placeholders";
 import Users from "../pages/dashboard/users";
 import PaymentGateway from "../pages/dashboard/setting/payment-gateway";
-import SettingUser from "../pages/dashboard/setting/setting-user";
-import ChangeUserPassword from "../pages/dashboard/setting/change-user-password";
-import Subscriptions from "../pages/dashboard/setting/subscriptions";
 
 export const MainRoutes = () => {
   const { user } = useUI();
@@ -97,7 +94,7 @@ export const MainRoutes = () => {
       path: "/documents",
       element: (
         <ProtectedRoute>
-          {user.role === "AGENT" ? (
+          {user.role === "AGENT" || user.role === "CUSTOMER" ? (
             <DocumentRoot />
           ) : (
             <Navigate to="not-found" />
@@ -116,7 +113,7 @@ export const MainRoutes = () => {
       ],
     },
     {
-      path: '/placeholders',
+      path: "/placeholders",
       element: (
         <ProtectedRoute>
           {user.role === "AGENT" ? (
@@ -125,58 +122,15 @@ export const MainRoutes = () => {
             <Navigate to="not-found" />
           )}
         </ProtectedRoute>
-      )
+      ),
     },
     {
-      path: '/users',
+      path: "/users",
       element: (
         <ProtectedRoute>
-          {user.role === "ADMIN" ? (
-            <SettingRoot />
-          ) : (
-            <Navigate to="not-found" />
-          )}
+          {user.role === "ADMIN" ? <Users /> : <Navigate to="not-found" />}
         </ProtectedRoute>
       ),
-      children: [
-        {
-          path: "",
-          element: <Users />,
-        },
-        {
-          path: ":id",
-          element: (
-            <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
-                <SettingUser />
-              ) : (
-                <Navigate to="/not-found" />
-              )}
-            </ProtectedRoute>),
-        },
-        {
-          path: ":id/change-password",
-          element: (
-            <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
-                <ChangeUserPassword />
-              ) : (
-                <Navigate to="/not-found" />
-              )}
-            </ProtectedRoute>),
-        },
-        {
-          path: ":id/subscriptions",
-          element: (
-            <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
-                <Subscriptions />
-              ) : (
-                <Navigate to="/not-found" />
-              )}
-            </ProtectedRoute>),
-        },
-      ]
     },
     {
       path: "/templates",
@@ -190,7 +144,11 @@ export const MainRoutes = () => {
       path: "/tutorial",
       element: (
         <ProtectedRoute>
-          {user.isAgent ? <Tutorial /> : <Navigate to="/not-found" />}
+          {user.isAgent || user.role === "CUSTOMER" ? (
+            <Tutorial />
+          ) : (
+            <Navigate to="/not-found" />
+          )}
         </ProtectedRoute>
       ),
     },
@@ -198,7 +156,9 @@ export const MainRoutes = () => {
       path: "/profile",
       element: (
         <ProtectedRoute>
-          {user.role === "AGENT" || user.role === 'ADMIN' ? (
+          {user.role === "AGENT" ||
+          user.role === "ADMIN" ||
+          user.role === "CUSTOMER" ? (
             <SettingRoot />
           ) : (
             <Navigate to="/not-found" />
@@ -218,7 +178,7 @@ export const MainRoutes = () => {
           path: "payment-gateway",
           element: (
             <ProtectedRoute>
-              {user.role === 'ADMIN' ? (
+              {user.role === "ADMIN" ? (
                 <PaymentGateway />
               ) : (
                 <Navigate to="/not-found" />
