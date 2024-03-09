@@ -268,6 +268,8 @@ const Users = () => {
   };
 
   return (
+
+<DashboardLayout>
     <>
       {user.role === "ADMIN" ? null : <SubscriptionAlert />}
       {user && (user.role === 'ADMIN') && (
