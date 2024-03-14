@@ -11,22 +11,27 @@ import { colors, fonts } from "../../utils/theme";
 import PrimaryInput from "../inputs/primary-input";
 import PrimaryButton from "../buttons/primary-button";
 
-const schema = yup.object({
-  firstname: yup.string().required("Please enter first name"),
-  lastname: yup.string().required("Please enter last name"),
-  address: yup.string().required("Please enter your address"),
-  gender: yup.string().required("Please enter your gender"),
-  email: yup
-    .string()
-    .required("Please enter your email")
-    .email("Please enter valid email"),
-  phoneNumber: yup.string().required("Please enter phone number"),
-  city: yup.string().required("Please enter your city"),
-  country: yup.string().required("Please enter your country"),
-  state: yup.string().required("Please enter your state"),
-  zipCode: yup.string().required("Please enter your zip code"),
-});
-const ContactForm = ({ handleNext, handleInviteData, inviteData }) => {
+
+
+const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalFields=[] }) => {
+  const additionalFieldValidations = additionalFields.reduce((acc, fl) => { acc[fl.key] = yup.string().required(`Please enter ${fl.name}`); return acc }, {})
+  const schema = yup.object({
+    firstname: yup.string().required("Please enter first name"),
+    lastname: yup.string().required("Please enter last name"),
+    address: yup.string().required("Please enter your address"),
+    gender: yup.string().required("Please enter your gender"),
+    email: yup
+      .string()
+      .required("Please enter your email")
+      .email("Please enter valid email"),
+    phoneNumber: yup.string().required("Please enter phone number"),
+    city: yup.string().required("Please enter your city"),
+    country: yup.string().required("Please enter your country"),
+    state: yup.string().required("Please enter your state"),
+    zipCode: yup.string().required("Please enter your zip code"),
+    ...additionalFieldValidations
+  });
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       firstname: (inviteData && inviteData.firstname) || "",
@@ -200,6 +205,21 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData }) => {
           </>
         )}
       />
+      {additionalFields && additionalFields.length > 0 && additionalFields.map((fl) => {
+        return (
+          <Controller
+            name={fl.key}
+            control={control}
+            render={({ field, fieldState }) => (
+              <PrimaryInput
+                {...field}
+                placeholder={fl.name}
+                helperText={fieldState.error && fieldState.error.message}
+              />
+            )}
+          />
+        )
+      })}
 
       <div className="btn-container">
         <PrimaryButton type="submit">Save</PrimaryButton>
