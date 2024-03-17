@@ -418,7 +418,7 @@ const DocumentsListing = () => {
             <div className="loader-container">
               <EmptyFeedback
                 message="You don't have any contracts yet."
-                btnText="Create Contract"
+                btnText={user.role === "CUSTOMER" ? null : "Create Contract"}
                 action={() => navigate("/templates")}
               />
             </div>
