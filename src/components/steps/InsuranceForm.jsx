@@ -22,14 +22,14 @@ const schema = yup.object({
     .default(undefined),
   causeOfLoss: yup.string().required("Please enter cause of loss"),
 });
-const InsuranceForm = ({ handleInviteData, handleOpenModal }) => {
+const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
   const { control, handleSubmit } = useForm({
     defaultValues: {
-      insuranceCompany: "",
-      policyNumber: "",
-      claimNo: "",
-      dateOfLoss: null,
-      causeOfLoss: "",
+      insuranceCompany: (inviteData && inviteData.insuranceCompany) || "",
+      policyNumber: (inviteData && inviteData.policyNumber) || "",
+      claimNo: (inviteData && inviteData.claimNo) || "",
+      dateOfLoss: (inviteData && inviteData.dateOfLoss) || "",
+      causeOfLoss: (inviteData && inviteData.causeOfLoss) || "",
     },
     resolver: yupResolver(schema),
   });

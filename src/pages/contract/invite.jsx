@@ -121,7 +121,7 @@ const Invite = () => {
         },
       }
     );
-    return data;
+    return data; 
   };
 
   const { mutate: SignContract, isLoading: isSigning } =
@@ -155,7 +155,7 @@ const Invite = () => {
         <SignModal
           open={confirmModal}
           handleClose={handleCloseModal}
-          handleSignContract={handleSignContract}
+          handleAction={handleSignContract}
           loading={isSigning}
         />
         <Box sx={{ width: 500, mb: 4 }}>

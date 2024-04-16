@@ -6,10 +6,8 @@ import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
 import PrimaryButton from "../buttons/primary-button";
 
-const SignModal = ({ open, handleClose, handleSignContract, loading }) => {
-  const handleAction = () => {
-    handleSignContract();
-  };
+const SignModal = ({ open, handleClose, handleAction, loading, actionText }) => {
+  
   return (
     <Dialog
       onClose={handleClose}
@@ -27,7 +25,7 @@ const SignModal = ({ open, handleClose, handleSignContract, loading }) => {
             <CheckRoundedIcon sx={{ color: colors.checkGreen, fontSize: 56 }} />
           </div>
           <h4>Confirm?</h4>
-          <p>Are you sure you want to sign this contract?</p>
+          <p>{actionText ? actionText : 'Are you sure you want to sign this contract?'}</p>
           <div className="btn-wrap">
             <div className="btn-container">
               <PrimaryButton
