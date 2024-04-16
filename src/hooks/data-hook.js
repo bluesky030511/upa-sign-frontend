@@ -155,12 +155,17 @@ export const useDeletePlaceholder = () => {
 };
 
 export const getPlaceholdersByContractId = async (id, accessToken) => {
-  const { data } = await axios.get(`${BASE_URL}${API_ENDPOINTS.PLACEHOLDER}/contract/${id}`, {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
+  if(accessToken) {
+    const { data } = await axios.get(`${BASE_URL}${API_ENDPOINTS.PLACEHOLDER}/contract/${id}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    return data;
+  }
+
+  const { data } = await http.get(`${API_ENDPOINTS.PLACEHOLDER}/contract/${id}`);
   return data;
 }
 

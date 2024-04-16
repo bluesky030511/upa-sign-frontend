@@ -12,7 +12,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import format from "date-fns/format";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import Tooltip from "@mui/material/Tooltip";
@@ -142,6 +142,7 @@ function filterList(list, query) {
 }
 
 const DocumentDetails = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
@@ -208,7 +209,7 @@ const DocumentDetails = () => {
             fontFamily: fonts.medium,
           }}
           startIcon={<AddRoundedIcon />}
-          onClick={handleOpen}
+          onClick={() => navigate(`/contract/${id}`)}
         >
           Invite
         </Button>
@@ -359,7 +360,7 @@ const DocumentDetails = () => {
             <EmptyFeedback
               message="You haven't invited anyone to sign this contract."
               btnText="Invite"
-              action={handleOpen}
+              action={() => navigate(`/contract/${id}`)}
             />
           </div>
         )}

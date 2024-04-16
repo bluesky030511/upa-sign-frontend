@@ -9,7 +9,7 @@ import ConfirmationModal from '../modals/confirmation-modal';
 import PlaceholderConfirmationModal from '../modals/placeholder-confirmation-modal';
 import PlaceholderModal from '../modals/placeholder-modal';
 
-const PlaceholderDropdown = ({ id, dataKey, name, value, customerFilled, refetch}) => {
+const PlaceholderDropdown = ({ id, dataKey, name, value, refetch, filledBy}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [placeholderConfirmationModal, setplaceholderConfirmationModal] = useState({
@@ -65,7 +65,7 @@ const PlaceholderDropdown = ({ id, dataKey, name, value, customerFilled, refetch
         dataKey={dataKey}
         name={name}
         value={value}
-        customerFilled={customerFilled}
+        filledBy={filledBy}
         handleClose={closePlaceholderEditModal}
         refetch={refetch}
       />

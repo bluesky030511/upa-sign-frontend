@@ -54,6 +54,7 @@ import PaymentGateway from "../pages/dashboard/setting/payment-gateway";
 import SettingUser from "../pages/dashboard/setting/setting-user";
 import ChangeUserPassword from "../pages/dashboard/setting/change-user-password";
 import Subscriptions from "../pages/dashboard/setting/subscriptions";
+import InviteByAgent from "../pages/contract/invite-by-agent";
 
 export const MainRoutes = () => {
   const { user } = useUI();
@@ -239,7 +240,15 @@ export const MainRoutes = () => {
       children: [
         {
           path: "",
-          element: <Invite />,
+          element:
+            <Invite />,
+        },
+        {
+          path: ":contractId",
+          element:
+            <ProtectedRoute>
+              { user.role === 'AGENT' || user.role === 'ADMIN' ? <InviteByAgent /> : <Navigate to="/not-found" /> }
+            </ProtectedRoute>
         },
         {
           path: "detail/:id/:token",
