@@ -1,16 +1,13 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack"; 
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
 import { useMutation, useQuery } from "react-query";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import styled from "styled-components";
 
-import ContactForm from "../../components/steps/ContactForm";
-import InsuranceForm from "../../components/steps/InsuranceForm";
+import { colors, fonts } from "../../utils/theme";
 import SignModal from "../../components/modals/sign-modal";
 import { useUI } from "../../context/ui.context";
 import { Loader } from "../../shared-components/loader/loader";
@@ -34,6 +31,16 @@ const Invite = () => {
   const handleInviteData = (values) => {
     setInviteData({ ...inviteData, ...values });
   };
+
+  const url = `${BASE_URL}/${contractId}.pdf`;
+  pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
+
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
 
   const handleOpenModal = () => {
     setConfirmModal(true);
@@ -109,7 +116,7 @@ const Invite = () => {
       if(!knownFields.includes(key)) {
         additionalFields[key] = input.data[key]
         delete input.data[key]
-      }
+      } 
     })
     const { data } = await axios.post(
       `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
@@ -158,31 +165,34 @@ const Invite = () => {
           handleAction={handleSignContract}
           loading={isSigning}
         />
-        <Box sx={{ width: 500, mb: 4 }}>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            <Step sx={{ "& svg": { width: 24, height: 24 } }}>
-              <StepLabel>Contact</StepLabel>
-            </Step>
-            <Step>
-              <StepLabel>Insurance</StepLabel>
-            </Step>
-          </Stepper>
+        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb:4, gap: 3 }}>
+          <Box sx={{ display: "flex", justifyContent: "right" }}>
+            <Button variant="contained" 
+              size="large"
+              sx={{
+                bgcolor: colors.themeBlue,
+                textTransform: "none",
+                fontFamily: fonts.medium,
+                minWidth: 120,
+                borderRadius: 1,
+              }} 
+              onClick={handleOpenModal}
+            >
+              Sign
+            </Button>
+          </Box>
+          <Document file={url} onLoadSuccess={onDocumentLoadSuccess} >
+            {Array.from(new Array(numPages), (el, index) => (
+              <PDF>
+                <Page
+                  key={`page_${index + 1}`}
+                  pageNumber={index + 1}
+                  width="800"
+                />  
+              </PDF>
+            ))}
+          </Document>
         </Box>
-        {activeStep === 0 && (
-          <ContactForm
-            handleNext={handleNext}
-            handleInviteData={handleInviteData}
-            inviteData={inviteData}
-            additionalFields={placeholders}
-          />
-        )}
-        {activeStep === 1 && (
-          <InsuranceForm
-            handleInviteData={handleInviteData}
-            handleOpenModal={handleOpenModal}
-            inviteData={inviteData}
-          />
-        )}
       </Container>
     )
   ) : (
@@ -197,4 +207,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+`;
+const PDF = styled.div`
+  margin-top: 10px
 `;
