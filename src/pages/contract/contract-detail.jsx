@@ -31,32 +31,30 @@ const ContractDetail = () => {
   };
 
   const downloadDoc = async (kind) => {
-    await axios.get(kind == "preview" ? `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/${kind}.pdf?id=${file}` : 
-      `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/disclaimer.pdf?inviteId=${inviteId}`)
-      .then(res => {
-        fetch(`${BASE_URL}/${kind}.pdf`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/pdf',
-          },
-        })
-        .then((response) => response.blob())
-        .then((blob) => {
-          const url = window.URL.createObjectURL(
-            new Blob([blob]),
-          );
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute(
-            'download',
-            kind == 'preview' ? `sign_contract.pdf` : 'certification.pdf',
-          );
+    try {
+      const url = kind === "preview"
+        ? `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/${kind}.pdf?id=${file}`
+        : `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/disclaimer.pdf?inviteId=${inviteId}`;
 
-          document.body.appendChild(link);
-          link.click();
-          link.parentNode.removeChild(link);
-        });
-      });
+      const response = await axios.get(url, { responseType: 'blob' });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+  
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute(
+        'download',
+        kind === 'preview' ? `sign_contract.pdf` : 'certification.pdf'
+      );
+  
+      document.body.appendChild(link);
+      link.click();
+  
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+    }
   }
 
   const { data, isFetching } = useQuery("contract-invite", getContract, {
