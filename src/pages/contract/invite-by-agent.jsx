@@ -22,12 +22,13 @@ const InviteByAgent = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
   const navigate = useNavigate();
-  const { showSuccessToast } = useToast();
+  const { showSuccessToast, showErrorToast } = useToast();
 
   const {
     mutate: InviteCustomer,
     error,
     isError,
+    isLoading: isInviting,
   } = useInviteCustomer()
 
   const handleNext = () => {
@@ -85,6 +86,11 @@ const InviteByAgent = () => {
           handleCloseModal();
           navigate(`/documents/details/${contractId}`)
         },
+        onError: (error, variables, context) => {
+          showErrorToast(error.response.data.message);
+          handleCloseModal();
+          navigate(`/documents/details/${contractId}`)
+        }
       }
     );
   }
@@ -102,7 +108,7 @@ const InviteByAgent = () => {
               open={confirmModal}
               handleClose={handleCloseModal}
               handleAction={onSubmit}
-              loading={false}
+              loading={isInviting}
               actionText="Are you sure you want to send invite?"
             />
             <Box sx={{ width: 500, mb: 4 }}>
