@@ -1,5 +1,6 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState} from "react";
+import { useWindowWidth } from '@wojtekmaj/react-hooks';
 import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack"; 
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
@@ -13,8 +14,10 @@ import { useUI } from "../../context/ui.context";
 import { Loader } from "../../shared-components/loader/loader";
 import PageLoader from "../../shared-components/loader/page-loader";
 import { useGetPlaceholdersByContractId } from "../../hooks/data-hook";
+import { min } from "date-fns";
 
 const Invite = () => {
+  const width = useWindowWidth();
   const [searchParam] = useSearchParams();
   const { setUser, removeUser } = useUI();
   let accessToken = searchParam.get("accessToken");
@@ -165,7 +168,7 @@ const Invite = () => {
           handleAction={handleSignContract}
           loading={isSigning}
         />
-        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb:4, gap: 3 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb:4, gap: 3}} >
           <Box sx={{ display: "flex", justifyContent: "right" }}>
             <Button variant="contained" 
               size="large"
@@ -187,7 +190,7 @@ const Invite = () => {
                 <Page
                   key={`page_${index + 1}`}
                   pageNumber={index + 1}
-                  width="800"
+                  width={Math.min( width > 600 ? width-375 : width - 40, 1000)} 
                 />  
               </PDF>
             ))}
@@ -209,5 +212,7 @@ const Container = styled.div`
   flex-direction: column;
 `;
 const PDF = styled.div`
-  margin-top: 10px
+  margin-top: 10px;
+  justify-content: center;
+  display: flex;
 `;
