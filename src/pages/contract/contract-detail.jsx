@@ -36,7 +36,7 @@ const ContractDetail = () => {
         ? `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/${kind}.pdf?id=${file}`
         : `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/disclaimer.pdf?inviteId=${inviteId}`;
 
-      const response = await axios.get(url, { responseType: 'blob' });
+      const response = await axios.get(url, { responseType: 'blob', headers: {Authorization: `Bearer ${token}`} });
       const blob = new Blob([response.data], { type: 'application/pdf' });
   
       const downloadUrl = window.URL.createObjectURL(blob);
