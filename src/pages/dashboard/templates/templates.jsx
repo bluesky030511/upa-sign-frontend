@@ -12,20 +12,20 @@ import IconButton from "@mui/material/IconButton";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import Tooltip from "@mui/material/Tooltip";
 
-import DashboardLayout from "../../components/dashboard/layout";
-import { colors, fonts } from "../../utils/theme";
-import { useDeleteTemplate, useGetTemplates } from "../../hooks/data-hook";
-import FileInvoice from "../../assets/images/file-invoice-solid_x.svg";
-import { useUI } from "../../context/ui.context";
-import TemplateModal from "../../components/modals/template-modal";
-import GuideLinesModal from "../../components/modals/guidelines-modal";
-import { useToast } from "../../context/toast.context";
-import { API_ENDPOINTS, S3_BUCKET_URL } from "../../utils/variables";
-import ContractModal from "../../components/modals/contract-modal";
-import SubscriptionAlert from "../../components/alerts/subscription-alert";
-import { useSubscription } from "../../context/subscription.context";
-import { isSubscribed } from "../../utils/helper";
-import ContractDetailsModal from "../../components/modals/contract-details-modal";
+import DashboardLayout from "../../../components/dashboard/layout";
+import { colors, fonts } from "../../../utils/theme";
+import { useDeleteTemplate, useGetTemplates } from "../../../hooks/data-hook";
+import FileInvoice from "../../../assets/images/file-invoice-solid_x.svg";
+import { useUI } from "../../../context/ui.context";
+import TemplateModal from "../../../components/modals/template-modal";
+import GuideLinesModal from "../../../components/modals/guidelines-modal";
+import { useToast } from "../../../context/toast.context";
+import { API_ENDPOINTS, S3_BUCKET_URL } from "../../../utils/variables";
+import ContractModal from "../../../components/modals/contract-modal";
+import SubscriptionAlert from "../../../components/alerts/subscription-alert";
+import { useSubscription } from "../../../context/subscription.context";
+import { isSubscribed } from "../../../utils/helper";
+import ContractDetailsModal from "../../../components/modals/contract-details-modal";
 
 const Templates = () => {
   const { user } = useUI();

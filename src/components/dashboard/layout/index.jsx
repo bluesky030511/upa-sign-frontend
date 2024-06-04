@@ -16,7 +16,7 @@ const DashboardLayout = ({ children }) => {
         mobileOpen={mobileOpen}
         handleDrawerToggle={handleDrawerToggle}
       />
-      <DashboardHeader handleDrawerToggle={handleDrawerToggle} />
+      <DashboardHeader handleDrawerToggle={handleDrawerToggle} width={252} />
       <ContentWrapper>
         <div className="inner-content">{children}</div>
       </ContentWrapper>
