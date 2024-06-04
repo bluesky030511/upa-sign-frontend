@@ -145,6 +145,16 @@ export const useUpdatePlaceholder = () => {
   return useMutation(updatePlaceholder);
 };
 
+export const createTemplate = async (userData) => {
+  console.log("userData: ", userData);
+  const { data } = await http.post(`${API_ENDPOINTS.TEMPLATE}/doc/${userData.id}`, userData.tempData);
+  return data;
+}
+
+export const useCreateTemplate = () => {
+  return useMutation(createTemplate);
+}
+
 export const deletePlaceholder = async (id) => {
   const { data } = await http.delete(`${API_ENDPOINTS.PLACEHOLDER}/${id}`);
   return data;

@@ -21,12 +21,12 @@ import { useToast } from "../../../context/toast.context";
 import styled from "styled-components";
 import { SHOWN } from "../../../utils/variables";
 
-const DashboardHeader = ({ handleDrawerToggle }) => {
+const DashboardHeader = ({ handleDrawerToggle, width }) => {
   const { user, removeUser } = useUI();
   const { showSuccessToast } = useToast();
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const drawerWidth = 252;
+  const drawerWidth = width;
 
   const handleClick = (event) => {
     if (user.isShadow) return;

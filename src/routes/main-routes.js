@@ -16,12 +16,13 @@ import Signup from "../pages/auth/signup";
 import ForgotPassword from "../pages/auth/forgot-password";
 
 //User Stack Screens
-import Templates from "../pages/dashboard/templates";
+import Templates from "../pages/dashboard/templates/templates";
 import SettingRoot from "../pages/dashboard/setting/setting-root";
 import Settings from "../pages/dashboard/setting/setting";
 import VerificationScreen from "../pages/auth/verfication-code";
 import ChangePassword from "../pages/dashboard/setting/change-password";
 import Tutorial from "../pages/dashboard/tutorial";
+import TemplateEdit from "../pages/dashboard/templates/template-edit";
 
 // Documents Pages
 import DocumentRoot from "../pages/dashboard/documents/document-root";
@@ -185,7 +186,15 @@ export const MainRoutes = () => {
         <ProtectedRoute>
           {user.isAgent ? <Templates /> : <Navigate to="/not-found" />}
         </ProtectedRoute>
-      ),
+      )
+    },
+    {
+      path: "/template-edit/:id/:name",
+      element: (
+        <ProtectedRoute>
+          {user.isAgent ? <TemplateEdit /> : <Navigate to="/not-fount" />}
+        </ProtectedRoute>
+      )
     },
     {
       path: "/tutorial",

@@ -7,6 +7,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Slide from "@mui/material/Slide";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { Controller, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUploadTemplate } from "../../hooks/data-hook";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
@@ -50,6 +51,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const TemplateModal = ({ open, handleClose }) => {
+  const navigate = useNavigate();
   const { showSuccessToast } = useToast();
   const queryClient = useQueryClient();
   const {
@@ -85,11 +87,13 @@ const TemplateModal = ({ open, handleClose }) => {
     data.append("name", values.name);
     data.append("file", values.file[0]);
     UploadTemplate(data, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log("data: ", data);
         reset();
         queryClient.invalidateQueries(["templates"]);
         showSuccessToast("Template Uploaded");
         handleClose();
+        navigate(`/template-edit/${data.filename.replace(/\.[^/.]+$/, "")}/${values.name}`)
       },
     });
   };
