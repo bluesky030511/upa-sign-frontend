@@ -54,8 +54,8 @@ const SignField = ({ item, selectedUser }) => {
   const dragConfig = React.useMemo(() => ({
     type: 'SIGN_FIELD',
     item: { id: item.id, name: selectedUser === 0 ? 
-      user[item.id] ? user[item.id] : 
-      item.id == 'name' ? `${user.firstname} ${user.lastname}` : 
+      // user[item.id] ? user[item.id] : 
+      // item.id == 'full_name' ? `${user.firstname} ${user.lastname}` : 
       `{agent_${item.id}}` : `{client_${item.id}}` },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
@@ -176,7 +176,7 @@ const EditDrawer = (props) => {
                 <SignField item={{ id:"signature", name:"Signature", icon: <DriveFileRenameOutlineIcon/>}} selectedUser={selectedUser} />
               </Grid>
               <Grid item xs={6}>
-                <SignField item={{ id:"name", name:"Full name", icon:<BoyIcon/>}} selectedUser={selectedUser} />
+                <SignField item={{ id:"full_name", name:"Full name", icon:<BoyIcon/>}} selectedUser={selectedUser} />
               </Grid>
               <Grid item xs={6}>
                 <SignField item={{ id:"phone_number", name:"Phone Number", icon:<PhoneIcon/>}} selectedUser={selectedUser} />

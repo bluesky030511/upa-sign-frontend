@@ -28,42 +28,21 @@ import { colors, fonts } from "../../../utils/theme";
 import EditDrawer from "./layout";
 
 const Field = ({ id, left, top, children }) => {
-  const ref = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'SIGN_FIELD',
     item: { id, left, top },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     })
-  }));
-
-  const [, drop] = useDrop({
-    accept: 'SIGN_FIELD',
-    drop: (item, monitor) => {
-      const delta = monitor.getDropResult();
-    },
-  });
-
-  useEffect(() => {
-    if (ref.current) {
-      setDimensions({
-        width: ref.current.offsetWidth,
-        height: ref.current.offsetHeight,
-      });
-    }
-  }, [children]);
-
-  drag(drop(ref));
+  }), [id, left, top]);
 
   return (
     <div 
-      ref={ref} 
+      ref={drag} 
       style={{
         position: 'absolute',
-        left: `${left - dimensions.width/2}px`,
-        top: `${top - dimensions.height/2}px`,
+        left: `${left}px`,
+        top: `${top}px`,
         opacity: isDragging ? 0.5 : 1,
       }}
     >
@@ -77,16 +56,19 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField }) => {
     accept: 'SIGN_FIELD',
     drop: (item, monitor) => {
       if(!monitor.didDrop()) {
-        const clientOffset = monitor.getClientOffset();
-        if(clientOffset) {
-          const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
-          const x = clientOffset.x - targetRect.left;
-          const y = clientOffset.y - targetRect.top - (targetRect.height + 10) * (pageNumber - 1);
-          if(fields.findIndex(field => field.id == item.id) != -1)
-            moveField(item, x, y);
-          else
+          if(fields.findIndex(field => field.id == item.id) != -1) {
+            const delta = monitor.getDifferenceFromInitialOffset();
+            moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y));
+            return undefined;
+          }
+          else {
+            const clientOffset = monitor.getClientOffset();
+            const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
+            const fieldRect = document.getElementById(item.id).getBoundingClientRect();
+            const x = clientOffset.x - targetRect.left - fieldRect.width / 2;
+            const y = clientOffset.y - targetRect.top - (targetRect.height + 10) * (pageNumber - 1) - fieldRect.height / 2;
             onDrop(item, pageNumber, x, y);
-        }
+          }
       }
     }
   });
@@ -101,7 +83,6 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField }) => {
             id={field.id}
             left={field.left}
             top={field.top}
-            moveField={moveField}
           >
             {field.name}
           </Field>
