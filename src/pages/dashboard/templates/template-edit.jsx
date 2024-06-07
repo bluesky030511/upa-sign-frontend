@@ -101,10 +101,12 @@ const TemplateEdit = () => {
   const width = useWindowWidth();
   const [fields, setFields] = useState([]);
   const { mutate: CreateTemplate, isLoading: isCreating } = useCreateTemplate();
+  const [currentItem, setCurrentItem] = useState(null);
 
   const handleDrop = (item, pageNumber, x, y) => {
     console.log("item: ", item, "clientOffset: ", x, y);
-    setFields([...fields, {id: fields.length, name: item.name, pageNumber: pageNumber, left: x, top: y}]);
+    setFields([...fields, {id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y}]);
+    setCurrentItem({id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y});
     console.log("fields: ", fields);
   }
 
@@ -113,8 +115,28 @@ const TemplateEdit = () => {
       prevFields.map(field => 
         field.id === item.id ? {...field, left: x, top: y} : field
     ));
+    setCurrentItem(item);
     console.log("id: ", id, "x: ", x, "y: ", y);
   }
+
+  const handleKeyDown = (event) => {
+    if(event.key == 'Delete') {
+      if(currentItem != null) {
+        const newItems = fields.filter((field) => field.id != currentItem.id);
+        setFields(newItems);
+        setCurrentItem(newItems[newItems.length - 1]);
+        console.log("newItems", newItems);
+      }
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [fields, currentItem]);
 
   const url = `${BASE_URL}/${id}.pdf`;
   pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
