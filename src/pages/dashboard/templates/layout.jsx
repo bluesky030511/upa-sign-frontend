@@ -38,6 +38,7 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import AttachEmailIcon from '@mui/icons-material/AttachEmail';
 import TransgenderIcon from '@mui/icons-material/Transgender';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 import HomeIcon from '@mui/icons-material/Home';
 import PolicyIcon from '@mui/icons-material/Policy';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
@@ -53,10 +54,10 @@ const SignField = ({ item, selectedUser }) => {
 
   const dragConfig = React.useMemo(() => ({
     type: 'SIGN_FIELD',
-    item: { id: item.id, name: selectedUser === 0 ? 
+    item: { id: item.id, name: item.id == "text" ? item.id : selectedUser === 0 ? 
       // user[item.id] ? user[item.id] : 
       // item.id == 'full_name' ? `${user.firstname} ${user.lastname}` : 
-      `{agent_${item.id}}` : `{client_${item.id}}` },
+      `agent_${item.id}` : `client_${item.id}` },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -227,6 +228,9 @@ const EditDrawer = (props) => {
                   <SignField item={{ id:"sign_date", name:"Sign Date", icon:<TrendingDownIcon/>}} selectedUser={selectedUser} />
                 </Grid>
               </>)}
+              <Grid item xs={6}>
+                <SignField item={{ id:"text", name:"Text", icon:<TextFieldsIcon/>}} selectedUser={selectedUser} />
+              </Grid>
             </Grid>
           </Box>
         </List>
