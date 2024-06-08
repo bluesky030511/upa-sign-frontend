@@ -11,6 +11,7 @@ import { API_ENDPOINTS, BASE_URL } from "../../../utils/variables";
 import { useCreateTemplate } from "../../../hooks/data-hook";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
+import { TextField } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -51,7 +52,7 @@ const Field = ({ id, left, top, children }) => {
   );
 }
 
-const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField }) => {
+const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields }) => {
   const [, drop] = useDrop({
     accept: 'SIGN_FIELD',
     drop: (item, monitor) => {
@@ -64,14 +65,21 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField }) => {
           else {
             const clientOffset = monitor.getClientOffset();
             const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
-            const fieldRect = document.getElementById(item.id).getBoundingClientRect();
-            const x = clientOffset.x - targetRect.left - fieldRect.width / 2;
-            const y = clientOffset.y - targetRect.top - (targetRect.height + 10) * (pageNumber - 1) - fieldRect.height / 2;
+            const x = clientOffset.x - targetRect.left - 100;
+            const y = clientOffset.y - targetRect.top - (targetRect.height + 10) * (pageNumber - 1) - 10;
             onDrop(item, pageNumber, x, y);
           }
       }
     }
   });
+
+  const handleText = (event, item) => {
+    console.log("value: ", event.target.value);
+    setFields((prevFields) => 
+      prevFields.map(field => 
+        field.id === item.id ? {...field, value: event.target.value} : field
+    ));
+  }
 
   return (
     <div ref={drop} style={{ position: 'relative' }}>
@@ -84,7 +92,14 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField }) => {
             left={field.left}
             top={field.top}
           >
-            {field.name}
+            <TextField 
+              variant="outlined"
+              defaultValue={field.name}
+              size="small"
+              sx={{ input: {cursor: "move", fontSize: "16px"}, width: "200px", height: "20px" }}
+              InputProps={{ readOnly: field.name == 'text' ? false : true }}
+              onChange={event => {handleText(event, field);}}
+            />
           </Field>
         ))}
       </PDF>
@@ -105,7 +120,7 @@ const TemplateEdit = () => {
 
   const handleDrop = (item, pageNumber, x, y) => {
     console.log("item: ", item, "clientOffset: ", x, y);
-    setFields([...fields, {id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y}]);
+    setFields([...fields, {id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, value: item.name, pageNumber: pageNumber, left: x, top: y}]);
     setCurrentItem({id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y});
     console.log("fields: ", fields);
   }
@@ -212,9 +227,10 @@ const TemplateEdit = () => {
                   key={`page_${index + 1}`}
                   pageNumber={index + 1}
                   onDrop={handleDrop}
-                  width={Math.min( width > 600 ? width-485 : width - 40, 1000)}
+                  width={Math.min( width > 600 ? width-485 : width - 40, 3000)}
                   fields={fields.filter((field) => field.pageNumber === index + 1)}
                   moveField={moveField}
+                  setFields={setFields}
                 />
               ))}
             </Document>
