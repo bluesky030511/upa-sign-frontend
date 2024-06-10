@@ -120,6 +120,7 @@ const Invite = () => {
         delete input.data[key]
       } 
     })
+    console.log("input.data: ", input.data);
     const { data } = await axios.post(
       `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
       {...input.data, additionalFields},
