@@ -53,6 +53,7 @@ const Field = ({ id, left, top, children }) => {
 }
 
 const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields }) => {
+  const maxWidth = 1363;
   const [, drop] = useDrop({
     accept: 'SIGN_FIELD',
     drop: (item, monitor) => {
@@ -96,7 +97,16 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
               variant="outlined"
               defaultValue={field.name}
               size="small"
-              sx={{ input: {cursor: "move", fontSize: "16px"}, width: "200px", height: "20px" }}
+              sx={{ 
+                input: {cursor: "move", fontSize: `${width / maxWidth * 20}px`}, 
+                width: field.name.includes("address") ? 
+                  `${ width / maxWidth * 420}px` : 
+                  field.name.includes("email") ? `${width / maxWidth * 370}px` :
+                  field.name.includes("date") || field.name.includes("country") || field.name.includes("state") 
+                  || field.name.includes("city") || field.name.includes("zipCode") || field.name.includes("gender") ? 
+                  `${width / maxWidth * 210}px` : `${width / maxWidth * 320}px`, 
+                height: `${width / maxWidth * 20}px` 
+              }}
               InputProps={{ readOnly: field.name == 'text' ? false : true }}
               onChange={event => {handleText(event, field);}}
             />
@@ -117,6 +127,7 @@ const TemplateEdit = () => {
   const [fields, setFields] = useState([]);
   const { mutate: CreateTemplate, isLoading: isCreating } = useCreateTemplate();
   const [currentItem, setCurrentItem] = useState(null);
+  const [oldWidth, setOldWidth] = useState(0);
 
   const handleDrop = (item, pageNumber, x, y) => {
     console.log("item: ", item, "clientOffset: ", x, y);
@@ -133,6 +144,24 @@ const TemplateEdit = () => {
     setCurrentItem(item);
     console.log("id: ", id, "x: ", x, "y: ", y);
   }
+
+  useEffect(() => {
+    setFields((prevFields) => 
+      prevFields.map(field => {
+        return  {
+          ...field, 
+          left: Math.min( width > 600 ? width-485 : width - 40, 3000)/oldWidth * field.left, 
+          top: Math.min( width > 600 ? width-485 : width - 40, 3000)/oldWidth * field.top
+        };
+      }
+    ));
+    setOldWidth(Math.min( width > 600 ? width-485 : width - 40, 3000));
+
+  }, [width]);
+
+  useEffect(() => {
+    setOldWidth(Math.min( width > 600 ? width-485 : width - 40, 3000));
+  }, []);
 
   const handleKeyDown = (event) => {
     if(event.key == 'Delete') {
