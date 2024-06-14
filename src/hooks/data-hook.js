@@ -55,11 +55,31 @@ const getTemplates = async () => {
 
 // Sign Contract
 const signContract = async (input) => {
-  const { data } = await http.post(
-    `${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
-    input.data
-  );
-  return data;
+  const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 'claimNo', 'dateOfLoss', 'causeOfLoss', 'status' ]
+    let additionalFields = {}
+    Object.keys(input.data).forEach(key => {
+      if(!knownFields.includes(key)) {
+        additionalFields[key] = input.data[key]
+        delete input.data[key]
+      } 
+    })
+    console.log("input.data: ", input.data);
+    const { data } = await axios.post(
+      `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
+      {...input.data, additionalFields},
+      {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${input.accessToken}`,
+        },
+      }
+    );
+    return data; 
+  // const { data } = await http.post(
+  //   `${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
+  //   input.data
+  // );
+  // return data;
 };
 
 // Upload template
@@ -146,7 +166,6 @@ export const useUpdatePlaceholder = () => {
 };
 
 export const createTemplate = async (userData) => {
-  console.log("userData: ", userData);
   const { data } = await http.post(`${API_ENDPOINTS.TEMPLATE}/doc/${userData.id}`, userData.tempData);
   return data;
 }

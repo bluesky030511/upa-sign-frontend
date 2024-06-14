@@ -53,6 +53,7 @@ import PlaceHolders from "../pages/dashboard/placeholders";
 import Users from "../pages/dashboard/users";
 import PaymentGateway from "../pages/dashboard/setting/payment-gateway";
 import SettingUser from "../pages/dashboard/setting/setting-user";
+import AddUser from "../pages/dashboard/setting/add-user";
 import ChangeUserPassword from "../pages/dashboard/setting/change-user-password";
 import Subscriptions from "../pages/dashboard/setting/subscriptions";
 import InviteByAgent from "../pages/contract/invite-by-agent";
@@ -123,6 +124,18 @@ export const MainRoutes = () => {
         <ProtectedRoute>
           {user.role === "AGENT" ? (
             <PlaceHolders />
+          ) : (
+            <Navigate to="not-found" />
+          )}
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: '/add-user',
+      element: (
+        <ProtectedRoute>
+          {user.role === "ADMIN" ? (
+            <AddUser />
           ) : (
             <Navigate to="not-found" />
           )}

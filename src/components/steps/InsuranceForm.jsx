@@ -30,13 +30,18 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
       claimNo: (inviteData && inviteData.claimNo) || "",
       dateOfLoss: (inviteData && inviteData.dateOfLoss) || "",
       causeOfLoss: (inviteData && inviteData.causeOfLoss) || "",
+      mortgage: (inviteData && inviteData.mortgage) || "",
+      initials: (inviteData && inviteData.initials) || "",
+      publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
+      contingencyFee: (inviteData && inviteData.contingencyFee) || "",
+
     },
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
+  const onSubmit =(data) => {
     handleInviteData(data);
-    handleOpenModal();
+    handleOpenModal(data);
   };
   return (
     <Form className="profile-box" onSubmit={handleSubmit(onSubmit)}>
@@ -81,6 +86,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               {...field}
+              label="Date of loss"
               maxDate={new Date()}
               slotProps={{
                 textField: {
@@ -127,6 +133,50 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         render={({ field, fieldState }) => (
           <PrimaryInput
             placeholder="Cause of Loss"
+            {...field}
+            helperText={fieldState.error && fieldState.error.message}
+          />
+        )}
+      />
+      <Controller
+        name="mortgage"
+        control={control}
+        render={({ field, fieldState }) => (
+          <PrimaryInput
+            placeholder="Mortgage"
+            {...field}
+            helperText={fieldState.error && fieldState.error.message}
+          />
+        )}
+      />
+      <Controller
+        name="initials"
+        control={control}
+        render={({ field, fieldState }) => (
+          <PrimaryInput
+            placeholder="Initials"
+            {...field}
+            helperText={fieldState.error && fieldState.error.message}
+          />
+        )}
+      />
+      <Controller
+        name="publicAdjusterLicense"
+        control={control}
+        render={({ field, fieldState }) => (
+          <PrimaryInput
+            placeholder="Public adjuster license #"
+            {...field}
+            helperText={fieldState.error && fieldState.error.message}
+          />
+        )}
+      />
+      <Controller
+        name="contingencyFee"
+        control={control}
+        render={({ field, fieldState }) => (
+          <PrimaryInput
+            placeholder="Contingency fee %"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />

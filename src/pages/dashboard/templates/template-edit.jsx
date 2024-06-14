@@ -5,6 +5,8 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDrag, useDrop } from "react-dnd";
 import { useNavigate } from "react-router-dom";
+import { ResizableBox } from "react-resizable";
+import dayjs, { Dayjs } from 'dayjs';
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack";
 import { API_ENDPOINTS, BASE_URL } from "../../../utils/variables";
@@ -23,19 +25,22 @@ import IconButton from "@mui/material/IconButton";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import Tooltip from "@mui/material/Tooltip";
 
+import 'react-resizable/css/styles.css';
 
 import DashboardHeader from "../../../components/dashboard/header";
 import { colors, fonts } from "../../../utils/theme";
 import EditDrawer from "./layout";
 
-const Field = ({ id, left, top, children }) => {
+
+const Field = ({ id, left, top, isResizing, children }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'SIGN_FIELD',
     item: { id, left, top },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
-    })
-  }), [id, left, top]);
+    }),
+    canDrag: () => !isResizing,
+  }), [id, left, top, isResizing]);
 
   return (
     <div 
@@ -52,8 +57,12 @@ const Field = ({ id, left, top, children }) => {
   );
 }
 
-const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields }) => {
+const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields, handleProperty, item }) => {
   const maxWidth = 1363;
+  const [sizes, setSizes] = useState({});
+  const [isResizing, setIsResizing] = useState(false);
+
+  
   const [, drop] = useDrop({
     accept: 'SIGN_FIELD',
     drop: (item, monitor) => {
@@ -61,7 +70,6 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
           if(fields.findIndex(field => field.id == item.id) != -1) {
             const delta = monitor.getDifferenceFromInitialOffset();
             moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y));
-            return undefined;
           }
           else {
             const clientOffset = monitor.getClientOffset();
@@ -75,11 +83,38 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
   });
 
   const handleText = (event, item) => {
-    console.log("value: ", event.target.value);
     setFields((prevFields) => 
       prevFields.map(field => 
         field.id === item.id ? {...field, value: event.target.value} : field
     ));
+  }
+
+  const handleClick = (e, id) => {
+    if(id && sizes[id]) {
+      setFields((prevFields) => 
+        prevFields.map(field => 
+          field.id === id ? {...field, width: sizes[id].width ? sizes[id].width : 200 } : field
+      ));
+    }
+  }
+
+  const handleResize = (id, size) => {
+    setSizes((prevSizes) => ({
+      ...prevSizes,
+      [id]: size,
+    }));
+  };
+
+  function handleVale(item, field){
+    if(item && item.value && item.id === field.id) {
+      if(item.name == 'date' && item.value != 'date') return dayjs(item.value).format("ddd MMM DD YYYY");
+      if(item.name == 'time' && item.value != 'time') return dayjs(item.value).format('hh:mm A');
+      return item.value
+    } else {
+      if(field.name == 'date' && field.value != 'date') return dayjs(field.value).format("ddd MMM DD YYYY");
+      if(field.name == 'time' && field.value != 'time') return dayjs(field.value).format('hh:mm A');
+       return field.value
+    }
   }
 
   return (
@@ -92,24 +127,38 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
             id={field.id}
             left={field.left}
             top={field.top}
+            isResizing={isResizing}
           >
-            <TextField 
-              variant="outlined"
-              defaultValue={field.name}
-              size="small"
-              sx={{ 
-                input: {cursor: "move", fontSize: `${width / maxWidth * 20}px`}, 
-                width: field.name.includes("address") ? 
-                  `${ width / maxWidth * 420}px` : 
-                  field.name.includes("email") ? `${width / maxWidth * 370}px` :
-                  field.name.includes("date") || field.name.includes("country") || field.name.includes("state") 
-                  || field.name.includes("city") || field.name.includes("zipCode") || field.name.includes("gender") ? 
-                  `${width / maxWidth * 210}px` : `${width / maxWidth * 320}px`, 
-                height: `${width / maxWidth * 20}px` 
-              }}
-              InputProps={{ readOnly: field.name == 'text' ? false : true }}
-              onChange={event => {handleText(event, field);}}
-            />
+            <ResizableBox
+              width={(sizes[field.id] || { width: 200, height: 40 }).width}
+              minConstraints={[100, 30]}
+              maxConstraints={[800, 80]}
+              onResize={ (e, data) => handleResize(field.id, data.size)}
+              onResizeStart={() => setIsResizing(true)}
+              onResizeStop={() => setIsResizing(false)}
+              onClick={(e) => handleClick(e, field.id)}
+            >
+              <TextField 
+                variant="outlined"
+                value={handleVale(item, field)}
+                label = {'' || field.dataLabel}
+                size="small"
+                fullWidth
+                sx={{ 
+                  input: {
+                    cursor: "move", 
+                    fontSize: `${width / maxWidth * (item && item.fontSize && item.id === field.id ? (22 + (item.fontSize - 11)) : (22 + (field.fontSize - 11)))}px`, 
+                    p: '2px', 
+                    px: '4px'
+                  }, 
+                }}
+                InputProps={{ readOnly: true }}
+                onClick={(e) => {
+                  if(field) 
+                    handleProperty(true, field);
+                }}
+              />
+            </ResizableBox>
           </Field>
         ))}
       </PDF>
@@ -128,12 +177,25 @@ const TemplateEdit = () => {
   const { mutate: CreateTemplate, isLoading: isCreating } = useCreateTemplate();
   const [currentItem, setCurrentItem] = useState(null);
   const [oldWidth, setOldWidth] = useState(0);
+  const [showProp, setShowProp] = useState(false);
+  const [item, setItem] = useState(null);
 
   const handleDrop = (item, pageNumber, x, y) => {
-    console.log("item: ", item, "clientOffset: ", x, y);
-    setFields([...fields, {id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, value: item.name, pageNumber: pageNumber, left: x, top: y}]);
+    setFields([
+      ...fields, 
+      {
+        id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, 
+        name: item.name, 
+        value: item.name, 
+        pageNumber: pageNumber, 
+        left: x, 
+        top: y,
+        fontSize: 11,
+        dataLabel: '',
+        width: 200,
+      }
+    ]);
     setCurrentItem({id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y});
-    console.log("fields: ", fields);
   }
 
   const moveField = (item, x, y) => {
@@ -142,7 +204,6 @@ const TemplateEdit = () => {
         field.id === item.id ? {...field, left: x, top: y} : field
     ));
     setCurrentItem(item);
-    console.log("id: ", id, "x: ", x, "y: ", y);
   }
 
   useEffect(() => {
@@ -169,9 +230,24 @@ const TemplateEdit = () => {
         const newItems = fields.filter((field) => field.id != currentItem.id);
         setFields(newItems);
         setCurrentItem(newItems[newItems.length - 1]);
-        console.log("newItems", newItems);
       }
     }
+  }
+
+  const handleProperty = async (state, item) => {
+    setShowProp(state);
+    await setFields((prevFields) => 
+      prevFields.map(field => 
+        field.id === item.id ? {...field, fontSize: item.fontSize, value: item.value, dataLabel: item.dataLabel,} : field
+    ));
+    state == true ? setItem(item) : setItem(null);
+  }
+
+  const deleteItem = (item) => {
+    setShowProp(false);
+    const newItems = fields.filter((field) => field.id != item.id);
+    setFields(newItems);
+    setItem(null);
   }
 
   useEffect(() => {
@@ -185,8 +261,6 @@ const TemplateEdit = () => {
   const url = `${BASE_URL}/${id}.pdf`;
   pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
 
-  console.log("id: ", id);
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -197,7 +271,6 @@ const TemplateEdit = () => {
 
   const createTemplate = () => () => {
     const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
-    console.log("width: ", targetRect.width, "height: ", targetRect.height);
     console.log("creating...");
     CreateTemplate({ id: id, tempData: { name: name, fields: fields.map((field) => ({...field, left: field.left / targetRect.width, top: field.top / targetRect.height }))} }, {
       onSuccess: () => {
@@ -212,6 +285,12 @@ const TemplateEdit = () => {
       <EditDrawer 
         mobileOpen={mobileOpen}
         handleDrawerToggle={handleDrawerToggle} 
+        showProp={showProp}
+        handleProperty={handleProperty}
+        item={item}
+        setItem={setItem}
+        deleteItem={deleteItem}
+        setFields={setFields}
       />
       <DashboardHeader handleDrawerToggle={handleDrawerToggle} width={360} />
       <TemplateEditWrapper>
@@ -260,6 +339,8 @@ const TemplateEdit = () => {
                   fields={fields.filter((field) => field.pageNumber === index + 1)}
                   moveField={moveField}
                   setFields={setFields}
+                  handleProperty={handleProperty}
+                  item={item}
                 />
               ))}
             </Document>
