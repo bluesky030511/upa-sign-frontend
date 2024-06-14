@@ -1,28 +1,134 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useWindowWidth } from '@wojtekmaj/react-hooks';
+import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack"; 
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import http from '../../utils/http';
-import { API_ENDPOINTS } from '../../utils/variables';
 import PageLoader from '../../shared-components/loader/page-loader';
 import { Loader } from '../../shared-components/loader/loader';
+import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
+import { TextField } from "@mui/material";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import { colors, fonts } from "../../utils/theme";
 import ContactForm from '../../components/steps/ContactForm';
 import InsuranceForm from '../../components/steps/InsuranceForm';
 import { useGetPlaceholdersByContractId, useInviteCustomer } from '../../hooks/data-hook';
 import SignModal from '../../components/modals/sign-modal';
 import { useToast } from '../../context/toast.context';
+import dayjs, { Dayjs } from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+
+const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
+  const maxWidth = 1363;
+  const pdfContainerRef = useRef(null);
+  const [fieldDimensions, setFieldDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (pdfContainerRef.current) {
+        const targetRect = pdfContainerRef.current.getBoundingClientRect();
+        setFieldDimensions({ width: targetRect.width, height: targetRect.height });
+      }
+    };
+    setTimeout(() => {
+      updateDimensions();
+    }, 100);
+
+    updateDimensions();
+
+  }, []);
+
+  const handleText = (event, item) => {
+    setFields((prevFields) => 
+      prevFields.map(field => 
+        field.id === item.id ? {...field, value: event.target.value} : field
+    ));
+  }
+
+  const handleTime = (value, item) => {
+    setFields((prevFields) => 
+      prevFields.map(field => 
+        field.id === item.id ? { ...field, value: value } : field
+    ));
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <PDF ref={pdfContainerRef} >
+          <Page pageNumber={pageNumber} width={width} />
+          {fields.map((field) => (
+            <div
+              style={{
+                position: 'absolute',
+                left: `${fieldDimensions.width * field.left}px`,
+                top: `${fieldDimensions.height * field.top}px`
+              }}
+              key={field.id}            
+            >
+              
+              {field.name != 'date' && field.name != 'time' && (<TextField 
+                variant="outlined"
+                defaultValue={field.value}
+                label={field.dataLabel}
+                size="small"
+                sx={{ 
+                  input: {fontSize: `${width / maxWidth * (22 + (field.fontSize - 11))}px`, p: '2px', px: '4px'}, 
+                  width: field.width,
+                  height: `${width / maxWidth * 20}px` 
+                }}
+                InputProps={{ readOnly: field.name == "text" ? false : true }}
+                onChange={event => {handleText(event, field);}}
+              />)}
+              <DemoContainer components={['DatePicker', 'TimePicker']}>
+                {field.name == 'date' && (<DatePicker 
+                  label={field.dataLabel} 
+                  defaultValue={field.value && dayjs(field.value)} 
+                  sx={{ 
+                    input: { py: '10px', px: '4px' }, 
+                    width: '50px',  
+                  }}
+                  onChange={(value) => handleTime(value.toString(), field)} 
+                />)}
+                {field.name == 'time' && (<TimePicker 
+                  label={field.dataLabel} 
+                  defaultValue={field.value && dayjs(field.value)} 
+                  sx={{ 
+                    input: { py: '10px', px: '4px' }, 
+                    width: '50px',  
+                  }} 
+                  onChange={(value) => handleTime(value, field)} 
+                />)}
+              </DemoContainer>
+            </div>
+          ))}
+        </PDF>
+      </LocalizationProvider>
+    </div>
+  );
+}
 
 const InviteByAgent = () => {
+  const width = useWindowWidth();
   const { contractId } = useParams()
   const [inviteData, setInviteData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
+  const [url, setUrl] = useState(null);
   const navigate = useNavigate();
   const { showSuccessToast, showErrorToast } = useToast();
+  const [fields, setFields] = useState(null);
+  const [step, setStep] = useState(0);
+
+  pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
 
   const {
     mutate: InviteCustomer,
@@ -30,6 +136,12 @@ const InviteByAgent = () => {
     isError,
     isLoading: isInviting,
   } = useInviteCustomer()
+
+  const [numPages, setNumPages] = useState(null);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
 
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
@@ -48,13 +160,67 @@ const InviteByAgent = () => {
     setConfirmModal(true);
   };
 
+  const handleStep = async (values) => {
+    const data = {
+      client_signature: "client_signature",
+      client_full_name: `${inviteData.firstname} ${inviteData.lastname}`,
+      client_phone_number: inviteData.phoneNumber,
+      client_email: inviteData.email,
+      client_full_address: `${inviteData.address}, ${inviteData.city}, ${inviteData.state}, ${inviteData.zipCode}` || 'N/A',
+      client_street_address: inviteData.address,
+      client_country: inviteData.country,
+      client_state: inviteData.state,
+      client_city: inviteData.city,
+      client_zipCode: inviteData.zipCode,
+      client_gender: inviteData.gender,
+      client_insurance_company: values.insuranceCompany,
+      client_policy_number: values.policyNumber,
+      client_claim: values.claimNo,
+      client_contract_date: "client_contract_date",
+      client_cause_of_loss: values.causeOfLoss,
+      client_date_of_loss: new Date(values.dateOfLoss).toDateString(),
+      client_mortgage: values.mortgage,
+      client_initials: values.initials,
+      client_public_adjuster_license: values.publicAdjusterLicense,
+      client_contingency_fee: values.contingencyFee,
+    };
+    setStep(1);
+    await fields.forEach(field => {
+      if(field.name.includes("client")) {
+        field.value = data[field.name] ? data[field.name] : field.value;
+      }
+    });
+    setFields([...fields]);
+  }
+
   const handleCloseModal = () => {
     setConfirmModal(false);
   };
 
   const { data, isLoading } = useQuery('contract-invite', getContract, {
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: async (data) => {
+      setUrl(`${BASE_URL}/${data.template.filename}`);
+      let date = new Date();
+      let value = {
+        agent_sign_date: date.toDateString(),
+        agent_full_name: data.agent.firstname + ' ' + data.agent.lastname,
+        agent_signature: "agent_signature",
+        agent_full_address: `${data.agent.address}, ${data.agent.city}, ${data.agent.state}, ${data.agent.zipCode}` || 'N/A',
+        agent_street_address: data.agent.address,
+        agent_phone_number: data.agent.phoneNumber,
+        agent_email: data.agent.email,
+        agent_city: data.agent.city,
+        agent_state: data.agent.state,
+        agent_country: data.agent.country,
+        agent_zipCode: data.agent.zipCode,
+        agent_gender: data.agent.gender,
+      }
+      await data.fields.forEach(field => {
+        if(field.name.includes("agent")) {
+          field.value = value[field.name] ? value[field.name] : field.value;
+        }
+      });
+      setFields(data.fields);
     },
     onerror: (error) => {
       console.log(error)
@@ -64,7 +230,8 @@ const InviteByAgent = () => {
   const { data: placeholders } = useGetPlaceholdersByContractId(contractId)
 
   const onSubmit = () => {
-    const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 'claimNo', 'dateOfLoss', 'causeOfLoss', 'status' ]
+    const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 
+      'claimNo', 'dateOfLoss', 'causeOfLoss', 'status', 'mortgage', 'initials', 'publicAdjusterLicense', 'contingencyFee' ]
     let additionalFields = {}
     Object.keys(inviteData).forEach(key => {
       if(!knownFields.includes(key)) {
@@ -77,7 +244,8 @@ const InviteByAgent = () => {
         id: contractId,
         input: {
           ...inviteData,
-          ...additionalFields
+          ...additionalFields,
+          ...{fields: fields}
         },
       },
       {
@@ -94,7 +262,6 @@ const InviteByAgent = () => {
       }
     );
   }
-
   return Boolean(contractId) ?
     (
       isLoading ? (
@@ -111,7 +278,7 @@ const InviteByAgent = () => {
               loading={isInviting}
               actionText="Are you sure you want to send invite?"
             />
-            <Box sx={{ width: 500, mb: 4 }}>
+            {step === 0 && (<><Box sx={{ width: 500, mb: 4 }}>
               <Stepper activeStep={activeStep} alternativeLabel>
                 <Step sx={{ "& svg": { width: 24, height: 24 } }}>
                   <StepLabel>Contact</StepLabel>
@@ -132,10 +299,38 @@ const InviteByAgent = () => {
             {activeStep === 1 && (
               <InsuranceForm
                 handleInviteData={handleInviteData}
-                handleOpenModal={handleOpenModal}
+                handleOpenModal={handleStep}
                 inviteData={inviteData}
               />
-            )}
+            )}</>)}
+            {step === 1 && (<Box sx={{ display:"flex", flexDirection:"column", justifyContent:"center", mb:4, gap:3 }}>
+              <Box sx={{ display:"flex", justifyContent:"right" }} >
+                <Button variant="contained"
+                  size='large'
+                  sx={{
+                    bgcolor: colors.themeBlue,
+                    textTransform: "none",
+                    fontFamily: fonts.medium,
+                    minWidth: 120,
+                    borderRadius: 1,
+                  }} 
+                  onClick={handleOpenModal}
+                >
+                  Invite
+                </Button>
+              </Box>
+              {url && <Document file={url} onLoadSuccess={onDocumentLoadSuccess} >
+                {Array.from(new Array(numPages), (el, index) => (
+                  <DroppablePage
+                    key={`page_${index + 1}`}
+                    pageNumber={index + 1}
+                    width={Math.min( width > 600 ? width-485 : width - 40, 3000)}
+                    fields={fields.filter((field) => field.pageNumber === index + 1)}
+                    setFields={setFields}
+                  />
+                ))}
+              </Document>}
+            </Box>)}
           </Container >
         )
     ) :
@@ -150,6 +345,11 @@ const Container = styled.div`
   align-items: center;
   flex-direction: column;
 `;
-
+const PDF = styled.div`
+  margin-top: 10px;
+  justify-content: center;
+  display: flex;
+  position: relative;
+`;
 
 export default InviteByAgent;

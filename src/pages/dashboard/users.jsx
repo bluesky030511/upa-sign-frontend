@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/dashboard/layout";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
@@ -22,6 +23,7 @@ import EmptyFeedback from "../../shared-components/empty/empty-feedback";
 import { Loader } from "../../shared-components/loader/loader";
 import { styled as muiStyled } from "@mui/material/styles";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { visuallyHidden } from "@mui/utils";
 import { compareDesc, format } from 'date-fns';
 import { Link } from '@mui/material';
@@ -231,6 +233,7 @@ function filterList(list, query) {
 }
 
 const Users = () => {
+  const navigate = useNavigate();
   const { user } = useUI();
   const [searchText, setSearchText] = useState("");
   const { isFetching, isSuccess, data, refetch } = useGetUsers();
@@ -274,6 +277,10 @@ const Users = () => {
     setType(type);
   };
 
+  const handleAddUser = () => {
+    navigate("/add-user");
+  }
+
   return (
     <>
       {user.role === "ADMIN" ? null : <SubscriptionAlert />}
@@ -286,6 +293,20 @@ const Users = () => {
               value={searchText}
               onChange={handleSearch}
             />
+          </div>
+          <div className="add-user">
+            <Button
+              variant="contained" 
+              sx={{ 
+                backgroundColor: colors.themeBlue, 
+                fontFamily: fonts.medium, 
+                textTransform: "none",
+              }} 
+              startIcon={<AddRoundedIcon />}
+              onClick={handleAddUser}
+            >
+              Add
+            </Button>
           </div>
           {
             isFetching ? (
@@ -406,6 +427,12 @@ const ListingWrapper = styled.div`
     display: flex;
     justify-content: flex-end;
     margin-bottom: 24px;
+  }
+
+  div.add-user {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px
   }
 
   div.loader-container {
