@@ -26,7 +26,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
       .email("Please enter valid email"),
     phoneNumber: yup.string().required("Please enter phone number"),
     city: yup.string().required("Please enter your city"),
-    country: yup.string().required("Please enter your country"),
+    // country: yup.string().required("Please enter your country"),
     state: yup.string().required("Please enter your state"),
     zipCode: yup.string().required("Please enter your zip code"),
     ...additionalFieldValidations
@@ -42,7 +42,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
       phoneNumber: (inviteData && inviteData.phoneNumber) || "",
       city: (inviteData && inviteData.city) || "",
       state: (inviteData && inviteData.state) || "",
-      country: (inviteData && inviteData.country) || "",
+      // country: (inviteData && inviteData.country) || "",
       zipCode: (inviteData && inviteData.zipCode) || "",
     },
     resolver: yupResolver(schema),
@@ -118,7 +118,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
           />
         )}
       />
-      <Controller
+      {/* <Controller
         name="country"
         control={control}
         render={({ field, fieldState }) => (
@@ -128,7 +128,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
             helperText={fieldState.error && fieldState.error.message}
           />
         )}
-      />
+      /> */}
       <Grid container spacing={1}>
         <Grid item lg={4} xs={12}>
           <Controller

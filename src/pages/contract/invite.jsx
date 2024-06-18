@@ -66,7 +66,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               style={{
                 position: 'absolute',
                 left: `${fieldDimensions.width * field.left}px`,
-                top: `${fieldDimensions.height * field.top}px`
+                top: field.name == "date" || field.name == "time" ? `${fieldDimensions.height * field.top - 5}px`  : `${fieldDimensions.height * field.top}px`
               }}
               key={field.id}            
             >
@@ -100,7 +100,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
                       input: { py: '10px', px: '4px' }, 
                       width: '50px',  
                     }} 
-                    onChange={(value) => handleTime(value.format('hh:mm A').toString(), field)} 
+                    onChange={(value) => handleTime(value, field)} 
                   />)}
                 </DemoContainer>
             </div>
