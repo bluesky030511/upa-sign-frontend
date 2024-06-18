@@ -93,7 +93,7 @@ const headCells = [
   },
   {
     id: "isCustomerFilled",
-    label: "Customer Filled",
+    label: "Filled By",
     align: "center",
     width: "25%",
     type: "string",
@@ -241,10 +241,10 @@ const PlaceHolders = () => {
     if (data) {
       const filteredList = filterList(data, searchText);
       // return filteredList;
-        return stableSort(
-          filteredList,
-          getComparator(order, orderBy, type)
-        ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+      return stableSort(
+        filteredList,
+        getComparator(order, orderBy, type)
+      ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }
     return [];
   }, [data, searchText, order, orderBy, page, rowsPerPage]);
@@ -320,54 +320,54 @@ const PlaceHolders = () => {
         />
         <SubscriptionAlert />
         {user && (user.role === "ADMIN" || user.role === "AGENT") && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                mb: { xs: 4, sm: 2 },
-                p: 0,
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              mb: { xs: 4, sm: 2 },
+              p: 0,
+            }}
+          >
+
+            <Tooltip
+              title={
+                user.role === "ADMIN" || isSubscribed(subscription)
+                  ? ""
+                  : "Please first subscribe to UPA sign."
+              }
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    fontFamily: fonts.medium,
+                    fontSize: 12,
+                  },
+                },
               }}
             >
-              
-              <Tooltip
-                title={
-                  user.role === "ADMIN" || isSubscribed(subscription)
-                    ? ""
-                    : "Please first subscribe to UPA sign."
-                }
-                slotProps={{
-                  tooltip: {
-                    sx: {
-                      fontFamily: fonts.medium,
-                      fontSize: 12,
+              <span>
+                <Button
+                  disabled={
+                    user.role === "AGENT" && !isSubscribed(subscription)
+                  }
+                  variant="contained"
+                  sx={{
+                    bgcolor: colors.themeBlue,
+                    textTransform: "none",
+                    fontFamily: fonts.medium,
+                    "&:disabled": {
+                      bgcolor: colors.translucentBlue,
                     },
-                  },
-                }}
-              >
-                <span>
-                  <Button
-                    disabled={
-                      user.role === "AGENT" && !isSubscribed(subscription)
-                    }
-                    variant="contained"
-                    sx={{
-                      bgcolor: colors.themeBlue,
-                      textTransform: "none",
-                      fontFamily: fonts.medium,
-                      "&:disabled": {
-                        bgcolor: colors.translucentBlue,
-                      },
-                    }}
-                    startIcon={<AddRoundedIcon />}
-                    onClick={() => setPlaceholderModal(true)}
-                  >
-                    Add
-                  </Button>
-                </span>
-              </Tooltip>
-            </Box>
-          )}
+                  }}
+                  startIcon={<AddRoundedIcon />}
+                  onClick={() => setPlaceholderModal(true)}
+                >
+                  Add
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
+        )}
         <ListingWrapper>
           <div className="search-container">
             <SearchInput
@@ -384,7 +384,7 @@ const PlaceHolders = () => {
               </div>
             ) : data && data.length ? (
               <Paper sx={{ boxShadow: 'none', overflow: 'hidden' }}>
-                
+
                 <TableContainer
                   component={Paper}
                   sx={{
@@ -423,7 +423,7 @@ const PlaceHolders = () => {
                                 {row.name}
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                              {`${row.isCustomerFilled}`}
+                                {row.filledBy}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {row.value}
@@ -443,11 +443,11 @@ const PlaceHolders = () => {
                                     refetch={refetch}
                                     name={row.name}
                                     value={row.value}
-                                    customerFilled={row.isCustomerFilled}
+                                    filledBy={row.filledBy}
                                   />
                                 ) : ''}
-                                  
-                                
+
+
                               </StyledTableCell>
                             </StyledTableRow>
                           );

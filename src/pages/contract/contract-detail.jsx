@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
 import PrimaryButton from "../../components/buttons/primary-button";
+import DownloadIcon from '@mui/icons-material/Download';
+import { Box, IconButton } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useUI } from "../../context/ui.context";
 import axios from "axios";
@@ -27,6 +29,33 @@ const ContractDetail = () => {
     );
     return data;
   };
+
+  const downloadDoc = async (kind) => {
+    try {
+      const url = kind === "preview"
+        ? `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/${kind}.pdf?id=${file}`
+        : `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/disclaimer.pdf?inviteId=${inviteId}`;
+
+      const response = await axios.get(url, { responseType: 'blob', headers: {Authorization: `Bearer ${token}`} });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+  
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute(
+        'download',
+        kind === 'preview' ? `sign_contract.pdf` : 'certification.pdf'
+      );
+  
+      document.body.appendChild(link);
+      link.click();
+  
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+    }
+  }
 
   const { data, isFetching } = useQuery("contract-invite", getContract, {
     onSuccess: (data) => {
@@ -57,8 +86,40 @@ const ContractDetail = () => {
           <div className="btn-wrap">
             <div className="btn-container">
               {data && (
+                <Box sx={{display:"flex", alignContent:"center", gap: "2px"}}>
+                  <a
+                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${file}`}
+                  >
+                    <PrimaryButton
+                      sx={{
+                        bgcolor: colors.themeBlue,
+                        boxShadow: "none",
+                        textTransform: "none",
+                        "&:hover": {
+                          bgcolor: colors.themeBlue,
+                          boxShadow: "none",
+                        },
+                      }}
+                    >
+                      Preview
+                    </PrimaryButton>
+                  </a>
+                  <IconButton
+                    sx={{
+                      color: colors.themeBlue,
+                      borderRadius: 2,
+                    }}
+                    onClick={() => downloadDoc('preview')}
+                  >
+                    <DownloadIcon size="large" />
+                  </IconButton>
+                </Box>
+              )}
+            </div>
+            <div className="btn-container">
+              <Box sx={{display:"flex", alignContent:"center", gap:"2px"}}>
                 <a
-                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${file}`}
+                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/disclaimer.pdf?inviteId=${inviteId}`}
                 >
                   <PrimaryButton
                     sx={{
@@ -71,29 +132,19 @@ const ContractDetail = () => {
                       },
                     }}
                   >
-                    Preview
+                    Disclaimer
                   </PrimaryButton>
                 </a>
-              )}
-            </div>
-            <div className="btn-container">
-              <a
-                href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/disclaimer.pdf?inviteId=${inviteId}`}
-              >
-                <PrimaryButton
+                <IconButton
                   sx={{
-                    bgcolor: colors.themeBlue,
-                    boxShadow: "none",
-                    textTransform: "none",
-                    "&:hover": {
-                      bgcolor: colors.themeBlue,
-                      boxShadow: "none",
-                    },
+                    color: colors.themeBlue,
+                    borderRadius: 2,
                   }}
+                  onClick={() => downloadDoc('disclaimer')}
                 >
-                  Disclaimer
-                </PrimaryButton>
-              </a>
+                  <DownloadIcon size="large" />
+                </IconButton>
+              </Box>
             </div>
           </div>
         </div>

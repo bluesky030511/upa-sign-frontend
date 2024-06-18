@@ -16,12 +16,13 @@ import Signup from "../pages/auth/signup";
 import ForgotPassword from "../pages/auth/forgot-password";
 
 //User Stack Screens
-import Templates from "../pages/dashboard/templates";
+import Templates from "../pages/dashboard/templates/templates";
 import SettingRoot from "../pages/dashboard/setting/setting-root";
 import Settings from "../pages/dashboard/setting/setting";
 import VerificationScreen from "../pages/auth/verfication-code";
 import ChangePassword from "../pages/dashboard/setting/change-password";
 import Tutorial from "../pages/dashboard/tutorial";
+import TemplateEdit from "../pages/dashboard/templates/template-edit";
 
 // Documents Pages
 import DocumentRoot from "../pages/dashboard/documents/document-root";
@@ -52,8 +53,10 @@ import PlaceHolders from "../pages/dashboard/placeholders";
 import Users from "../pages/dashboard/users";
 import PaymentGateway from "../pages/dashboard/setting/payment-gateway";
 import SettingUser from "../pages/dashboard/setting/setting-user";
+import AddUser from "../pages/dashboard/setting/add-user";
 import ChangeUserPassword from "../pages/dashboard/setting/change-user-password";
 import Subscriptions from "../pages/dashboard/setting/subscriptions";
+import InviteByAgent from "../pages/contract/invite-by-agent";
 
 export const MainRoutes = () => {
   const { user } = useUI();
@@ -128,6 +131,18 @@ export const MainRoutes = () => {
       )
     },
     {
+      path: '/add-user',
+      element: (
+        <ProtectedRoute>
+          {user.role === "ADMIN" ? (
+            <AddUser />
+          ) : (
+            <Navigate to="not-found" />
+          )}
+        </ProtectedRoute>
+      )
+    },
+    {
       path: '/users',
       element: (
         <ProtectedRoute>
@@ -184,7 +199,15 @@ export const MainRoutes = () => {
         <ProtectedRoute>
           {user.isAgent ? <Templates /> : <Navigate to="/not-found" />}
         </ProtectedRoute>
-      ),
+      )
+    },
+    {
+      path: "/template-edit/:id/:name",
+      element: (
+        <ProtectedRoute>
+          {user.isAgent ? <TemplateEdit /> : <Navigate to="/not-fount" />}
+        </ProtectedRoute>
+      )
     },
     {
       path: "/tutorial",
@@ -239,7 +262,15 @@ export const MainRoutes = () => {
       children: [
         {
           path: "",
-          element: <Invite />,
+          element:
+            <Invite />,
+        },
+        {
+          path: ":contractId",
+          element:
+            <ProtectedRoute>
+              { user.role === 'AGENT' || user.role === 'ADMIN' ? <InviteByAgent /> : <Navigate to="/not-found" /> }
+            </ProtectedRoute>
         },
         {
           path: "detail/:id/:token",

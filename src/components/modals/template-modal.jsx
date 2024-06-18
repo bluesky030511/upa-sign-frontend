@@ -7,6 +7,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Slide from "@mui/material/Slide";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { Controller, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUploadTemplate } from "../../hooks/data-hook";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
@@ -23,7 +24,7 @@ import { useQueryClient } from "react-query";
 
 const MAX_FILE_SIZE = 5242880; // 5 MB
 
-const validFileExtensions = ["doc", "docx"];
+const validFileExtensions = ["doc", "docx", "pdf"];
 
 function isValidFileType(fileName) {
   const extension = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -50,6 +51,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const TemplateModal = ({ open, handleClose }) => {
+  const navigate = useNavigate();
   const { showSuccessToast } = useToast();
   const queryClient = useQueryClient();
   const {
@@ -85,11 +87,13 @@ const TemplateModal = ({ open, handleClose }) => {
     data.append("name", values.name);
     data.append("file", values.file[0]);
     UploadTemplate(data, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log("data: ", data);
         reset();
         queryClient.invalidateQueries(["templates"]);
         showSuccessToast("Template Uploaded");
         handleClose();
+        navigate(`/template-edit/${data.filename.replace(/\.[^/.]+$/, "")}/${values.name}`)
       },
     });
   };
@@ -180,14 +184,14 @@ const TemplateModal = ({ open, handleClose }) => {
                 <>
                   <p className="file-info">
                     Upload your template here <br />
-                    Only .doc and .docx file is allowed
+                    Only .doc, .docx and pdf file is allowed
                     <br />
                     Max size 5 MB
                   </p>
                   <IconButton aria-label="upload template" component="label">
                     <input
                       hidden
-                      accept=".doc,.docx"
+                      accept=".doc,.docx, .pdf"
                       type="file"
                       {...register("file")}
                       name="file"

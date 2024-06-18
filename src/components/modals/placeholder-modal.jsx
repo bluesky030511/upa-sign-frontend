@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { useToast } from '../../context/toast.context';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Dialog, DialogContent, Slide, Tooltip } from '@mui/material';
+import { Box, Dialog, DialogContent, MenuItem, Select, Slide, Tooltip } from '@mui/material';
 import { colors, fonts } from "../../utils/theme";
 import styled from 'styled-components';
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -20,15 +20,15 @@ const schema = yup.object({
   key: yup
     .string()
     .required('Please enter a valid key'),
-  isCustomerFilled: yup
-    .boolean(),
+  filledBy: yup.
+    string().required('Filled By is a required field'),
   name: yup
     .string()
     .required('Please enter a valid name'),
   value: yup
     .string()
-    .when('isCustomerFilled', {
-      is: 'false',
+    .when('filledBy', {
+      is: 'STATIC',
       then: (schema) => schema.required('Please enter valid value'),
       otherwise: (schema) => schema.optional()
     })
@@ -38,7 +38,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 })
 
-const PlaceholderModal = ({ open, id, handleClose, refetch, dataKey, value, name, customerFilled }) => {
+const PlaceholderModal = ({ open, id, handleClose, refetch, dataKey, value, name, filledBy }) => {
 
   const { showSuccessToast, showErrorToast } = useToast();
   const { subscription } = useSubscription();
@@ -47,12 +47,12 @@ const PlaceholderModal = ({ open, id, handleClose, refetch, dataKey, value, name
       key: dataKey || "",
       value: value || "",
       name: name || "",
-      isCustomerFilled: customerFilled === undefined || customerFilled === null || customerFilled === true ? true : false
+      filledBy: filledBy
     },
     resolver: yupResolver(schema)
   })
 
-  const isCustomerFilled = watch('isCustomerFilled')
+  const documentFilledBy = watch('filledBy')
 
   const {
     mutate: CreatePlaceholder,
@@ -64,14 +64,14 @@ const PlaceholderModal = ({ open, id, handleClose, refetch, dataKey, value, name
 
   const { mutate: UpdatePlaceholder } = useUpdatePlaceholder()
 
-  const onSubmit = ({ key, value, name, isCustomerFilled }) => {
+  const onSubmit = ({ key, value, name, filledBy }) => {
     if (id) {
       UpdatePlaceholder({
         id,
         key,
         value,
         name,
-        isCustomerFilled
+        filledBy
       }, {
         onSuccess: () => {
           reset();
@@ -89,7 +89,7 @@ const PlaceholderModal = ({ open, id, handleClose, refetch, dataKey, value, name
           key,
           value,
           name,
-          isCustomerFilled
+          filledBy
         }, {
         onSuccess: () => {
           reset();
@@ -180,22 +180,46 @@ const PlaceholderModal = ({ open, id, handleClose, refetch, dataKey, value, name
                 )}
               />
             </div>
-            <div className="input-container">
+            <div className='input-container'>
+              <p className="label">Filled By:</p>
               <Controller
-                name="isCustomerFilled"
-                label="Customer filled"
+                name="filledBy"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <CheckboxInput
-                    {...field}
-                    placeholder='Customer Filled'
-                    size='small'
-                  // helperText={fieldState.error && fieldState.error.message}
-                  />
+                  <>
+                    <Select
+                      displayEmpty
+                      placeholder='Filled By'
+                      {...field}
+                      fullWidth
+                      sx={{
+                        bgcolor: colors.translucentBlue,
+                        // marginTop: "27px",
+                        fontFamily: fonts.medium,
+                        color: colors.fadeBlack,
+                        fontSize: 16,
+                        "& fieldset": {
+                          display: "none",
+                        },
+                      }}
+                      inputProps={{
+                        sx: {
+                          color: colors.foreBlack,
+                        },
+                      }}
+                    >
+                      <MenuItem value="AGENT">AGENT</MenuItem>
+                      <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
+                      <MenuItem value="STATIC">STATIC</MenuItem>
+                    </Select>
+                    <span className="error-text">
+                      {fieldState.error && fieldState.error.message}
+                    </span>
+                  </>
                 )}
               />
             </div>
-            {!isCustomerFilled ? (
+            {documentFilledBy === 'STATIC' ? (
               <div className="input-container">
                 <p className="label">Value:</p>
                 <Controller
