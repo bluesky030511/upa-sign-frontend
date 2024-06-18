@@ -55,7 +55,8 @@ const getTemplates = async () => {
 
 // Sign Contract
 const signContract = async (input) => {
-  const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 'claimNo', 'dateOfLoss', 'causeOfLoss', 'status' ]
+  const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber',  'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 
+      'claimNo', 'dateOfLoss', 'causeOfLoss', 'status', 'mortgage', 'initials', 'contingencyFee', 'lossAddress', 'lossCity', 'lossState', 'lossZipCode' ];
     let additionalFields = {}
     Object.keys(input.data).forEach(key => {
       if(!knownFields.includes(key)) {
