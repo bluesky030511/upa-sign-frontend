@@ -220,9 +220,6 @@ const EditDrawer = (props) => {
                   <SignField item={{ id:"street_address", name:"Street Address", icon:<HomeIcon/>}} selectedUser={selectedUser} />
                 </Grid>
                 <Grid item xs={6}>
-                  <SignField item={{ id:"country", name:"Country", icon:<PublicIcon/>}} selectedUser={selectedUser} />
-                </Grid>
-                <Grid item xs={6}>
                   <SignField item={{ id:"state", name:"State", icon:<LocationCityIcon/>}} selectedUser={selectedUser} />
                 </Grid>
                 <Grid item xs={6}>
@@ -234,9 +231,13 @@ const EditDrawer = (props) => {
                 <Grid item xs={6}>
                   <SignField item={{ id:"gender", name:"Gender", icon:<TransgenderIcon/>}} selectedUser={selectedUser} />
                 </Grid>
-                {selectedUser === 0 && (<Grid item xs={6}>
-                  <SignField item={{ id:"sign_date", name:"Sign Date", icon:<CalendarMonthIcon/>}} selectedUser={selectedUser} />
-                </Grid>)}
+                {selectedUser === 0 && (
+                  <>
+                    <Grid item xs={6}>
+                      <SignField item={{ id:"public_adjuster_license", name:"Public Adjuster License#", icon:<ContactsIcon/>}} selectedUser={selectedUser} />
+                    </Grid>
+                  </>
+                )}
                 
                 {selectedUser === 1 && (
                 <>
@@ -259,18 +260,33 @@ const EditDrawer = (props) => {
                     <SignField item={{ id:"date_of_loss", name:"Date of loss", icon:<CalendarMonthIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                   <Grid item xs={6}>
+                    <SignField item={{ id:"loss_full_address", name:"Loss Full Address", icon:<HomeIcon/>}} selectedUser={selectedUser} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <SignField item={{ id:"loss_street_address", name:"Loss Street Address", icon:<HomeIcon/>}} selectedUser={selectedUser} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <SignField item={{ id:"loss_state", name:"Loss State", icon:<LocationCityIcon/>}} selectedUser={selectedUser} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <SignField item={{ id:"loss_city", name:"Loss City", icon:<ApartmentIcon/>}} selectedUser={selectedUser} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <SignField item={{ id:"loss_zipCode", name:"Loss Zip Code", icon:<AttachEmailIcon/>}} selectedUser={selectedUser} />
+                  </Grid>
+                  <Grid item xs={6}>
                     <SignField item={{ id:"mortgage", name:"Mortgage", icon:<CurrencyExchangeIcon/>}} selectedUser={selectedUser} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <SignField item={{ id:"initials", name:"Initials", icon:<NotesIcon/>}} selectedUser={selectedUser} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <SignField item={{ id:"public_adjuster_license", name:"Public Adjuster License#", icon:<ContactsIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                   <Grid item xs={6}>
                     <SignField item={{ id:"contingency_fee", name:"Contingency fee %", icon:<PointOfSaleIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                 </>)}
+                <Grid item xs={6}>
+                    <SignField item={{ id:"initials", name:"Initials", icon:<NotesIcon/>}} selectedUser={selectedUser} />
+                </Grid>
+                <Grid item xs={6}>
+                  <SignField item={{ id:"sign_date", name:"Sign Date", icon:<CalendarMonthIcon/>}} selectedUser={selectedUser} />
+                </Grid>
                 <Grid item xs={6}>
                   <SignField item={{ id:"text", name:"Text", icon:<TextFieldsIcon/>}} selectedUser={selectedUser} />
                 </Grid>

@@ -70,7 +70,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               style={{
                 position: 'absolute',
                 left: `${fieldDimensions.width * field.left}px`,
-                top: `${fieldDimensions.height * field.top}px`
+                top: field.name == "date" || field.name == "time" ? `${fieldDimensions.height * field.top - 12}px`  : `${fieldDimensions.height * field.top}px`
               }}
               key={field.id}            
             >
@@ -78,14 +78,18 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               {field.name != 'date' && field.name != 'time' && (<TextField 
                 variant="outlined"
                 defaultValue={field.value}
-                label={field.dataLabel}
+                label={field.name == "agent_public_adjuster_license" ? 
+                "Agent public adjuster license" : field.name == "agent_initials" ? 
+                "Agent initials" : field.dataLabel}
                 size="small"
                 sx={{ 
                   input: {fontSize: `${width / maxWidth * (22 + (field.fontSize - 11))}px`, p: '2px', px: '4px'}, 
                   width: field.width,
                   height: `${width / maxWidth * 20}px` 
                 }}
-                InputProps={{ readOnly: field.name == "text" ? false : true }}
+                InputProps={{ 
+                  readOnly: field.name == "text" || field.name == "agent_public_adjuster_license" || field.name == "agent_initials"  ? false : true 
+                }}
                 onChange={event => {handleText(event, field);}}
               />)}
               <DemoContainer components={['DatePicker', 'TimePicker']}>
@@ -168,7 +172,7 @@ const InviteByAgent = () => {
       client_email: inviteData.email,
       client_full_address: `${inviteData.address}, ${inviteData.city}, ${inviteData.state}, ${inviteData.zipCode}` || 'N/A',
       client_street_address: inviteData.address,
-      client_country: inviteData.country,
+      // client_country: inviteData.country,
       client_state: inviteData.state,
       client_city: inviteData.city,
       client_zipCode: inviteData.zipCode,
@@ -177,12 +181,18 @@ const InviteByAgent = () => {
       client_policy_number: values.policyNumber,
       client_claim: values.claimNo,
       client_contract_date: "client_contract_date",
+      client_sign_date: "client_sign_date",
       client_cause_of_loss: values.causeOfLoss,
       client_date_of_loss: new Date(values.dateOfLoss).toDateString(),
       client_mortgage: values.mortgage,
       client_initials: values.initials,
-      client_public_adjuster_license: values.publicAdjusterLicense,
+      // client_public_adjuster_license: values.publicAdjusterLicense,
       client_contingency_fee: values.contingencyFee,
+      client_loss_full_address: `${values.lossAddress}, ${values.lossCity}, ${values.lossState}, ${values.lossZipCode}` || 'N/A',
+      client_loss_street_address:values.lossAddress,
+      client_loss_city: values.lossCity,
+      client_loss_state: values.lossState,
+      client_loss_zipCode: values.lossZipCode,
     };
     setStep(1);
     await fields.forEach(field => {
@@ -211,7 +221,7 @@ const InviteByAgent = () => {
         agent_email: data.agent.email,
         agent_city: data.agent.city,
         agent_state: data.agent.state,
-        agent_country: data.agent.country,
+        // agent_country: data.agent.country,
         agent_zipCode: data.agent.zipCode,
         agent_gender: data.agent.gender,
       }
@@ -230,8 +240,8 @@ const InviteByAgent = () => {
   const { data: placeholders } = useGetPlaceholdersByContractId(contractId)
 
   const onSubmit = () => {
-    const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 
-      'claimNo', 'dateOfLoss', 'causeOfLoss', 'status', 'mortgage', 'initials', 'publicAdjusterLicense', 'contingencyFee' ]
+    const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber',  'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 
+      'claimNo', 'dateOfLoss', 'causeOfLoss', 'status', 'mortgage', 'initials', 'contingencyFee', 'lossAddress', 'lossCity', 'lossState', 'lossZipCode' ];
     let additionalFields = {}
     Object.keys(inviteData).forEach(key => {
       if(!knownFields.includes(key)) {

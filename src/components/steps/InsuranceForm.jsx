@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import Grid from "@mui/material/Grid";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,6 +22,13 @@ const schema = yup.object({
     .required("Please enter date of loss")
     .default(undefined),
   causeOfLoss: yup.string().required("Please enter cause of loss"),
+  mortgage: yup.string().required("Please enter mortgage"),
+  initials: yup.string().required("Please enter initials"),
+  contingencyFee: yup.string().required("Please enter contingencyFee"),
+  lossAddress: yup.string().required("Please enter loss address"),
+  lossCity: yup.string().required("Please enter loss city"),
+  lossState: yup.string().required("Please enter loss state"),
+  lossZipCode: yup.string().required("Please enter loss ZipCode"),
 });
 const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
   const { control, handleSubmit } = useForm({
@@ -32,7 +40,11 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
       causeOfLoss: (inviteData && inviteData.causeOfLoss) || "",
       mortgage: (inviteData && inviteData.mortgage) || "",
       initials: (inviteData && inviteData.initials) || "",
-      publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
+      lossAddress: (inviteData && inviteData.lossAddress) || "",
+      lossCity: (inviteData && inviteData.lossCity) || "",
+      lossState: (inviteData && inviteData.lossState) || "",
+      lossZipCode: (inviteData && inviteData.lossZipCode) || "",
+      // publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
       contingencyFee: (inviteData && inviteData.contingencyFee) || "",
 
     },
@@ -139,6 +151,58 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         )}
       />
       <Controller
+        name="lossAddress"
+        control={control}
+        render={({ field, fieldState }) => (
+          <PrimaryInput
+            placeholder="Loss Address"
+            {...field}
+            helperText={fieldState.error && fieldState.error.message}
+          />
+        )}
+      />
+      <Grid container spacing={1}>
+        <Grid item lg={4} xs={12}>
+          <Controller
+            name="lossState"
+            control={control}
+            render={({ field, fieldState }) => (
+              <PrimaryInput
+                {...field}
+                placeholder="Loss State"
+                helperText={fieldState.error && fieldState.error.message}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item lg={4} xs={12}>
+          <Controller
+            name="lossCity"
+            control={control}
+            render={({ field, fieldState }) => (
+              <PrimaryInput
+                placeholder="Loss City"
+                {...field}
+                helperText={fieldState.error && fieldState.error.message}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item lg={4} xs={12}>
+          <Controller
+            name="lossZipCode"
+            control={control}
+            render={({ field, fieldState }) => (
+              <PrimaryInput
+                {...field}
+                placeholder="Loss ZipCode"
+                helperText={fieldState.error && fieldState.error.message}
+              />
+            )}
+          />
+        </Grid>
+      </Grid>
+      <Controller
         name="mortgage"
         control={control}
         render={({ field, fieldState }) => (
@@ -160,7 +224,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
           />
         )}
       />
-      <Controller
+      {/* <Controller
         name="publicAdjusterLicense"
         control={control}
         render={({ field, fieldState }) => (
@@ -170,7 +234,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
             helperText={fieldState.error && fieldState.error.message}
           />
         )}
-      />
+      /> */}
       <Controller
         name="contingencyFee"
         control={control}
