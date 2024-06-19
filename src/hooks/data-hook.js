@@ -66,8 +66,8 @@ const signContract = async (input) => {
     })
     console.log("input.data: ", input.data);
     const { data } = await axios.post(
-      `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
-      {...input.data, additionalFields},
+      `${BASE_URL}${API_ENDPOINTS.CONTRACT}/invite/${input.contractId}`, //${input.inviteId}/status`,
+      {...input.data, inviteId: input.inviteId, additionalFields},
       {
         headers: {
           Accept: "application/json",
