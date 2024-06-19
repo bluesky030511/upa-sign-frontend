@@ -55,18 +55,10 @@ const getTemplates = async () => {
 
 // Sign Contract
 const signContract = async (input) => {
-  const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber', 'country', 'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 'claimNo', 'dateOfLoss', 'causeOfLoss', 'status' ]
-    let additionalFields = {}
-    Object.keys(input.data).forEach(key => {
-      if(!knownFields.includes(key)) {
-        additionalFields[key] = input.data[key]
-        delete input.data[key]
-      } 
-    })
     console.log("input.data: ", input.data);
     const { data } = await axios.post(
-      `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${input.contractId}/invite/${input.inviteId}/status`,
-      {...input.data, additionalFields},
+      `${BASE_URL}${API_ENDPOINTS.CONTRACT}/invite/${input.contractId}`, //${input.inviteId}/status`,
+      {...input.data, inviteId: input.inviteId},
       {
         headers: {
           Accept: "application/json",
