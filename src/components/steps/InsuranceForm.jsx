@@ -29,6 +29,7 @@ const schema = yup.object({
   lossCity: yup.string().required("Please enter loss city"),
   lossState: yup.string().required("Please enter loss state"),
   lossZipCode: yup.string().required("Please enter loss ZipCode"),
+  publicAdjusterLicense: yup.string().required("Please enter Public Adjuster License number"),
 });
 const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
   const { control, handleSubmit } = useForm({
@@ -44,7 +45,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
       lossCity: (inviteData && inviteData.lossCity) || "",
       lossState: (inviteData && inviteData.lossState) || "",
       lossZipCode: (inviteData && inviteData.lossZipCode) || "",
-      // publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
+      publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
       contingencyFee: (inviteData && inviteData.contingencyFee) || "",
 
     },
@@ -224,7 +225,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
           />
         )}
       />
-      {/* <Controller
+      <Controller
         name="publicAdjusterLicense"
         control={control}
         render={({ field, fieldState }) => (
@@ -234,7 +235,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
             helperText={fieldState.error && fieldState.error.message}
           />
         )}
-      /> */}
+      />
       <Controller
         name="contingencyFee"
         control={control}
