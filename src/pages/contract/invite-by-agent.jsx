@@ -193,10 +193,11 @@ const InviteByAgent = () => {
       client_loss_city: values.lossCity,
       client_loss_state: values.lossState,
       client_loss_zipCode: values.lossZipCode,
+      agent_public_adjuster_license: values.publicAdjusterLicense,
     };
     setStep(1);
     await fields.forEach(field => {
-      if(field.name.includes("client")) {
+      if(field.name.includes("client") || field.name == "agent_public_adjuster_license") {
         field.value = data[field.name] ? data[field.name] : field.value;
       }
     });
