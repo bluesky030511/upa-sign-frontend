@@ -24,6 +24,7 @@ import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import Tooltip from "@mui/material/Tooltip";
+import CreateTemplateModal from "../../../components/modals/create-template-modal";
 
 import 'react-resizable/css/styles.css';
 
@@ -89,7 +90,7 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
     ));
   }
 
-  const handleClick = (e, id) => {
+  const handleClick = (id) => {
     if(id && sizes[id]) {
       setFields((prevFields) => 
         prevFields.map(field => 
@@ -130,13 +131,14 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
             isResizing={isResizing}
           >
             <ResizableBox
-              width={(sizes[field.id] || { width: 200, height: 40 }).width}
-              minConstraints={[100, 30]}
-              maxConstraints={[800, 80]}
+              width={ field.name == "month" || field.name == "count" ? 100: (sizes[field.id] || { width: 200, height: 40 }).width}
+
+              minConstraints={field.name == "month" || field.name == "count" ? [50, 40] : [100, 30]}
+              maxConstraints={field.name == "month" || field.name == "count" ? [120, 40] : [800, 80]}
               onResize={ (e, data) => handleResize(field.id, data.size)}
               onResizeStart={() => setIsResizing(true)}
-              onResizeStop={() => setIsResizing(false)}
-              onClick={(e) => handleClick(e, field.id)}
+              onResizeStop={() => {setIsResizing(false); handleClick(field.id)}}
+              onClick={(e) => handleClick(field.id)}
             >
               <TextField 
                 variant="outlined"
@@ -179,6 +181,9 @@ const TemplateEdit = () => {
   const [oldWidth, setOldWidth] = useState(0);
   const [showProp, setShowProp] = useState(false);
   const [item, setItem] = useState(null);
+  const [createModal, setCreateModal] = useState(false);
+  const [state, setState] = useState('private');
+  const [teams, setTeams] = useState([]);
 
   const handleDrop = (item, pageNumber, x, y) => {
     setFields([
@@ -192,7 +197,7 @@ const TemplateEdit = () => {
         top: y,
         fontSize: 11,
         dataLabel: '',
-        width: 200,
+        width: item.name == "month" || item.name == "count" ? 100 : 200,
       }
     ]);
     setCurrentItem({id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y});
@@ -269,13 +274,33 @@ const TemplateEdit = () => {
     setNumPages(numPages);
   }
 
-  const createTemplate = () => () => {
+  const handleOpenModal = () => {
+    setCreateModal(true);
+  }
+
+  const handleCloseModal = () => {
+    setCreateModal(false);
+  }
+
+  const createTemplate = () => {
     const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
     console.log("creating...");
-    CreateTemplate({ id: id, tempData: { name: name, fields: fields.map((field) => ({...field, left: field.left / targetRect.width, top: field.top / targetRect.height }))} }, {
+    CreateTemplate({ 
+      id: id, 
+      tempData: { 
+        name: name, 
+        state: state,
+        teams: teams.map(item => item.value),
+        fields: fields.map((field) => ({...field, left: field.left / targetRect.width, top: field.top / targetRect.height 
+      }))} 
+    }, {
       onSuccess: () => {
+        handleCloseModal();
         console.log("Success...");
         navigate("/templates");
+      },
+      onError: () => {
+        handleCloseModal();
       }
     });
   }
@@ -291,6 +316,16 @@ const TemplateEdit = () => {
         setItem={setItem}
         deleteItem={deleteItem}
         setFields={setFields}
+      />
+      <CreateTemplateModal 
+        open={createModal}
+        handleClose={handleCloseModal}
+        handleAction={createTemplate}
+        loading={isCreating}
+        state={state}
+        setState={setState}
+        teams={teams}
+        setTeams={setTeams}
       />
       <DashboardHeader handleDrawerToggle={handleDrawerToggle} width={360} />
       <TemplateEditWrapper>
@@ -317,7 +352,7 @@ const TemplateEdit = () => {
                   textTransform: "none",
                 }} 
                 startIcon={<AddRoundedIcon />}
-                onClick={createTemplate()}
+                onClick={handleOpenModal}
               >
                 {isCreating ? (
                   <CircularProgress

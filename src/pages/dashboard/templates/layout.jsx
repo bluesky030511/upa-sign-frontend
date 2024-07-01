@@ -18,7 +18,11 @@ import {
   InputAdornment,
   Tooltip,
   Button,
+  Select,
+  FormControl,
+  InputLabel,
   IconButton,
+  MenuItem,
 } from "@mui/material";
 import { useDrag } from "react-dnd";
 import ImageIcon from '@mui/icons-material/Image';
@@ -59,6 +63,8 @@ import NotesIcon from '@mui/icons-material/Notes';
 import ContactsIcon from '@mui/icons-material/Contacts';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
+import Filter9PlusIcon from '@mui/icons-material/Filter9Plus';
 import styled from "styled-components";
 
 import { colors, fonts } from "../../../utils/theme";
@@ -69,7 +75,8 @@ const SignField = ({ item, selectedUser }) => {
 
   const dragConfig = React.useMemo(() => ({
     type: 'SIGN_FIELD',
-    item: { id: item.id, name: item.id == "text" || item.id == "date" || item.id == "time" ? item.id : selectedUser === 0 ? 
+    item: { id: item.id, name: item.id == "text" || item.id == "date" || item.id == "time" || item.id == "month" || item.id == "count" 
+      ? item.id : selectedUser === 0 ? 
       `agent_${item.id}` : `client_${item.id}` },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
@@ -220,10 +227,10 @@ const EditDrawer = (props) => {
                   <SignField item={{ id:"street_address", name:"Street Address", icon:<HomeIcon/>}} selectedUser={selectedUser} />
                 </Grid>
                 <Grid item xs={6}>
-                  <SignField item={{ id:"state", name:"State", icon:<LocationCityIcon/>}} selectedUser={selectedUser} />
+                  <SignField item={{ id:"city", name:"City", icon:<ApartmentIcon/>}} selectedUser={selectedUser} />
                 </Grid>
                 <Grid item xs={6}>
-                  <SignField item={{ id:"city", name:"City", icon:<ApartmentIcon/>}} selectedUser={selectedUser} />
+                  <SignField item={{ id:"state", name:"State", icon:<LocationCityIcon/>}} selectedUser={selectedUser} />
                 </Grid>
                 <Grid item xs={6}>
                   <SignField item={{ id:"zipCode", name:"Zip Code", icon:<AttachEmailIcon/>}} selectedUser={selectedUser} />
@@ -266,10 +273,10 @@ const EditDrawer = (props) => {
                     <SignField item={{ id:"loss_street_address", name:"Loss Street Address", icon:<HomeIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                   <Grid item xs={6}>
-                    <SignField item={{ id:"loss_state", name:"Loss State", icon:<LocationCityIcon/>}} selectedUser={selectedUser} />
+                    <SignField item={{ id:"loss_city", name:"Loss City", icon:<ApartmentIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                   <Grid item xs={6}>
-                    <SignField item={{ id:"loss_city", name:"Loss City", icon:<ApartmentIcon/>}} selectedUser={selectedUser} />
+                    <SignField item={{ id:"loss_state", name:"Loss State", icon:<LocationCityIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                   <Grid item xs={6}>
                     <SignField item={{ id:"loss_zipCode", name:"Loss Zip Code", icon:<AttachEmailIcon/>}} selectedUser={selectedUser} />
@@ -296,6 +303,12 @@ const EditDrawer = (props) => {
                 <Grid item xs={6}>
                   <SignField item={{ id:"time", name:"Time", icon:<AlarmIcon/>}} selectedUser={selectedUser} />
                 </Grid>
+                <Grid item xs={6}>
+                  <SignField item={{ id:"month", name:"Month", icon:<InsertInvitationIcon/>}} selectedUser={selectedUser} />
+                </Grid>
+                <Grid item xs={6}>
+                  <SignField item={{ id:"count", name:"Count", icon:<Filter9PlusIcon/>}} selectedUser={selectedUser} />
+                </Grid>
               </Grid>
             </Box>
           </List>
@@ -321,9 +334,33 @@ const EditDrawer = (props) => {
               <DemoContainer components={['DatePicker', 'TimePicker']}>
                 <Stack spacing={4} sx={{ px: 2, py: 6}}>
                   {item && item.name == 'text' && (<TextField size="small" fullWidth label="Default Value" value={item ? item.value : ''} onChange={(e)=>{handleItem(e, 'value')}}/>)}
+                  {item && item.name == 'month' && (
+                    <FormControl size="small" fullWidth >
+                      <InputLabel>Month</InputLabel>
+                      <Select
+                        value = {item ? item.value : ''}
+                        label = "Month"
+                        onChange={(e)=>{handleItem(e, 'value')}}
+                      >
+                        <MenuItem value="January" >January</MenuItem>
+                        <MenuItem value="February" >February</MenuItem>
+                        <MenuItem value="March" >March</MenuItem>
+                        <MenuItem value="April" >April</MenuItem>
+                        <MenuItem value="May" >May</MenuItem>
+                        <MenuItem value="June" >June</MenuItem>
+                        <MenuItem value="July" >July</MenuItem>
+                        <MenuItem value="August" >August</MenuItem>
+                        <MenuItem value="September" >September</MenuItem>
+                        <MenuItem value="October" >October</MenuItem>
+                        <MenuItem value="November" >November</MenuItem>
+                        <MenuItem value="December" >December</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                  {item && item.name == 'count' && (<TextField size="small" type="number" fullWidth label="Default Value" value={item ? item.value : ''} onChange={(e)=>{handleItem(e, 'value')}}/>)}
                   {item && item.name == 'date' && (<DatePicker label="Date" size="small" value={item ? dayjs(item.value) : null} onChange={(value)=>{handleTime('value', value)}} />)}
                   {item && item.name == 'time' && (<TimePicker label="Time" size="small" value={item ? dayjs(item.value) : null} onChange={(value)=>{handleTime('value', value)}} />)}
-                  {item && (item.name == 'text' || item.name == 'date' || item.name == 'time' ) && (<TextField size="small" fullWidth label="Data label" value={item ? item.dataLabel : ''} onChange={(e)=>{handleItem(e, 'dataLabel')}}/>)}
+                  {item && (item.name == 'text' || item.name == 'date' || item.name == 'time' || item.name == 'month' || item.name == 'count' ) && (<TextField size="small" fullWidth label="Data label" value={item ? item.dataLabel : ''} onChange={(e)=>{handleItem(e, 'dataLabel')}}/>)}
                   <TextField size="small" fullWidth type="number" label="Font size" value={item ? item.fontSize : 11} onChange={(e)=>{handleItem(e, 'fontSize')}}/>
                   <Button variant="outlined" color="error" onClick={(e) => {deleteItem(item)}}>Delete field</Button>
                 </Stack>

@@ -95,6 +95,10 @@ const LeftDrawer = (props) => {
                   to="/documents"
                   item={{ name: "Documents", icon: <DescriptionOutlined /> }}
                 />
+                <CustomLink 
+                  to="/sign-documents"
+                  item={{ name: "Sign Documents", icon: <AutoAwesomeMosaicOutlined /> }}
+                />
                 <CustomLink
                   to="/Placeholders"
                   item={{ name: "Placeholders", icon: <PlaceOutlined /> }}
@@ -126,10 +130,16 @@ const LeftDrawer = (props) => {
             )}
 
             {user.role === "ADMIN" && (
-              <CustomLink
-                to="/users"
-                item={{ name: "Users", icon: <Settings /> }}
-              />
+              <>
+                <CustomLink 
+                  to="/sign-documents"
+                  item={{ name: "Sign Documents", icon: <AutoAwesomeMosaicOutlined /> }}
+                />
+                <CustomLink
+                  to="/users"
+                  item={{ name: "Users", icon: <Settings /> }}
+                />
+              </>
             )}
             {(user.role === "AGENT" ||
               user.role === "ADMIN" ||

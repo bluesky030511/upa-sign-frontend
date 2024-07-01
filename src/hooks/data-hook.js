@@ -15,6 +15,11 @@ const getContractById = async (id) => {
   return data;
 };
 
+const getSignedContractById = async (id) => {
+  const { data } = await http.get(`${API_ENDPOINTS.CONTRACT}/${id}/get-sign-invite`);
+  return data;
+}
+
 // Delete Contract
 const deleteContract = async (id) => {
   const { data } = await http.delete(`${API_ENDPOINTS.CONTRACT}/${id}`);
@@ -99,6 +104,10 @@ export const useGetContractById = (id) => {
   return useQuery("get-contract-by-id", () => getContractById(id));
 };
 
+export const useGetSignedContractById = (id) => {
+  return useQuery("get-signed-contract-by-id", () => getSignedContractById(id));
+}
+
 export const useDeleteContract = () => {
   return useMutation(deleteContract);
 };
@@ -164,6 +173,33 @@ export const createTemplate = async (userData) => {
 
 export const useCreateTemplate = () => {
   return useMutation(createTemplate);
+}
+
+export const addAccessPermission = async (userData) => {
+  const { data } = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/add-access`, userData);
+  return data;
+}
+
+export const useAddAccessPermission = () => {
+  return useMutation(addAccessPermission);
+}
+
+export const deleteAccessPermission = async (userData) => {
+  const { data } = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/delete-access`, userData);
+  return data;
+}
+
+export const useDeleteAccessPermission = () => {
+  return useMutation(deleteAccessPermission);
+}
+
+export const getAccessUserList = async () => {
+  const { data } = await http.get(`${BASE_URL}${API_ENDPOINTS.USERS}/get-access`);
+  return data;
+}
+
+export const useGetAccessUserList = () => {
+  return useQuery("accessUserList", getAccessUserList);
 }
 
 export const deletePlaceholder = async (id) => {

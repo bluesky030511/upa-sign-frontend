@@ -29,6 +29,7 @@ import SearchInput from "../../../components/inputs/search-input";
 import PaymentModal from "../../../components/modals/payment-modal";
 import { useSubscription } from "../../../context/subscription.context";
 import { isSubscribed } from "../../../utils/helper";
+import AccessPermissionModal from "../../../components/modals/access-permission-modal";
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -157,7 +158,7 @@ export const descendingComparator = (a, b, orderBy, type) => {
       return 1;
     }
   }
-  if (type === "string") {
+  if (type === "string" && b[orderBy] && a[orderBy]) {
     if (b[orderBy].toUpperCase() < a[orderBy].toUpperCase()) {
       return -1;
     }
@@ -215,6 +216,7 @@ const DocumentsListing = () => {
   });
   const [searchParams, setSearchParams] = useSearchParams();
   const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const { subscription } = useSubscription();
   const visibleRows = useMemo(() => {
     if (data) {
@@ -256,6 +258,14 @@ const DocumentsListing = () => {
     localStorage.removeItem(PLAN);
   };
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  }
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  }
+
   const populateQueries = () => {
     if (localStorage.getItem(PLAN)) {
       setSearchParams({
@@ -286,8 +296,25 @@ const DocumentsListing = () => {
           handleClose={handleClose}
           plan={searchParams.get("plan") || localStorage.getItem(PLAN)}
         />
+        <AccessPermissionModal 
+          open={openModal}
+          handleClose={handleCloseModal}
+        />
         <SubscriptionAlert />
         <ListingWrapper>
+          <div className="permission-container">
+            <Button
+              variant="contained" 
+              sx={{ 
+                backgroundColor: colors.themeBlue, 
+                fontFamily: fonts.medium, 
+                textTransform: "none",
+              }} 
+              onClick={handleOpenModal}
+            >
+              Access Permission
+            </Button>
+          </div>
           <div className="search-container">
             <SearchInput
               placeholder="Search"
@@ -346,24 +373,50 @@ const DocumentsListing = () => {
                             <StyledTableCell align="center">
                               {user.isAgent ||
                               row.invite[0].status === "PENDING" ? (
-                                <ActionDropDown
-                                  id={row.id}
-                                  file={
-                                    user.isAgent
-                                      ? row.file
-                                      : row.invite[0].file
-                                      ? row.invite[0].file
-                                      : row.file
-                                  }
-                                  inviteId={
-                                    user.isAgent ? null : row.invite[0].id
-                                  }
-                                  signed={
-                                    user.isAgent
-                                      ? false
-                                      : row.invite[0].status === "APPROVED"
-                                  }
-                                />
+                                <Box 
+                                  sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}
+                                >
+                                  <ActionDropDown
+                                    id={row.id}
+                                    file={
+                                      user.isAgent
+                                        ? row.file
+                                        : row.invite[0].file
+                                        ? row.invite[0].file
+                                        : row.file
+                                    }
+                                    inviteId={
+                                      user.isAgent ? null : row.invite[0].id
+                                    }
+                                    signed={
+                                      user.isAgent
+                                        ? false
+                                        : row.invite[0].status === "APPROVED"
+                                    }
+                                  />
+                                  {user.isAgent && (<Button
+                                    sx={{
+                                      bgcolor: colors.translucentGreen,
+                                      boxShadow: "none",
+                                      color: colors.foreGreen,
+                                      textTransform: "none",
+                                      px: { xs: "8px", sm: "17px" },
+                                      py: { xs: "2px", sm: "6px" },
+                                      fontSize: "11px",
+                                      fontFamily: fonts.medium,
+                                      "&:hover": {
+                                        bgcolor: colors.translucentGreen,
+                                      },
+                                      "& .MuiButton-endIcon": {
+                                        marginLeft: 0,
+                                        marginRight: 0,
+                                      },
+                                    }}
+                                    onClick={() => navigate(`details/${row.id}`)}
+                                  >
+                                    Invite
+                                  </Button>)}
+                                </Box>
                               ) : (
                                 <a
                                   href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
@@ -441,6 +494,12 @@ const ListingWrapper = styled.div`
   flex-direction: column;
 
   div.search-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 24px;
+  }
+
+  div.permission-container {
     display: flex;
     justify-content: flex-end;
     margin-bottom: 24px;

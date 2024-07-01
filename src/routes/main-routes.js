@@ -29,6 +29,10 @@ import DocumentRoot from "../pages/dashboard/documents/document-root";
 import DocumentsListing from "../pages/dashboard/documents/documents-listing";
 import DocumentDetails from "../pages/dashboard/documents/document-details";
 
+// Sign Documents Pages
+import SignDocuments from "../pages/dashboard/sign-documents/sign-documents";
+import SignDocumentsList from "../pages/dashboard/sign-documents/sign-document";
+
 // Contract Pages
 import Contract from "../pages/contract/contract";
 import Invite from "../pages/contract/invite";
@@ -198,6 +202,22 @@ export const MainRoutes = () => {
       element: (
         <ProtectedRoute>
           {user.isAgent ? <Templates /> : <Navigate to="/not-found" />}
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: "/sign-documents",
+      element: (
+        <ProtectedRoute>
+          <SignDocuments />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: "/sign-document/:id",
+      element: (
+        <ProtectedRoute>
+          <SignDocumentsList />
         </ProtectedRoute>
       )
     },

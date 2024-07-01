@@ -36,7 +36,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
     };
     setTimeout(() => {
       updateDimensions();
-    }, 100);
+    }, 500);
 
     updateDimensions();
 
@@ -125,7 +125,7 @@ const Invite = () => {
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
-  const [fields, setFields] = useState(null);
+  const [fields, setFields] = useState([]);
 
   const handleInviteData = (values) => {
     setInviteData({ ...inviteData, ...values });
@@ -292,7 +292,7 @@ const Invite = () => {
                 pageNumber={index + 1}
                 width={Math.min( width > 600 ? width-485 : width - 40, 3000)}
                 fields={fields.filter((field) => 
-                  field.pageNumber === index + 1 && (field.name === "text" || field.name == "date" || field.name == "time" || field.name === "client_signature" || field.name === "client_contract_date" || field.name === "client_sign_date")
+                  field.pageNumber === index + 1 && (field.name === "client_signature" || field.name === "client_contract_date" || field.name === "client_sign_date")
                 )}
                 setFields={setFields}
               />
