@@ -64,7 +64,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Insurance Company"
+            placeholder="Client Insurance Company"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -75,7 +75,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Policy #"
+            placeholder="Client Policy #"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -86,7 +86,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Claim #"
+            placeholder="Client Claim #"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -106,7 +106,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
                   fullWidth: true,
                   variant: "outlined",
                   inputProps: {
-                    placeholder: "Date of loss",
+                    placeholder: "Client Date of loss",
                     sx: {
                       fontFamily: fonts.medium,
                       fontSize: 16,
@@ -145,7 +145,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Cause of Loss"
+            placeholder="Client Cause of Loss"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -156,7 +156,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Loss Address"
+            placeholder="Client Loss Address"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -165,12 +165,12 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
       <Grid container spacing={1}>
         <Grid item lg={4} xs={12}>
           <Controller
-            name="lossState"
+            name="lossCity"
             control={control}
             render={({ field, fieldState }) => (
               <PrimaryInput
+                placeholder="Client Loss City"
                 {...field}
-                placeholder="Loss State"
                 helperText={fieldState.error && fieldState.error.message}
               />
             )}
@@ -178,12 +178,12 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         </Grid>
         <Grid item lg={4} xs={12}>
           <Controller
-            name="lossCity"
+            name="lossState"
             control={control}
             render={({ field, fieldState }) => (
               <PrimaryInput
-                placeholder="Loss City"
                 {...field}
+                placeholder="Client Loss State"
                 helperText={fieldState.error && fieldState.error.message}
               />
             )}
@@ -196,7 +196,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
             render={({ field, fieldState }) => (
               <PrimaryInput
                 {...field}
-                placeholder="Loss ZipCode"
+                placeholder="Client Loss ZipCode"
                 helperText={fieldState.error && fieldState.error.message}
               />
             )}
@@ -208,7 +208,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Mortgage"
+            placeholder="Client Mortgage"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -219,7 +219,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Initials"
+            placeholder="Client Initials"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -241,7 +241,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData }) => {
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Contingency fee %"
+            placeholder="Client Contingency fee %"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
