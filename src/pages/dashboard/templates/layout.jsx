@@ -303,12 +303,12 @@ const EditDrawer = (props) => {
                 <Grid item xs={6}>
                   <SignField item={{ id:"time", name:"Time", icon:<AlarmIcon/>}} selectedUser={selectedUser} />
                 </Grid>
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                   <SignField item={{ id:"month", name:"Month", icon:<InsertInvitationIcon/>}} selectedUser={selectedUser} />
                 </Grid>
                 <Grid item xs={6}>
                   <SignField item={{ id:"count", name:"Count", icon:<Filter9PlusIcon/>}} selectedUser={selectedUser} />
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
           </List>

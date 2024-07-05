@@ -412,7 +412,7 @@ const DocumentsListing = () => {
                                         marginRight: 0,
                                       },
                                     }}
-                                    onClick={() => navigate(`details/${row.id}`)}
+                                    onClick={() => navigate(`/contract/${row.id}`)}
                                   >
                                     Invite
                                   </Button>)}

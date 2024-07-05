@@ -76,12 +76,13 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               style={{
                 position: 'absolute',
                 left: `${fieldDimensions.width * field.left}px`,
-                top: field.name == "date" || field.name == "time" ? `${fieldDimensions.height * field.top - 12}px`  : `${fieldDimensions.height * field.top}px`
+                top: `${fieldDimensions.height * field.top}px`
               }}
               key={field.id}            
             >
               
-              {field.name != 'date' && field.name != 'time' && field.name != 'month' && (<TextField 
+              {/* {field.name != 'date' && field.name != 'time' && field.name != 'month' && ( */}
+              <TextField 
                 variant="outlined"
                 defaultValue={field.value == 'count' ? 0 : field.value }
                 label={field.name == "agent_public_adjuster_license" ? 
@@ -93,13 +94,14 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
                   width: field.width,
                   height: `${width / maxWidth * 20}px` 
                 }}
-                type={ field.name == 'count' ? 'number' : 'text' }
+                // type={ field.name == 'count' ? 'number' : 'text' }
                 InputProps={{ 
-                  readOnly: field.name == "text" || field.name == "agent_public_adjuster_license" || field.name == "agent_initials" || field.name == "month" || field.name == "count"  ? false : true 
+                  readOnly: true //field.name == "text" || field.name == "agent_public_adjuster_license" || field.name == "agent_initials" || field.name == "month" || field.name == "count"  ? false : true 
                 }}
                 onChange={event => {handleText(event, field);}}
-              />)}
-              { field.name == 'month' && (
+              />
+              {/* )} */}
+              {/* { field.name == 'month' && (
                 <FormControl size='small'>
                   <InputLabel>Month</InputLabel>
                   <Select
@@ -141,7 +143,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
                   }} 
                   onChange={(value) => handleTime(value, field)} 
                 />)}
-              </DemoContainer>
+              </DemoContainer> */}
             </div>
           ))}
         </PDF>
@@ -223,12 +225,23 @@ const InviteByAgent = () => {
       client_loss_city: values.lossCity,
       client_loss_state: values.lossState,
       client_loss_zipCode: values.lossZipCode,
+      agent_initials: values.agentInitials,
       agent_public_adjuster_license: values.publicAdjusterLicense,
     };
+
     setStep(1);
     await fields.forEach(field => {
-      if(field.name.includes("client") || field.name == "agent_public_adjuster_license") {
+      if(field.name.includes("client") || field.name == "agent_public_adjuster_license" || field.name == "agent_initials") {
         field.value = data[field.name] ? data[field.name] : field.value;
+      }
+      if(values[field.id]) {
+        console.log("value", values[field.id]);
+        if (field.name == "date")
+          field.value =  new Date(values[field.id]).toDateString();
+        else if (field.name == "time") 
+          field.value = dayjs(values[field.id]).format('hh:mm A');
+        else
+          field.value = values[field.id];
       }
     });
     setFields([...fields]);
@@ -342,6 +355,7 @@ const InviteByAgent = () => {
                 handleInviteData={handleInviteData}
                 handleOpenModal={handleStep}
                 inviteData={inviteData}
+                fields = {fields}
               />
             )}</>)}
             {step === 1 && (<Box sx={{ display:"flex", flexDirection:"column", justifyContent:"center", mb:4, gap:3 }}>
