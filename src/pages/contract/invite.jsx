@@ -172,6 +172,7 @@ const Invite = () => {
   const { data, isFetching } = useQuery("contract-invite", getContract, {
     onSuccess: (data) => {
       removeUser();
+      console.log("data: ", data);
       setUser({
         loggedIn: false,
         isAgent: false,

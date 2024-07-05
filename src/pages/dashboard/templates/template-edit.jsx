@@ -11,6 +11,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack";
 import { API_ENDPOINTS, BASE_URL } from "../../../utils/variables";
 import { useCreateTemplate } from "../../../hooks/data-hook";
+import { useToast } from '../../../context/toast.context';
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { TextField } from "@mui/material";
@@ -70,7 +71,10 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
       if(!monitor.didDrop()) {
           if(fields.findIndex(field => field.id == item.id) != -1) {
             const delta = monitor.getDifferenceFromInitialOffset();
-            moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y));
+            if(item.dataLabel != '')
+              moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y  + 8));
+            else  
+              moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y  + 5));
           }
           else {
             const clientOffset = monitor.getClientOffset();
@@ -177,6 +181,7 @@ const TemplateEdit = () => {
   const width = useWindowWidth();
   const [fields, setFields] = useState([]);
   const { mutate: CreateTemplate, isLoading: isCreating } = useCreateTemplate();
+  const { showSuccessToast, showErrorToast } = useToast();
   const [currentItem, setCurrentItem] = useState(null);
   const [oldWidth, setOldWidth] = useState(0);
   const [showProp, setShowProp] = useState(false);
@@ -196,7 +201,7 @@ const TemplateEdit = () => {
         left: x, 
         top: y,
         fontSize: 11,
-        dataLabel: '',
+        dataLabel: item.name == "text" || item.name == "date" || item.name == "time" ? item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase() : "",
         width: item.name == "month" || item.name == "count" ? 100 : 200,
       }
     ]);
@@ -299,7 +304,8 @@ const TemplateEdit = () => {
         console.log("Success...");
         navigate("/templates");
       },
-      onError: () => {
+      onError: (error) => {
+        showErrorToast(error.response.data.message);
         handleCloseModal();
       }
     });
