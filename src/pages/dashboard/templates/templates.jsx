@@ -136,7 +136,7 @@ const Templates = () => {
                 p: 0,
               }}
             >
-              <Button
+              {/* <Button
                 variant="text"
                 sx={{
                   textTransform: "none",
@@ -147,7 +147,7 @@ const Templates = () => {
                 onClick={handleShowGuideLine}
               >
                 Guidelines
-              </Button>
+              </Button> */}
               <Tooltip
                 title={
                   user.role === "ADMIN" || isSubscribed(subscription)

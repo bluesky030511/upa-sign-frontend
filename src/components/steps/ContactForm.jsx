@@ -63,7 +63,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
             render={({ field, fieldState }) => (
               <PrimaryInput
                 {...field}
-                placeholder="First Name"
+                placeholder="Client First Name"
                 spaced={false}
                 helperText={fieldState.error && fieldState.error.message}
               />
@@ -76,7 +76,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
             control={control}
             render={({ field, fieldState }) => (
               <PrimaryInput
-                placeholder="Last Name"
+                placeholder="Client Last Name"
                 {...field}
                 spaced={false}
                 helperText={fieldState.error && fieldState.error.message}
@@ -90,7 +90,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Enter your phone number"
+            placeholder="Enter client phone number"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -101,7 +101,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Enter your email address"
+            placeholder="Enter client email address"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -112,7 +112,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
         control={control}
         render={({ field, fieldState }) => (
           <PrimaryInput
-            placeholder="Address"
+            placeholder="Client Address"
             {...field}
             helperText={fieldState.error && fieldState.error.message}
           />
@@ -132,12 +132,12 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
       <Grid container spacing={1}>
         <Grid item lg={4} xs={12}>
           <Controller
-            name="state"
+            name="city"
             control={control}
             render={({ field, fieldState }) => (
               <PrimaryInput
+                placeholder="Client City"
                 {...field}
-                placeholder="State"
                 helperText={fieldState.error && fieldState.error.message}
               />
             )}
@@ -145,12 +145,12 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
         </Grid>
         <Grid item lg={4} xs={12}>
           <Controller
-            name="city"
+            name="state"
             control={control}
             render={({ field, fieldState }) => (
               <PrimaryInput
-                placeholder="City"
                 {...field}
+                placeholder="Client State"
                 helperText={fieldState.error && fieldState.error.message}
               />
             )}
@@ -163,7 +163,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
             render={({ field, fieldState }) => (
               <PrimaryInput
                 {...field}
-                placeholder="Zip Code"
+                placeholder="Client Zip Code"
                 helperText={fieldState.error && fieldState.error.message}
               />
             )}

@@ -8,7 +8,13 @@ import http from '../../utils/http';
 import PageLoader from '../../shared-components/loader/page-loader';
 import { Loader } from '../../shared-components/loader/loader';
 import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
-import { TextField } from "@mui/material";
+import { 
+  TextField,
+  Select,
+  FormControl,
+  InputLabel, 
+  MenuItem,
+} from "@mui/material";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -40,7 +46,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
     };
     setTimeout(() => {
       updateDimensions();
-    }, 100);
+    }, 500);
 
     updateDimensions();
 
@@ -70,14 +76,15 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               style={{
                 position: 'absolute',
                 left: `${fieldDimensions.width * field.left}px`,
-                top: field.name == "date" || field.name == "time" ? `${fieldDimensions.height * field.top - 12}px`  : `${fieldDimensions.height * field.top}px`
+                top: `${fieldDimensions.height * field.top}px`
               }}
               key={field.id}            
             >
               
-              {field.name != 'date' && field.name != 'time' && (<TextField 
+              {/* {field.name != 'date' && field.name != 'time' && field.name != 'month' && ( */}
+              <TextField 
                 variant="outlined"
-                defaultValue={field.value}
+                defaultValue={field.value == 'count' ? 0 : field.value }
                 label={field.name == "agent_public_adjuster_license" ? 
                 "Agent public adjuster license" : field.name == "agent_initials" ? 
                 "Agent initials" : field.dataLabel}
@@ -87,18 +94,43 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
                   width: field.width,
                   height: `${width / maxWidth * 20}px` 
                 }}
+                // type={ field.name == 'count' ? 'number' : 'text' }
                 InputProps={{ 
-                  readOnly: field.name == "text" || field.name == "agent_public_adjuster_license" || field.name == "agent_initials"  ? false : true 
+                  readOnly: true //field.name == "text" || field.name == "agent_public_adjuster_license" || field.name == "agent_initials" || field.name == "month" || field.name == "count"  ? false : true 
                 }}
                 onChange={event => {handleText(event, field);}}
-              />)}
+              />
+              {/* )} */}
+              {/* { field.name == 'month' && (
+                <FormControl size='small'>
+                  <InputLabel>Month</InputLabel>
+                  <Select
+                    value={field? field.value : ''}
+                    onChange={event => {handleText(event, field);}}
+                    sx={{ width: field.width, }}
+                  >
+                    <MenuItem value="January" >January</MenuItem>
+                    <MenuItem value="February" >February</MenuItem>
+                    <MenuItem value="March" >March</MenuItem>
+                    <MenuItem value="April" >April</MenuItem>
+                    <MenuItem value="May" >May</MenuItem>
+                    <MenuItem value="June" >June</MenuItem>
+                    <MenuItem value="July" >July</MenuItem>
+                    <MenuItem value="August" >August</MenuItem>
+                    <MenuItem value="September" >September</MenuItem>
+                    <MenuItem value="October" >October</MenuItem>
+                    <MenuItem value="November" >November</MenuItem>
+                    <MenuItem value="December" >December</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
               <DemoContainer components={['DatePicker', 'TimePicker']}>
                 {field.name == 'date' && (<DatePicker 
                   label={field.dataLabel} 
                   defaultValue={field.value && dayjs(field.value)} 
                   sx={{ 
                     input: { py: '10px', px: '4px' }, 
-                    width: '50px',  
+                    width: field.width,  
                   }}
                   onChange={(value) => handleTime(value.toString(), field)} 
                 />)}
@@ -107,11 +139,11 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
                   defaultValue={field.value && dayjs(field.value)} 
                   sx={{ 
                     input: { py: '10px', px: '4px' }, 
-                    width: '50px',  
+                    width: field.width,  
                   }} 
                   onChange={(value) => handleTime(value, field)} 
                 />)}
-              </DemoContainer>
+              </DemoContainer> */}
             </div>
           ))}
         </PDF>
@@ -129,7 +161,7 @@ const InviteByAgent = () => {
   const [url, setUrl] = useState(null);
   const navigate = useNavigate();
   const { showSuccessToast, showErrorToast } = useToast();
-  const [fields, setFields] = useState(null);
+  const [fields, setFields] = useState([]);
   const [step, setStep] = useState(0);
 
   pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
@@ -187,18 +219,29 @@ const InviteByAgent = () => {
       client_mortgage: values.mortgage,
       client_initials: values.initials,
       // client_public_adjuster_license: values.publicAdjusterLicense,
-      client_contingency_fee: values.contingencyFee,
+      client_contingency_fee: `${values.contingencyFee}%`,
       client_loss_full_address: `${values.lossAddress}, ${values.lossCity}, ${values.lossState}, ${values.lossZipCode}` || 'N/A',
       client_loss_street_address:values.lossAddress,
       client_loss_city: values.lossCity,
       client_loss_state: values.lossState,
       client_loss_zipCode: values.lossZipCode,
+      agent_initials: values.agentInitials,
       agent_public_adjuster_license: values.publicAdjusterLicense,
     };
+
     setStep(1);
     await fields.forEach(field => {
-      if(field.name.includes("client") || field.name == "agent_public_adjuster_license") {
+      if(field.name.includes("client") || field.name == "agent_public_adjuster_license" || field.name == "agent_initials") {
         field.value = data[field.name] ? data[field.name] : field.value;
+      }
+      if(values[field.id]) {
+        console.log("value", values[field.id]);
+        if (field.name == "date")
+          field.value =  new Date(values[field.id]).toDateString();
+        else if (field.name == "time") 
+          field.value = dayjs(values[field.id]).format('hh:mm A');
+        else
+          field.value = values[field.id];
       }
     });
     setFields([...fields]);
@@ -312,6 +355,7 @@ const InviteByAgent = () => {
                 handleInviteData={handleInviteData}
                 handleOpenModal={handleStep}
                 inviteData={inviteData}
+                fields = {fields}
               />
             )}</>)}
             {step === 1 && (<Box sx={{ display:"flex", flexDirection:"column", justifyContent:"center", mb:4, gap:3 }}>
