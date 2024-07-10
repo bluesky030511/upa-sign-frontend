@@ -13,7 +13,7 @@ import Paper from "@mui/material/Paper";
 import format from "date-fns/format";
 import compareDesc from "date-fns/compareDesc";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { visuallyHidden } from "@mui/utils";
 
@@ -30,6 +30,7 @@ import PaymentModal from "../../../components/modals/payment-modal";
 import { useSubscription } from "../../../context/subscription.context";
 import { isSubscribed } from "../../../utils/helper";
 import AccessPermissionModal from "../../../components/modals/access-permission-modal";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -371,8 +372,8 @@ const DocumentsListing = () => {
                               {date}
                             </StyledTableCell>
                             <StyledTableCell align="center">
-                              {user.isAgent ||
-                              row.invite[0].status === "PENDING" ? (
+                              {user.isAgent && (
+                              // row.invite[0].status === "PENDING" ? (
                                 <Box 
                                   sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}
                                 >
@@ -416,19 +417,17 @@ const DocumentsListing = () => {
                                   >
                                     Invite
                                   </Button>)}
-                                </Box>
-                              ) : (
-                                <a
-                                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
+                                  <a
+                                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
                                 >
-                                  <Button
+                                  {/* <Button
                                     id="basic-menu"
                                     sx={{
                                       bgcolor: colors.translucentGreen,
                                       boxShadow: "none",
                                       color: colors.foreGreen,
                                       textTransform: "none",
-                                      px: { xs: "8px", sm: "17px" },
+                                      px: { xs: "4px", sm: "17px" },
                                       py: { xs: "2px", sm: "6px" },
                                       fontSize: "11px",
                                       fontFamily: fonts.medium,
@@ -443,11 +442,19 @@ const DocumentsListing = () => {
                                         },
                                       },
                                     }}
-                                    endIcon={<VisibilityOutlinedIcon />}
                                   >
                                     Preview
-                                  </Button>
+                                  </Button> */}
+                                  <IconButton sx={{ 
+                                    // bgcolor: colors.translucentGreen,
+                                    py: { xs: "2px", sm: "6px" },
+                                    color: colors.foreGreen 
+                                  }}>
+                                    <VisibilityIcon />
+                                  </IconButton>
                                 </a>
+                                </Box>
+                              // ) : (
                               )}
                             </StyledTableCell>
                           </StyledTableRow>
