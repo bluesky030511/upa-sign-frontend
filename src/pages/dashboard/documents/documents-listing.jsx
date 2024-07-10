@@ -303,7 +303,7 @@ const DocumentsListing = () => {
         />
         <SubscriptionAlert />
         <ListingWrapper>
-          <div className="permission-container">
+          {/* <div className="permission-container">
             <Button
               variant="contained" 
               sx={{ 
@@ -315,7 +315,7 @@ const DocumentsListing = () => {
             >
               Access Permission
             </Button>
-          </div>
+          </div> */}
           <div className="search-container">
             <SearchInput
               placeholder="Search"
