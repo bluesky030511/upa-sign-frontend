@@ -8,6 +8,7 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { useQueryClient } from "react-query";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
+import { useNavigate, useParams } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import Tooltip from "@mui/material/Tooltip";
@@ -26,10 +27,13 @@ import SubscriptionAlert from "../../../components/alerts/subscription-alert";
 import { useSubscription } from "../../../context/subscription.context";
 import { isSubscribed } from "../../../utils/helper";
 import ContractDetailsModal from "../../../components/modals/contract-details-modal";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const Templates = () => {
   const { user } = useUI();
   const { showSuccessToast } = useToast();
+  const navigate = useNavigate();
   const { subscription } = useSubscription();
   const { isFetching, data, isSuccess } = useGetTemplates();
   const { mutate: DeleteTemplate, isLoading: isDeleting } = useDeleteTemplate();
@@ -223,29 +227,46 @@ const Templates = () => {
                                 },
                               }}
                             >
-                              <span>
-                                <Button
-                                  variant="outlined"
-                                  disabled={!isSubscribed(subscription)}
-                                  sx={{
-                                    color: colors.themeBlue,
-                                    borderColor: colors.themeBlue,
-                                    textTransform: "none",
-                                    fontFamily: fonts.medium,
-                                    minHeight: "36px",
-                                    "&:hover": {
+                              <Box sx={{ display:'flex', justifyContent:'center' }}>
+                                {/* <span> */}
+                                  {/* <Button
+                                    variant="outlined"
+                                    disabled={!isSubscribed(subscription)}
+                                    sx={{
+                                      color: colors.themeBlue,
                                       borderColor: colors.themeBlue,
-                                      bgcolor: colors.themeBlue,
-                                      color: colors.white,
-                                    },
-                                  }}
-                                  onClick={() =>
-                                    handleOpenContractModal(template.id)
-                                  }
-                                >
-                                  Create
-                                </Button>
-                              </span>
+                                      textTransform: "none",
+                                      fontFamily: fonts.medium,
+                                      minHeight: "36px",
+                                      "&:hover": {
+                                        borderColor: colors.themeBlue,
+                                        bgcolor: colors.themeBlue,
+                                        color: colors.white,
+                                      },
+                                    }}
+                                    onClick={() =>
+                                      handleOpenContractModal(template.id)
+                                    }
+                                  >
+                                    Create
+                                  </Button> */}
+                                  <IconButton
+                                    disabled={!isSubscribed(subscription)}
+                                    onClick={() =>
+                                      handleOpenContractModal(template.id)
+                                    }
+                                  >
+                                    <AddCircleIcon/>
+                                  </IconButton>
+                                  {/* </span> */}
+                                
+                                  <IconButton
+                                    disabled={!isSubscribed(subscription)}
+                                    onClick={() => { navigate(`/template-edit/${template.filename.replace(/\.[^/.]+$/, "")}/${template.name}`);}}
+                                  >
+                                    <SettingsIcon />
+                                  </IconButton>
+                              </Box>
                             </Tooltip>
                           )}
 
