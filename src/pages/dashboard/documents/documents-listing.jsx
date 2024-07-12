@@ -372,8 +372,8 @@ const DocumentsListing = () => {
                               {date}
                             </StyledTableCell>
                             <StyledTableCell align="center">
-                              {user.isAgent && (
-                              // row.invite[0].status === "PENDING" ? (
+                              {user.isAgent ||
+                              row.invite[0].status === "PENDING" ? (
                                 <Box 
                                   sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}
                                 >
@@ -417,17 +417,56 @@ const DocumentsListing = () => {
                                   >
                                     Invite
                                   </Button>)}
-                                  <a
-                                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
+                                  {user.isAgent && (
+                                    <a
+                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
+                                  >
+                                    {/* <Button
+                                      id="basic-menu"
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        textTransform: "none",
+                                        px: { xs: "4px", sm: "17px" },
+                                        py: { xs: "2px", sm: "6px" },
+                                        fontSize: "11px",
+                                        fontFamily: fonts.medium,
+                                        "&:hover": {
+                                          bgcolor: colors.translucentGreen,
+                                        },
+                                        "& .MuiButton-endIcon": {
+                                          marginLeft: 1,
+                                          marginRight: 0,
+                                          "& svg": {
+                                            fontSize: 16,
+                                          },
+                                        },
+                                      }}
+                                    >
+                                      Preview
+                                    </Button> */}
+                                    <IconButton sx={{ 
+                                      // bgcolor: colors.translucentGreen,
+                                      py: { xs: "2px", sm: "6px" },
+                                      color: colors.foreGreen 
+                                    }}>
+                                      <VisibilityIcon />
+                                    </IconButton>
+                                  </a>)}
+                                </Box>
+                              ) : (
+                                <a
+                                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
                                 >
-                                  {/* <Button
+                                  <Button
                                     id="basic-menu"
                                     sx={{
                                       bgcolor: colors.translucentGreen,
                                       boxShadow: "none",
                                       color: colors.foreGreen,
                                       textTransform: "none",
-                                      px: { xs: "4px", sm: "17px" },
+                                      px: { xs: "8px", sm: "17px" },
                                       py: { xs: "2px", sm: "6px" },
                                       fontSize: "11px",
                                       fontFamily: fonts.medium,
@@ -442,19 +481,11 @@ const DocumentsListing = () => {
                                         },
                                       },
                                     }}
+                                    endIcon={<VisibilityOutlinedIcon />}
                                   >
                                     Preview
-                                  </Button> */}
-                                  <IconButton sx={{ 
-                                    // bgcolor: colors.translucentGreen,
-                                    py: { xs: "2px", sm: "6px" },
-                                    color: colors.foreGreen 
-                                  }}>
-                                    <VisibilityIcon />
-                                  </IconButton>
+                                  </Button>
                                 </a>
-                                </Box>
-                              // ) : (
                               )}
                             </StyledTableCell>
                           </StyledTableRow>
