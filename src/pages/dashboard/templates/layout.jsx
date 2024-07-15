@@ -65,7 +65,6 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import Filter9PlusIcon from '@mui/icons-material/Filter9Plus';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import styled from "styled-components";
 
 import { colors, fonts } from "../../../utils/theme";
@@ -266,15 +265,6 @@ const EditDrawer = (props) => {
                   </Grid>
                   <Grid item xs={6}>
                     <SignField item={{ id:"date_of_loss", name:"Date of loss", icon:<CalendarMonthIcon/>}} selectedUser={selectedUser} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <SignField item={{ id:"day_of_loss", name:"Day of loss", icon:<CalendarTodayIcon/>}} selectedUser={selectedUser} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <SignField item={{ id:"month_of_loss", name:"Month of loss", icon:<CalendarMonthIcon/>}} selectedUser={selectedUser} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <SignField item={{ id:"year_of_loss", name:"Year of loss", icon:<InsertInvitationIcon/>}} selectedUser={selectedUser} />
                   </Grid>
                   <Grid item xs={6}>
                     <SignField item={{ id:"loss_full_address", name:"Loss Full Address", icon:<HomeIcon/>}} selectedUser={selectedUser} />

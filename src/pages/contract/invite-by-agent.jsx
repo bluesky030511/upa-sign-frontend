@@ -85,9 +85,9 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               <TextField 
                 variant="outlined"
                 defaultValue={field.value == 'count' ? 0 : field.value }
-                // label={field.name == "agent_public_adjuster_license" ? 
-                // "Agent public adjuster license" : field.name == "agent_initials" ? 
-                // "Agent initials" : field.dataLabel}
+                label={field.name == "agent_public_adjuster_license" ? 
+                "Agent public adjuster license" : field.name == "agent_initials" ? 
+                "Agent initials" : field.dataLabel}
                 size="small"
                 sx={{ 
                   input: {fontSize: `${width / maxWidth * (22 + (field.fontSize - 11))}px`, p: '2px', px: '4px'}, 
@@ -227,12 +227,8 @@ const InviteByAgent = () => {
       client_loss_zipCode: values.lossZipCode,
       agent_initials: values.agentInitials,
       agent_public_adjuster_license: values.publicAdjusterLicense,
-      client_day_of_loss: String(new Date(values.dateOfLoss).getDate()),
-      client_month_of_loss: String(new Date(values.dateOfLoss).getMonth() + 1),
-      client_year_of_loss: String(new Date(values.dateOfLoss).getFullYear() % 100),
     };
 
-    console.log("data: ", data);
     setStep(1);
     await fields.forEach(field => {
       if(field.name.includes("client") || field.name == "agent_public_adjuster_license" || field.name == "agent_initials") {

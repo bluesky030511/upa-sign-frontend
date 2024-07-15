@@ -13,7 +13,7 @@ import Paper from "@mui/material/Paper";
 import format from "date-fns/format";
 import compareDesc from "date-fns/compareDesc";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { visuallyHidden } from "@mui/utils";
 
@@ -30,7 +30,6 @@ import PaymentModal from "../../../components/modals/payment-modal";
 import { useSubscription } from "../../../context/subscription.context";
 import { isSubscribed } from "../../../utils/helper";
 import AccessPermissionModal from "../../../components/modals/access-permission-modal";
-import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -303,7 +302,7 @@ const DocumentsListing = () => {
         />
         <SubscriptionAlert />
         <ListingWrapper>
-          {/* <div className="permission-container">
+          <div className="permission-container">
             <Button
               variant="contained" 
               sx={{ 
@@ -315,7 +314,7 @@ const DocumentsListing = () => {
             >
               Access Permission
             </Button>
-          </div> */}
+          </div>
           <div className="search-container">
             <SearchInput
               placeholder="Search"
@@ -417,43 +416,6 @@ const DocumentsListing = () => {
                                   >
                                     Invite
                                   </Button>)}
-                                  {user.isAgent && (
-                                    <a
-                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
-                                  >
-                                    {/* <Button
-                                      id="basic-menu"
-                                      sx={{
-                                        bgcolor: colors.translucentGreen,
-                                        boxShadow: "none",
-                                        color: colors.foreGreen,
-                                        textTransform: "none",
-                                        px: { xs: "4px", sm: "17px" },
-                                        py: { xs: "2px", sm: "6px" },
-                                        fontSize: "11px",
-                                        fontFamily: fonts.medium,
-                                        "&:hover": {
-                                          bgcolor: colors.translucentGreen,
-                                        },
-                                        "& .MuiButton-endIcon": {
-                                          marginLeft: 1,
-                                          marginRight: 0,
-                                          "& svg": {
-                                            fontSize: 16,
-                                          },
-                                        },
-                                      }}
-                                    >
-                                      Preview
-                                    </Button> */}
-                                    <IconButton sx={{ 
-                                      // bgcolor: colors.translucentGreen,
-                                      py: { xs: "2px", sm: "6px" },
-                                      color: colors.foreGreen 
-                                    }}>
-                                      <VisibilityIcon />
-                                    </IconButton>
-                                  </a>)}
                                 </Box>
                               ) : (
                                 <a

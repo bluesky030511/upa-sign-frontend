@@ -10,8 +10,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack";
 import { API_ENDPOINTS, BASE_URL } from "../../../utils/variables";
-import { useCreateTemplate, useGetTemplateFields } from "../../../hooks/data-hook";
-import { Loader } from "../../../shared-components/loader/loader";
+import { useCreateTemplate } from "../../../hooks/data-hook";
 import { useToast } from '../../../context/toast.context';
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -64,40 +63,18 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
   const maxWidth = 1363;
   const [sizes, setSizes] = useState({});
   const [isResizing, setIsResizing] = useState(false);
-  const pdfContainerRef = useRef(null);
 
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (pdfContainerRef.current) {
-        const targetRect = pdfContainerRef.current.getBoundingClientRect();
-        setFields((prevFields) => 
-          prevFields.map(field => 
-            {return {
-              ...field, 
-              left: field.left < 1 ? field.left * targetRect.width : field.left, 
-              top: field.top < 1 ? field.top * targetRect.height : field.top
-            }}
-        ));
-      }
-    };
-    setTimeout(() => {
-      updateDimensions();
-    }, 1200);
-
-    // updateDimensions();
-  }, []);
   
   const [, drop] = useDrop({
     accept: 'SIGN_FIELD',
     drop: (item, monitor) => {
       if(!monitor.didDrop()) {
           if(fields.findIndex(field => field.id == item.id) != -1) {
-            let field = fields.find(field => field.id == item.id);
             const delta = monitor.getDifferenceFromInitialOffset();
-            if(field.dataLabel != "")
-              moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y + width / maxWidth * 10));
+            if(item.dataLabel != '')
+              moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y  + 8));
             else  
-              moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y  + width / maxWidth * 6));
+              moveField(item, Math.round(item.left + delta.x), Math.round(item.top + delta.y  + 5));
           }
           else {
             const clientOffset = monitor.getClientOffset();
@@ -145,10 +122,9 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
     }
   }
 
-  
   return (
     <div ref={drop} style={{ position: 'relative' }}>
-      <PDF ref={pdfContainerRef} id="pdfContainer" >
+      <PDF id="pdfContainer" >
         <Page pageNumber={pageNumber} width={width} />
         {fields.map((field) => (
           <Field
@@ -159,12 +135,10 @@ const DroppablePage = ({ pageNumber, onDrop, width, fields, moveField, setFields
             isResizing={isResizing}
           >
             <ResizableBox
-              width={ field.name == "client_day_of_loss" || field.name == "client_month_of_loss" || field.name == "client_year_of_loss" ? 
-                50: (sizes[field.id] || { width: 200, height: 40 }).width}
-              minConstraints={field.name == "client_day_of_loss" || field.name == "client_month_of_loss" || field.name == "client_year_of_loss" ? 
-                [30, 40] : [100, 30]}
-              maxConstraints={field.name == "client_day_of_loss" || field.name == "client_month_of_loss" || field.name == "client_year_of_loss" ? 
-                [100, 40] : [800, 80]}
+              width={ field.name == "month" || field.name == "count" ? 100: (sizes[field.id] || { width: 200, height: 40 }).width}
+
+              minConstraints={field.name == "month" || field.name == "count" ? [50, 40] : [100, 30]}
+              maxConstraints={field.name == "month" || field.name == "count" ? [120, 40] : [800, 80]}
               onResize={ (e, data) => handleResize(field.id, data.size)}
               onResizeStart={() => setIsResizing(true)}
               onResizeStop={() => {setIsResizing(false); handleClick(field.id)}}
@@ -207,7 +181,6 @@ const TemplateEdit = () => {
   const width = useWindowWidth();
   const [fields, setFields] = useState([]);
   const { mutate: CreateTemplate, isLoading: isCreating } = useCreateTemplate();
-  const { isFetching, isSuccess, data } = useGetTemplateFields(id);
   const { showSuccessToast, showErrorToast } = useToast();
   const [currentItem, setCurrentItem] = useState(null);
   const [oldWidth, setOldWidth] = useState(0);
@@ -229,7 +202,7 @@ const TemplateEdit = () => {
         top: y,
         fontSize: 11,
         dataLabel: item.name == "text" || item.name == "date" || item.name == "time" ? item.name.charAt(0).toUpperCase() + item.name.slice(1).toLowerCase() : "",
-        width: item.name == "client_day_of_loss" || item.name == "client_month_of_loss" || item.name == "client_year_of_loss" ? 50 : 200,
+        width: item.name == "month" || item.name == "count" ? 100 : 200,
       }
     ]);
     setCurrentItem({id: fields.length > 0 ? fields[fields.length - 1].id + 1 : 0, name: item.name, pageNumber: pageNumber, left: x, top: y});
@@ -242,13 +215,6 @@ const TemplateEdit = () => {
     ));
     setCurrentItem(item);
   }
-
-  useEffect(() => {
-    // const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
-    if(data) {
-      setFields(data);
-    }
-  }, [data]);
 
   useEffect(() => {
     setFields((prevFields) => 
