@@ -227,9 +227,9 @@ const Templates = () => {
                                 },
                               }}
                             >
-                              <Box sx={{ display:'flex', justifyContent:'center' }}>
-                                {/* <span> */}
-                                  {/* <Button
+                              {/* <Box sx={{ display:'flex', justifyContent:'center' }}> */}
+                                <span>
+                                  <Button
                                     variant="outlined"
                                     disabled={!isSubscribed(subscription)}
                                     sx={{
@@ -249,27 +249,48 @@ const Templates = () => {
                                     }
                                   >
                                     Create
-                                  </Button> */}
-                                  <IconButton
+                                  </Button>
+                                  {/* <IconButton
                                     disabled={!isSubscribed(subscription)}
                                     onClick={() =>
                                       handleOpenContractModal(template.id)
                                     }
                                   >
                                     <AddCircleIcon/>
-                                  </IconButton>
-                                  {/* </span> */}
+                                  </IconButton> */}
+                                  </span>
                                 
-                                  <IconButton
+                                  {/* <IconButton
                                     disabled={!isSubscribed(subscription)}
                                     onClick={() => { navigate(`/template-edit/${template.filename.replace(/\.[^/.]+$/, "")}/${template.name}`);}}
                                   >
                                     <SettingsIcon />
                                   </IconButton>
-                              </Box>
+                              </Box> */}
                             </Tooltip>
                           )}
-
+                          {user.role === "ADMIN" && (
+                            <Box sx={{ display:'flex', justifyContent:'center' }}>
+                              <Button
+                                variant="outlined"
+                                sx={{
+                                  color: colors.themeBlue,
+                                  borderColor: colors.themeBlue,
+                                  textTransform: "none",
+                                  fontFamily: fonts.medium,
+                                  minHeight: "36px",
+                                  "&:hover": {
+                                    borderColor: colors.themeBlue,
+                                    bgcolor: colors.themeBlue,
+                                    color: colors.white,
+                                  },
+                                }}
+                                onClick={() => { navigate(`/template-edit/${template.filename.replace(/\.[^/.]+$/, "")}/${template.name}`);}}
+                              >
+                                Edit
+                              </Button>
+                            </Box>
+                          )}
                           {user &&
                             template.createdby &&
                             (template.createdby.role === user.role ||
