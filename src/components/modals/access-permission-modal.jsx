@@ -16,7 +16,7 @@ import styled from "styled-components";
 import { styled as muiStyled } from "@mui/material/styles";
 import { colors, fonts } from "../../utils/theme";
 import PrimaryButton from "../buttons/primary-button";
-import { useGetUserProfile, useGetUserData, useUpdateUserProfile } from '../../hooks/user-hook';
+import { useGetUserProfile, useUpdateUserProfile } from '../../hooks/user-hook';
 import { useAddAccessPermission, useDeleteAccessPermission } from "../../hooks/data-hook";
 import { useToast } from "../../context/toast.context";
 import { Loader } from "../../shared-components/loader/loader";
@@ -151,22 +151,18 @@ const EnhancedTableHead = (props) => {
   );
 };
 
-const AccessPermissionModal = ({ open, handleClose, handleAction, loading, userId }) => {
+const AccessPermissionModal = ({ open, handleClose, handleAction, loading }) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
   const [type, setType] = useState("string");
-  const [data, setData] = useState([]);
-  // let { isFetching, isSuccess, data, isError, error:prfileError } = useGetUserProfile({ id: userId });
+  const { isFetching, isSuccess, data, isError, error:prfileError } = useGetUserProfile({ id: null });
   const { mutate: AddAccessPermission, isLoading } = useAddAccessPermission();
   const { mutate: DeleteAccessPermission, isLoading: isDeleting } = useDeleteAccessPermission();
-  const { mutate: GetUserProfile, isLoading: isFetching, isSuccess } = useGetUserData();
   const [email, setEmail] = useState('');
   const [error, setError] = useState(false);
   const [visibleRows, setVisibleRows] = useState([]);
   const [ deleteEmail, setDeleteEmail ] = useState('');
   const { showSuccessToast, showErrorToast } = useToast();
-  console.log("userId: ", userId);
-  console.log("userData: ", data);
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -208,7 +204,6 @@ const AccessPermissionModal = ({ open, handleClose, handleAction, loading, userI
 
   const addAccessPermission = () => {
     AddAccessPermission({
-      id: userId,
       email: email
     }, {
       onSuccess: (data) => {
@@ -224,7 +219,6 @@ const AccessPermissionModal = ({ open, handleClose, handleAction, loading, userI
 
   const deleteAccessPermission = (email) => {
     DeleteAccessPermission({
-      id: userId,
       email: email
     }, {
       onSuccess: (data) => {
@@ -236,25 +230,6 @@ const AccessPermissionModal = ({ open, handleClose, handleAction, loading, userI
       }
     });
   }
-
-  const getUserProfile = (id) => {
-    GetUserProfile({
-      id}, {
-        onSuccess: (data) => {
-          setData(data);
-          console.log("data: ", data);
-        },
-        onError: (error) => {
-          showErrorToast(error.response.data.message);
-        }
-    });
-  }
-
-  useEffect(() => {
-    if (userId !== "") {
-      getUserProfile(userId);
-    }
-  }, [userId]);
 
   const handleRequestSort = (event, property, type) => {
     const isAsc = orderBy === property && order === "asc";
@@ -280,7 +255,7 @@ const AccessPermissionModal = ({ open, handleClose, handleAction, loading, userI
             <CheckRoundedIcon sx={{ color: colors.checkGreen, fontSize: 56 }} />
           </div> */}
           <h4>Access Permission</h4>
-          <p>{'Add user to give the permission access to view the user signed documents.'}</p>
+          <p>{'Add user for permission to access your signed documents'}</p>
 
           {/* <Divider flexItem/> */}
 

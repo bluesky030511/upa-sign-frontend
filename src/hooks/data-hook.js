@@ -202,15 +202,6 @@ export const useGetAccessUserList = () => {
   return useQuery("accessUserList", getAccessUserList);
 }
 
-export const getTemplateFields = async (id) => {
-  const { data } = await http.get(`${BASE_URL}${API_ENDPOINTS.TEMPLATE}/edit/${id}`);
-  return data;
-}
-
-export const useGetTemplateFields = (id) => {
-  return useQuery("getTemplateFields", () => getTemplateFields(id));
-}
-
 export const deletePlaceholder = async (id) => {
   const { data } = await http.delete(`${API_ENDPOINTS.PLACEHOLDER}/${id}`);
   return data;

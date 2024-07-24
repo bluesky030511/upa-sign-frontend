@@ -18,7 +18,6 @@ import {
   Button,
 } from "@mui/material";
 import SearchInput from "../../components/inputs/search-input";
-import AccessPermissionModal from "../../components/modals/access-permission-modal";
 import { useGetUsers } from "../../hooks/data-hook";
 import EmptyFeedback from "../../shared-components/empty/empty-feedback";
 import { Loader } from "../../shared-components/loader/loader";
@@ -133,20 +132,6 @@ const headCells = [
     width: "25%",
     type: "date",
   },
-  {
-    id: "updatedAt",
-    label: "Updated At",
-    align: "center",
-    width: "25%",
-    type: "date",
-  },
-  {
-    id: "Action",
-    label: "Action",
-    align: "center",
-    width: "25%",
-    type: "date",
-  },
 ];
 
 const EnhancedTableHead = (props) => {
@@ -257,8 +242,6 @@ const Users = () => {
   const [type, setType] = useState("string");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [openModal, setOpenModal] = useState(false);
-  const [userId, setUserId] = useState("");
 
   const handleSearch = (e) => {
     setSearchText(e.target.value);
@@ -273,16 +256,6 @@ const Users = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  const handleOpenModal = (id) => {
-    setUserId(id);
-    setOpenModal(true);
-  }
-
-  const handleCloseModal = () => {
-    setUserId("");
-    setOpenModal(false);
-  }
 
 
   const visibleRows = useMemo(() => {
@@ -311,11 +284,6 @@ const Users = () => {
   return (
     <>
       {user.role === "ADMIN" ? null : <SubscriptionAlert />}
-      <AccessPermissionModal 
-        open={openModal}
-        handleClose={handleCloseModal}
-        userId={userId}
-      />
       {user && (user.role === 'ADMIN') && (
         <ListingWrapper>
           <div className="search-container">
@@ -409,7 +377,6 @@ const Users = () => {
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 <Button href={`/users/${row.id}`} variant='contained' className='btn'>Edit</Button>
-                                <Button sx={{ ml: '5px' }} variant='contained' className='btn' onClick={() => {handleOpenModal(row.id);}}>Add Permission</Button>
                               </StyledTableCell>
                             </StyledTableRow>
                           );

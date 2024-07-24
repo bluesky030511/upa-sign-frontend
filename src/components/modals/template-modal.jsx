@@ -26,6 +26,7 @@ const MAX_FILE_SIZE = 5242880; // 5 MB
 
 const validFileExtensions = ["pdf", "docx", "doc"];
 
+
 function isValidFileType(fileName) {
   const extension = fileName.substring(fileName.lastIndexOf(".") + 1);
   return validFileExtensions.includes(extension);
@@ -185,6 +186,7 @@ const TemplateModal = ({ open, handleClose }) => {
                   <p className="file-info">
                     Upload your template here <br />
                     Only .pdf, .docx, .doc file is allowed
+
                     <br />
                     Max size 5 MB
                   </p>
@@ -192,6 +194,7 @@ const TemplateModal = ({ open, handleClose }) => {
                     <input
                       hidden
                       accept=".pdf, .docx, .doc"
+
                       type="file"
                       {...register("file")}
                       name="file"
