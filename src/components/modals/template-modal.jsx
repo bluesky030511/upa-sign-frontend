@@ -24,7 +24,8 @@ import { useQueryClient } from "react-query";
 
 const MAX_FILE_SIZE = 5242880; // 5 MB
 
-const validFileExtensions = ["doc", "docx", "pdf"];
+const validFileExtensions = ["pdf", "docx", "doc"];
+
 
 function isValidFileType(fileName) {
   const extension = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -184,14 +185,16 @@ const TemplateModal = ({ open, handleClose }) => {
                 <>
                   <p className="file-info">
                     Upload your template here <br />
-                    Only .doc, .docx and pdf file is allowed
+                    Only .pdf, .docx, .doc file is allowed
+
                     <br />
                     Max size 5 MB
                   </p>
                   <IconButton aria-label="upload template" component="label">
                     <input
                       hidden
-                      accept=".doc,.docx, .pdf"
+                      accept=".pdf, .docx, .doc"
+
                       type="file"
                       {...register("file")}
                       name="file"
