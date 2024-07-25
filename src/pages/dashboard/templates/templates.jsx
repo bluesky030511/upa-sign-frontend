@@ -26,8 +26,11 @@ import SubscriptionAlert from "../../../components/alerts/subscription-alert";
 import { useSubscription } from "../../../context/subscription.context";
 import { isSubscribed } from "../../../utils/helper";
 import ContractDetailsModal from "../../../components/modals/contract-details-modal";
+import { useNavigate } from "react-router-dom";
+
 
 const Templates = () => {
+  const navigate = useNavigate();
   const { user } = useUI();
   const { showSuccessToast } = useToast();
   const { subscription } = useSubscription();
