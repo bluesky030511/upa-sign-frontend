@@ -93,7 +93,7 @@ const ActionDropDown = ({ id, file, inviteId, signed }) => {
           },
         }}
       >
-        <MenuItem
+        {/* <MenuItem
           sx={{
             borderBottom: "1px solid rgba(0,0,0,0.1)",
             p: 0,
@@ -112,7 +112,7 @@ const ActionDropDown = ({ id, file, inviteId, signed }) => {
           >
             Preview
           </a>
-        </MenuItem>
+        </MenuItem> */}
         {user.isAgent && (
           <MenuItem
             sx={{

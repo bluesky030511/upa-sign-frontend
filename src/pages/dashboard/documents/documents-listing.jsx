@@ -302,7 +302,7 @@ const DocumentsListing = () => {
         />
         <SubscriptionAlert />
         <ListingWrapper>
-          <div className="permission-container">
+          {/* <div className="permission-container">
             <Button
               variant="contained" 
               sx={{ 
@@ -314,7 +314,7 @@ const DocumentsListing = () => {
             >
               Access Permission
             </Button>
-          </div>
+          </div> */}
           <div className="search-container">
             <SearchInput
               placeholder="Search"
@@ -416,6 +416,45 @@ const DocumentsListing = () => {
                                   >
                                     Invite
                                   </Button>)}
+                                  {/* {user.isAgent && (
+                                    <a
+                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
+                                  >
+                                    {/* <Button
+                                      id="basic-menu"
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        textTransform: "none",
+                                        px: { xs: "4px", sm: "17px" },
+                                        py: { xs: "2px", sm: "6px" },
+                                        fontSize: "11px",
+                                        fontFamily: fonts.medium,
+                                        "&:hover": {
+                                          bgcolor: colors.translucentGreen,
+                                        },
+                                        "& .MuiButton-endIcon": {
+                                          marginLeft: 1,
+                                          marginRight: 0,
+                                          "& svg": {
+                                            fontSize: 16,
+                                          },
+                                        },
+                                      }}
+                                    >
+                                      Preview
+                                    </Button> */}
+                                    {/* <IconButton sx={{ 
+                                      // bgcolor: colors.translucentGreen,
+                                      py: { xs: "2px", sm: "6px" },
+                                      color: colors.foreGreen 
+                                    }}>
+                                      <VisibilityIcon />
+                                    </IconButton>
+                                  </a> */}
+                                  {/* )
+                                  } */}
                                 </Box>
                               ) : (
                                 <a
