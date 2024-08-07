@@ -24,7 +24,7 @@ const schema = yup.object({
   firstname: yup.string().required("Please enter first name"),
   lastname: yup.string().required("Please enter last name"),
   address: yup.string().required("Please enter your address"),
-  gender: yup.string().required("Please enter your gender"),
+  // gender: yup.string().required("Please enter your gender"),
   email: yup
     .string()
     .required("Please enter your email")
@@ -34,6 +34,7 @@ const schema = yup.object({
   country: yup.string().required("Please enter your country"),
   state: yup.string().required("Please enter your state"),
   zipCode: yup.string().required("Please enter your zip code"),
+  license: yup.string().required("Please enter your license"),
 });
 
 const Settings = () => {
@@ -44,7 +45,7 @@ const Settings = () => {
     defaultValues: {
       firstname: (user && user.firstname) || "",
       lastname: (user && user.lastname) || "",
-      gender: (user && user.gender) || "",
+      // gender: (user && user.gender) || "",
       address: (user && user.address) || "",
       email: (user && user.email) || "",
       phoneNumber: (user && user.phoneNumber) || "",
@@ -52,6 +53,7 @@ const Settings = () => {
       state: (user && user.state) || "",
       country: (user && user.country) || "",
       zipCode: (user && user.zipCode) || "",
+      license: (user && user.license) || "",
     },
     resolver: yupResolver(schema),
   });
@@ -66,9 +68,10 @@ const Settings = () => {
         firstname: data.firstname,
         lastname: data.lastname,
         email: data.email,
-        gender: data.gender,
+        gender: "MAIL",
         address: data.address,
         phoneNumber: data.phoneNumber,
+        license: data.license,
         role: user.role,
         city: data.city,
         state: data.state,
@@ -101,7 +104,7 @@ const Settings = () => {
               position: "relative",
             }}
           >
-            <div className="avatar-container">
+            {/* <div className="avatar-container">
               <div className="profile-avatar">
                 <img
                   src={
@@ -114,7 +117,7 @@ const Settings = () => {
                   alt="profile"
                 />
               </div>
-            </div>
+            </div> */}
             <Grid container spacing={2}>
               <Grid item lg={6} xs={12}>
                 <Controller
@@ -145,7 +148,7 @@ const Settings = () => {
                 />
               </Grid>
             </Grid>
-            <Controller
+            {/* <Controller
               name="gender"
               control={control}
               render={({ field, fieldState }) => (
@@ -179,7 +182,7 @@ const Settings = () => {
                   </span>
                 </>
               )}
-            />
+            /> */}
             <Controller
               name="address"
               control={control}
@@ -208,6 +211,17 @@ const Settings = () => {
               render={({ field, fieldState }) => (
                 <PrimaryInput
                   placeholder="Enter your phone number"
+                  {...field}
+                  helperText={fieldState.error && fieldState.error.message}
+                />
+              )}
+            />
+            <Controller
+              name="license"
+              control={control}
+              render={({ field, fieldState }) => (
+                <PrimaryInput
+                  placeholder="Enter your license"
                   {...field}
                   helperText={fieldState.error && fieldState.error.message}
                 />

@@ -89,7 +89,6 @@ const TemplateModal = ({ open, handleClose }) => {
     data.append("file", values.file[0]);
     UploadTemplate(data, {
       onSuccess: (data) => {
-        console.log("data: ", data);
         reset();
         queryClient.invalidateQueries(["templates"]);
         showSuccessToast("Template Uploaded");

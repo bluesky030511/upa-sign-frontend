@@ -147,16 +147,12 @@ const SignDocumentsList = () => {
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("firstname");
   const [type, setType] = useState("string");
   const [searchText, setSearchText] = useState("");
   const { isFetching, data, refetch } = useGetSignedContractById(id);
-
-  useEffect(() => {
-    console.log("data: ", data);
-  }, [data]);
 
   const visibleRows = useMemo(() => {
     if (data) {
@@ -322,7 +318,7 @@ const SignDocumentsList = () => {
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 15]}
+              rowsPerPageOptions={[20, 50, 100]}
               component="div"
               count={data.length}
               rowsPerPage={rowsPerPage}

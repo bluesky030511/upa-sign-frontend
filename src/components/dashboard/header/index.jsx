@@ -106,12 +106,12 @@ const DashboardHeader = ({ handleDrawerToggle, width }) => {
                   border: "1px solid",
                   borderColor: colors.translucentBlue,
                 }}
-                src={
-                  user.gender
-                    ? user.gender === "MALE"
-                      ? ProfileAvatar
-                      : ProfileFemaleAvatar
-                    : ProfileAvatar
+                src={ProfileAvatar
+                  // user.gender
+                  //   ? user.gender === "MALE"
+                  //     ? ProfileAvatar
+                  //     : ProfileFemaleAvatar
+                  //   : ProfileAvatar
                 }
               >
                 <Person />

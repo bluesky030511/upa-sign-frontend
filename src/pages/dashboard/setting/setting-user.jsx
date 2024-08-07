@@ -21,7 +21,7 @@ const schema = yup.object({
   firstname: yup.string().required("Please enter first name"),
   lastname: yup.string().required("Please enter last name"),
   address: yup.string().required("Please enter your address"),
-  gender: yup.string().required("Please enter your gender"),
+  // gender: yup.string().required("Please enter your gender"),
   status: yup.string().required("Please enter valid status"),
   email: yup
     .string()
@@ -32,6 +32,7 @@ const schema = yup.object({
   country: yup.string().required("Please enter your country"),
   state: yup.string().required("Please enter your state"),
   zipCode: yup.string().required("Please enter your zip code"),
+  license: yup.string().required("Please enter your license"),
 });
 
 const SettingUser = () => {
@@ -42,7 +43,7 @@ const SettingUser = () => {
     defaultValues: {
       firstname: "",
       lastname: "",
-      gender: "",
+      // gender: "",
       role: "",
       address: "",
       email: "",
@@ -51,7 +52,8 @@ const SettingUser = () => {
       state: "",
       country: "",
       zipCode: "",
-      status: ""
+      status: "",
+      license: "",
     },
     resolver: yupResolver(schema),
   });
@@ -68,7 +70,7 @@ const SettingUser = () => {
         firstname: data.firstname,
         lastname: data.lastname,
         email: data.email,
-        gender: data.gender,
+        gender: "MALE",
         role: data.role,
         address: data.address,
         phoneNumber: data.phoneNumber,
@@ -77,6 +79,7 @@ const SettingUser = () => {
         state: data.state,
         country: data.country,
         zipCode: data.zipCode,
+        license: data.license,
       },
       {
         onSuccess: (data) => {
@@ -109,7 +112,7 @@ const SettingUser = () => {
               position: "relative",
             }}
           >
-            <div className="avatar-container">
+            {/* <div className="avatar-container">
               <div className="profile-avatar">
                 <img
                   src={
@@ -122,7 +125,7 @@ const SettingUser = () => {
                   alt="profile"
                 />
               </div>
-            </div>
+            </div> */}
             <Grid container spacing={2}>
               <Grid item lg={6} xs={12}>
                 <Controller
@@ -153,7 +156,7 @@ const SettingUser = () => {
                 />
               </Grid>
             </Grid>
-            <Controller
+            {/* <Controller
               name="gender"
               control={control}
               render={({ field, fieldState }) => (
@@ -187,7 +190,7 @@ const SettingUser = () => {
                   </span>
                 </>
               )}
-            />
+            /> */}
             <Controller
               name="status"
               control={control}
@@ -288,6 +291,17 @@ const SettingUser = () => {
               render={({ field, fieldState }) => (
                 <PrimaryInput
                   placeholder="Enter your phone number"
+                  {...field}
+                  helperText={fieldState.error && fieldState.error.message}
+                />
+              )}
+            />
+            <Controller
+              name="license"
+              control={control}
+              render={({ field, fieldState }) => (
+                <PrimaryInput
+                  placeholder="Enter your license"
                   {...field}
                   helperText={fieldState.error && fieldState.error.message}
                 />

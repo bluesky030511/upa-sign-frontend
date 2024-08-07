@@ -33,6 +33,15 @@ import DocumentDetails from "../pages/dashboard/documents/document-details";
 import SignDocuments from "../pages/dashboard/sign-documents/sign-documents";
 import SignDocumentsList from "../pages/dashboard/sign-documents/sign-document";
 
+// Reports Page
+import ReportsList from "../pages/dashboard/reports";
+
+// Ticket Page
+import TicketList from "../pages/dashboard/tickets";
+
+// Submit Issue page
+import SubmitIssue from "../pages/dashboard/submit-issue";
+
 // Contract Pages
 import Contract from "../pages/contract/contract";
 import Invite from "../pages/contract/invite";
@@ -301,6 +310,26 @@ export const MainRoutes = () => {
     {
       path: "/solutions",
       element: <Solutions />,
+    },
+    {
+      path: "/reports",
+      element: <ReportsList />,
+    },
+    {
+      path: "/ticket",
+      element: <TicketList />,
+    },
+    {
+      path: "/submit-issue",
+      element: (
+        <ProtectedRoute>
+          {user.role === "AGENT" || user.role === 'CUSTOMER' ? (
+            <SubmitIssue />
+          ) : (
+            <Navigate to="/not-found" />
+          )}
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/plans-pricing",

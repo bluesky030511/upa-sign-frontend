@@ -45,7 +45,7 @@ const Signup = () => {
     defaultValues: {
       firstname: "",
       lastname: "",
-      gender: "MALE",
+      // gender: "MALE",
       address: "",
       email: "",
       phoneNumber: "",
@@ -121,7 +121,7 @@ const Signup = () => {
             />
           </div>
         </div>
-        <Controller
+        {/* <Controller
           name="gender"
           control={control}
           render={({ field }) => (
@@ -148,7 +148,7 @@ const Signup = () => {
               <MenuItem value="FEMALE">Female</MenuItem>
             </Select>
           )}
-        />
+        /> */}
         <Controller
           name="address"
           control={control}

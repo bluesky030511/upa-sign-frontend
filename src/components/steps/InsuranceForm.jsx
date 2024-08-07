@@ -30,7 +30,7 @@ const schema = yup.object({
   lossState: yup.string().required("Please enter loss state"),
   lossZipCode: yup.string().required("Please enter loss ZipCode"),
   agentInitials: yup.string().required("Please enter agent initials"),
-  publicAdjusterLicense: yup.string().required("Please enter Public Adjuster License number"),
+  // publicAdjusterLicense: yup.string().required("Please enter Public Adjuster License number"),
 });
 const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }) => {
   const [additionalFields, setAdditionalFields] = useState([]);
@@ -43,7 +43,6 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
       return [...prevFields, ...uniqueFields];
     });
   }, [fields]);
-  console.log("additionalFields: ", additionalFields);
   const { control, handleSubmit } = useForm({
     defaultValues: {
       insuranceCompany: (inviteData && inviteData.insuranceCompany) || "",
@@ -58,14 +57,13 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
       lossState: (inviteData && inviteData.lossState) || "",
       lossZipCode: (inviteData && inviteData.lossZipCode) || "",
       agentInitials: (inviteData && inviteData.agentInitials) || "",
-      publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
+      // publicAdjusterLicense: (inviteData && inviteData.publicAdjusterLicense) || "",
       contingencyFee: (inviteData && inviteData.contingencyFee) || "",
     },
     resolver: yupResolver(schema),
   });
 
   const onSubmit =(data) => {
-    console.log("data: ", data);
     handleInviteData(data);
     handleOpenModal(data);
   };
@@ -249,7 +247,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
           />
         )}
       />
-      <Controller
+      {/* <Controller
         name="publicAdjusterLicense"
         control={control}
         render={({ field, fieldState }) => (
@@ -259,7 +257,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
             helperText={fieldState.error && fieldState.error.message}
           />
         )}
-      />
+      /> */}
       <Controller
         name="contingencyFee"
         control={control}
