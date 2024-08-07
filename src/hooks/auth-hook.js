@@ -11,7 +11,6 @@ const register = async (uData) => {
 // Login
 const login = async (uData) => {
     const {data} = await http.post(API_ENDPOINTS.LOGIN, uData);
-    console.log(data)
     return data;
 };
 

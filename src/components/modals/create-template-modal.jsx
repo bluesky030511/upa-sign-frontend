@@ -37,7 +37,6 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
         value: ''
       }
     ]);
-    console.log("teams:", teams);
   }
 
   const handleValue = async (event, item) => {

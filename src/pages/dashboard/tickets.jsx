@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { colors, fonts } from "../../../utils/theme";
+import { colors, fonts } from "../../utils/theme";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
@@ -11,60 +11,64 @@ import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import format from "date-fns/format";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import Tooltip from "@mui/material/Tooltip";
-import axios from "axios";
 import { visuallyHidden } from "@mui/utils";
+import { useToast } from '../../context/toast.context';
 
-import { useGetContractById } from "../../../hooks/data-hook";
-import InviteModal from "../../../components/modals/invite-modal";
-import IconButton from "@mui/material/IconButton";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import DownloadIcon from '@mui/icons-material/Download';
-import { Loader } from "../../../shared-components/loader/loader";
-import { API_ENDPOINTS, BASE_URL } from "../../../utils/variables";
-import { StyledTableCell, StyledTableRow } from "./documents-listing";
-import SubscriptionAlert from "../../../components/alerts/subscription-alert";
-import EmptyFeedback from "../../../shared-components/empty/empty-feedback";
-import { getComparator } from "./documents-listing";
-import SearchInput from "../../../components/inputs/search-input";
+import { useGetAllContract, useGetAllIssue, useUpdateIssueStatus } from "../../hooks/data-hook";
+import DashboardLayout from "../../components/dashboard/layout";
+import InviteModal from "../../components/modals/invite-modal";
+import SendMailModal from "../../components/modals/send-mail-modal";
+import AssignSignatureModal from "../../components/modals/assign-signature-modal";
+import { Loader } from "../../shared-components/loader/loader";
+import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
+import { StyledTableCell, StyledTableRow } from "./documents/documents-listing";
+import SubscriptionAlert from "../../components/alerts/subscription-alert";
+import EmptyFeedback from "../../shared-components/empty/empty-feedback";
+import { getComparator } from "./documents/documents-listing";
+import SearchInput from "../../components/inputs/search-input";
 
 const columns = [
   {
     id: "firstname",
     label: "Name",
-    width: "20%",
+    width: "10%",
     align: "center",
     type: "string",
   },
   {
-    id: "email",
-    label: "Email",
-    width: "17%",
+    id: "title",
+    label: "Title",
+    width: "10%",
     align: "center",
     type: "string",
   },
   {
-    id: "status",
-    label: "Status",
-    width: "8%",
+    id: "content",
+    label: "Content",
+    width: "50%",
     align: "center",
     type: "string",
   },
   {
     id: "createdAt",
-    label: "Invitation time",
-    width: "18%",
+    label: "Submition time",
+    width: "10%",
     align: "center",
     type: "date",
   },
   {
-    id: "approvedAt",
-    label: "Approved time",
-    width: "18%",
+    id: "status",
+    label: "Status",
+    width: "8%",
     align: "center",
     type: "date",
   },
@@ -103,9 +107,6 @@ const EnhancedTableHead = (props) => {
             </TableSortLabel>
           </StyledTableCell>
         ))}
-        <StyledTableCell align="center" sx={{ width: "16%" }}>
-          Phone
-        </StyledTableCell>
         <StyledTableCell align="center" sx={{ width: "16%" }}></StyledTableCell>
       </TableRow>
     </TableHead>
@@ -115,7 +116,7 @@ const EnhancedTableHead = (props) => {
 const stableSort = (array, comparator) => {
   if (Array.isArray(array)) {
     const stabilizedThis = array.map((el, index) => [
-      { ...el, firstname: el.customer.firstname, email: el.customer.email },
+      { ...el, firstname: el.firstname, email: el.email },
       index,
     ]);
     stabilizedThis.sort((a, b) => {
@@ -138,24 +139,29 @@ function filterList(list, query) {
   const regex = new RegExp(`${query.trim()}`, "i");
   return list.filter(
     (item) =>
-      item.customer.firstname.search(regex) >= 0 ||
-      (Boolean(item.customer.lastname) &&
-        item.customer.lastname.search(regex) >= 0) ||
-      item.customer.email.search(regex) >= 0
+      item.firstname.search(regex) >= 0 ||
+      (Boolean(item.lastname) &&
+        item.lastname.search(regex) >= 0) ||
+      item.email.search(regex) >= 0 ||
+      item.status.search(regex) >= 0
   );
 }
 
-const DocumentDetails = () => {
+const TicketList = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  // const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("firstname");
-  const [type, setType] = useState("string");
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [order, setOrder] = useState("desc");
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [type, setType] = useState("date");
   const [searchText, setSearchText] = useState("");
-  const { isFetching, data, refetch } = useGetContractById(id);
+  // const { isFetching, data, refetch } = useGetAllContract();
+  const { showSuccessToast, showErrorToast } = useToast();
+  const { isFetching, data, refetch } = useGetAllIssue();
+  const { mutate: UpdateStatus } = useUpdateIssueStatus();
+  const [userData, setUserData] = useState({});
 
   const visibleRows = useMemo(() => {
     if (data) {
@@ -184,65 +190,56 @@ const DocumentDetails = () => {
     setPage(0);
   };
 
-  const downloadDoc = async (file) => {
-    try {
-      const url = `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${file}`;
-
-      const response = await axios.get(url, { responseType: 'blob' });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-  
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.setAttribute(
-        'download',
-        `${file}.pdf`
-      );
-  
-      document.body.appendChild(link);
-      link.click();
-  
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error('Error downloading document:', error);
-    }
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
   const handleSearch = (e) => {
     setSearchText(e.target.value);
   };
+
+  const handleClose = () => {
+    setUserData({});
+    setOpen(false);
+  };
+
+  const handleOpen = (data) => {
+    setUserData(data)
+    setOpen(true);
+  };
+
+  const handleChange = (event, issue) => {
+    data.map((item, index) => {
+      if(item.id === issue.id)
+        item.status = event.target.value;
+    });
+    UpdateStatus(
+      {
+        id: issue.id,
+        value: {
+          status: event.target.value
+        }
+      },
+      {
+        onSuccess: () => {
+          console.log("Success...");
+        },
+        onError: (error) => {
+          showErrorToast(error.response.data.message);
+        }
+      }
+    )
+  }
+
   return (
-    <>
-      <InviteModal
+    <DashboardLayout>
+      <SubscriptionAlert />
+      {/* <AssignSignatureModal 
         open={open}
         handleClose={handleClose}
-        id={id}
-        refetch={refetch}
+        inviteData={inviteData}
+      /> */}
+      <SendMailModal 
+        open={open}
+        handleClose={handleClose}
+        userData={userData}
       />
-      <SubscriptionAlert />
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: colors.themeBlue,
-            textTransform: "none",
-            fontFamily: fonts.medium,
-          }}
-          startIcon={<AddRoundedIcon />}
-          onClick={() => navigate(`/contract/${id}`)}
-        >
-          Invite
-        </Button>
-      </Box>
       <ListingWrapper>
         <div className="search-container">
           <SearchInput
@@ -256,7 +253,7 @@ const DocumentDetails = () => {
           <div className="loader-container">
             <Loader size={48} />
           </div>
-        ) : data && data.length ? (
+        ) : (
           <Paper sx={{ boxShadow: "none", overflow: "hidden" }}>
             <TableContainer
               component={Paper}
@@ -278,7 +275,7 @@ const DocumentDetails = () => {
                   onRequestSort={handleRequestSort}
                 />
                 <TableBody>
-                  {visibleRows.map((invite, index) => (
+                  {visibleRows.map((issue, index) => (
                     <StyledTableRow key={index}>
                       <StyledTableCell align="center" sx={{ width: "2%" }}>
                         {index + 1}
@@ -286,23 +283,25 @@ const DocumentDetails = () => {
                       <StyledTableCell
                         align="center"
                         sx={{
-                          maxWidth: 100,
+                          width: "10%",
+                          maxWidth: 200,
                         }}
                       >
-                        {`${invite.customer.firstname} ${
-                          Boolean(invite.customer.lastname)
-                            ? invite.customer.lastname
+                        {`${issue.user.firstname} ${
+                          Boolean(issue.user.lastname)
+                            ? issue.user.lastname
                             : ""
                         }`}
                       </StyledTableCell>
                       <StyledTableCell
                         align="center"
                         sx={{
+                          width: "10%",
                           maxWidth: 164,
                         }}
                       >
                         <Tooltip
-                          title={invite.customer.email}
+                          title={issue.title}
                           slotProps={{
                             tooltip: {
                               sx: {
@@ -312,31 +311,40 @@ const DocumentDetails = () => {
                             },
                           }}
                         >
-                          <span>{invite.customer.email}</span>
+                          <span>{issue.title}</span>
                         </Tooltip>
                       </StyledTableCell>
-                      <StyledTableCell align="center" sx={{ maxWidth: "8%" }}>
-                        {invite.status}
+                      <StyledTableCell align="center" sx={{ maxWidth: "40%" }}>
+                        {issue.content}
                       </StyledTableCell>
-                      <StyledTableCell align="center" sx={{ maxWidth: "18%" }}>
+                      <StyledTableCell align="center" sx={{ maxWidth: "10%" }}>
                         {format(
-                          new Date(invite.createdAt),
+                          new Date(issue.createdAt),
                           "dd MMM, yyyy hh:mm a"
                         )}
                       </StyledTableCell>
-                      <StyledTableCell align="center" sx={{ maxWidth: "18%" }}>
-                        {Boolean(invite.approvedAt) &&
-                          format(
-                            new Date(invite.approvedAt),
-                            "dd MMM, yyyy hh:mm a"
-                          )}
+                      <StyledTableCell align="center" sx={{ maxWidth: "10%" }}>
+                        <FormControl size="small"
+                        >
+                          <Select
+                            defaultValue={issue.status}
+                            onChange={(value) => handleChange(value, issue)}
+                            sx={{
+                              boxShadow: "none",
+                              textTransform: "none",
+                              fontSize: "11px",
+                              fontFamily: fonts.medium,
+                            }}
+                          >
+                            <MenuItem value="Open">Open</MenuItem>
+                            <MenuItem value="Closed">Closed</MenuItem>
+                            <MenuItem value="Resolved">Resolved</MenuItem>
+                          </Select>
+                        </FormControl>
                       </StyledTableCell>
-                      <StyledTableCell align="center" sx={{ maxWidth: "16%" }}>
-                        {invite.customer.phoneNumber}
-                      </StyledTableCell>
-                      <StyledTableCell align="center" sx={{ maxWidth: "16%" }}>
-                      {invite.file && (
-                          <Box sx={{display:"flex", alignContent:"center", justifyContent:'center', gap: 1}}>
+                      <StyledTableCell align="center" sx={{ maxWidth: "10%" }}>
+                        <Box sx={{display:"flex", alignContent:"center", justifyContent:'center', gap: 1}}>
+                          {/* {invite.file && (
                             <a
                               href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${invite.file}`}
                             >
@@ -349,8 +357,7 @@ const DocumentDetails = () => {
                                   textTransform: "none",
                                   px: { xs: 1, sm: "17px" },
                                   py: { xs: "2px", sm: "6px" },
-                                  fontSize: "12px",
-                                  height: "40px",
+                                  fontSize: "11px",
                                   fontFamily: fonts.medium,
                                   "&:hover": {
                                     bgcolor: colors.translucentGreen,
@@ -365,22 +372,37 @@ const DocumentDetails = () => {
                                 }}
                                 endIcon={<VisibilityOutlinedIcon />}
                               >
-                                Preview
+                                {invite.status == "APPROVED" ? "View" : "Preview"}
                               </Button>
                             </a>
-                            {Boolean(invite.approvedAt) && (<IconButton
-                              sx={{
+                          )} */}
+                          <Button
+                            id="basic-menu"
+                            sx={{
+                              bgcolor: colors.translucentGreen,
+                              boxShadow: "none",
+                              color: colors.foreGreen,
+                              textTransform: "none",
+                              px: { xs: 1, sm: "17px" },
+                              py: { xs: "2px", sm: "6px" },
+                              fontSize: "11px",
+                              fontFamily: fonts.medium,
+                              "&:hover": {
                                 bgcolor: colors.translucentGreen,
-                                boxShadow: "none",
-                                color: colors.foreGreen,
-                                borderRadius: 2,
-                              }}
-                              onClick={() => downloadDoc(invite.file)}
-                            >
-                              <DownloadIcon size="large" />
-                            </IconButton>)}
-                          </Box>
-                        )}
+                              },
+                              "& .MuiButton-endIcon": {
+                                marginLeft: 1,
+                                marginRight: 0,
+                                "& svg": {
+                                  fontSize: 16,
+                                },
+                              },
+                            }}
+                            onClick={() => {handleOpen(issue);}}
+                          >
+                            Send Email
+                          </Button>
+                        </Box>
                       </StyledTableCell>
                     </StyledTableRow>
                   ))}
@@ -388,31 +410,23 @@ const DocumentDetails = () => {
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 15]}
+              rowsPerPageOptions={[20, 50, 100]}
               component="div"
               count={data.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Invites per page"
+              labelRowsPerPage="Reportss per page"
             />
           </Paper>
-        ) : (
-          <div className="loader-container">
-            <EmptyFeedback
-              message="You haven't invited anyone to sign this contract."
-              btnText="Invite"
-              action={() => navigate(`/contract/${id}`)}
-            />
-          </div>
         )}
       </ListingWrapper>
-    </>
+    </DashboardLayout>
   );
 };
 
-export default DocumentDetails;
+export default TicketList;
 
 const ListingWrapper = styled.div`
   background-color: ${colors.white};

@@ -18,6 +18,7 @@ import {
   Button,
 } from "@mui/material";
 import SearchInput from "../../components/inputs/search-input";
+import AccessPermissionModal from "../../components/modals/access-permission-modal";
 import { useGetUsers } from "../../hooks/data-hook";
 import EmptyFeedback from "../../shared-components/empty/empty-feedback";
 import { Loader } from "../../shared-components/loader/loader";
@@ -27,6 +28,10 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { visuallyHidden } from "@mui/utils";
 import { compareDesc, format } from 'date-fns';
 import { Link } from '@mui/material';
+
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 
 export const StyledTableCell = muiStyled(TableCell)(({ theme }) => ({
@@ -132,6 +137,20 @@ const headCells = [
     width: "25%",
     type: "date",
   },
+  {
+    id: "updatedAt",
+    label: "Updated At",
+    align: "center",
+    width: "25%",
+    type: "date",
+  },
+  {
+    id: "Action",
+    label: "Action",
+    align: "center",
+    width: "25%",
+    type: "date",
+  },
 ];
 
 const EnhancedTableHead = (props) => {
@@ -167,7 +186,7 @@ const EnhancedTableHead = (props) => {
             </TableSortLabel>
           </StyledTableCell>
         ))}
-        <StyledTableCell align="center" sx={{ width: "16%" }}></StyledTableCell>
+        {/* <StyledTableCell align="center" sx={{ width: "16%" }}></StyledTableCell> */}
       </TableRow>
     </TableHead>
   );
@@ -219,16 +238,22 @@ const stableSort = (array, comparator) => {
   return [];
 };
 
-function filterList(list, query) {
-  if (!query || !list.length) {
+function filterList(list, query, queryFilter) {
+  if (!list.length || queryFilter === "ALL" ) {
     return list;
   }
-  const regex = new RegExp(`${query.trim()}`, "i");
+  let regex = "------------------------------";
+  if(query)
+    regex = new RegExp(`${query.trim()}`, "i");
+
   return list.filter(
     (item) =>
       item.firstname.search(regex) >= 0 ||
-      item.lastname.search(regex) >= 0 ||
-      item.email.search(regex) >= 0
+      (Boolean(item.lastname) &&
+        item.lastname.search(regex) >= 0) ||
+      item.email.search(regex) >= 0 ||
+      item.role.search(regex) >= 0 ||
+      item.status.search(queryFilter) >= 0
   );
 }
 
@@ -241,11 +266,18 @@ const Users = () => {
   const [orderBy, setOrderBy] = useState("firstname");
   const [type, setType] = useState("string");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [openModal, setOpenModal] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [filter, setFilter] = useState("ALL");
 
   const handleSearch = (e) => {
     setSearchText(e.target.value);
   };
+
+  const handleFilter = (e) => {
+    setFilter(e.target.value);
+  }
 
   
   const handleChangePage = (event, newPage) => {
@@ -257,10 +289,19 @@ const Users = () => {
     setPage(0);
   };
 
+  const handleOpenModal = (id) => {
+    setUserId(id);
+    setOpenModal(true);
+  }
+
+  const handleCloseModal = () => {
+    setUserId("");
+    setOpenModal(false);
+  }
 
   const visibleRows = useMemo(() => {
     if (data) {
-      const filteredList = filterList(data, searchText);
+      const filteredList = filterList(data, searchText, filter);
       // return filteredList;
       return stableSort(
         filteredList,
@@ -268,7 +309,7 @@ const Users = () => {
       ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }
     return [];
-  }, [data, searchText, order, orderBy, page, rowsPerPage]);
+  }, [data, searchText, order, orderBy, page, rowsPerPage, filter]);
 
   const handleRequestSort = (event, property, type) => {
     const isAsc = orderBy === property && order === "asc";
@@ -284,9 +325,35 @@ const Users = () => {
   return (
     <>
       {user.role === "ADMIN" ? null : <SubscriptionAlert />}
+      <AccessPermissionModal 
+        open={openModal}
+        handleClose={handleCloseModal}
+        userId={userId}
+      />
       {user && (user.role === 'ADMIN') && (
         <ListingWrapper>
           <div className="search-container">
+            <FormControl size="small"
+              sx={{ mr: "10px" }}
+              variant="standard"
+            >
+              <Select
+                value={filter}
+                onChange={handleFilter}
+                sx={{
+                  boxShadow: "none",
+                  textTransform: "none",
+                  fontSize: "16px",
+                  fontFamily: fonts.medium,
+                  color: colors.foreBlack,
+                }}
+              >
+                <MenuItem value="ALL">ALL</MenuItem>
+                <MenuItem value="APPROVED">VERIFIED</MenuItem>
+                <MenuItem value="PENDING">PENDING</MenuItem>
+                <MenuItem value="DISABLED">DISABLED</MenuItem>
+              </Select>
+            </FormControl>
             <SearchInput
               placeholder="Search"
               id="search-contracts"
@@ -377,6 +444,7 @@ const Users = () => {
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 <Button href={`/users/${row.id}`} variant='contained' className='btn'>Edit</Button>
+                                <Button sx={{ ml: '5px' }} variant='contained' className='btn' onClick={() => {handleOpenModal(row.id);}}>Add Permission</Button>
                               </StyledTableCell>
                             </StyledTableRow>
                           );
@@ -385,7 +453,7 @@ const Users = () => {
                   </Table>
                 </TableContainer>
                 <TablePagination
-                  rowsPerPageOptions={[5, 10, 15]}
+                  rowsPerPageOptions={[20, 50, 100]}
                   component="div"
                   count={data.length}
                   rowsPerPage={rowsPerPage}

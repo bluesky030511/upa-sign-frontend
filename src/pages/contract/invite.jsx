@@ -10,6 +10,7 @@ import styled from "styled-components";
 
 import { colors, fonts } from "../../utils/theme";
 import SignModal from "../../components/modals/sign-modal";
+import ClientInfoModal from "../../components/modals/clientinfo-modal";
 import { useUI } from "../../context/ui.context";
 import { Loader } from "../../shared-components/loader/loader";
 import PageLoader from "../../shared-components/loader/page-loader";
@@ -120,12 +121,14 @@ const Invite = () => {
   const [inviteData, setInviteData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
+  const [clientinfoModal, setClientinfoModal] = useState(false);
   const navigate = useNavigate();
   // const { data: placeholders } = useGetPlaceholdersByContractId(contractId, accessToken)
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
   const [fields, setFields] = useState([]);
+  const [clientInfo, setClientInfo] = useState({});
 
   const handleInviteData = (values) => {
     setInviteData({ ...inviteData, ...values });
@@ -146,6 +149,14 @@ const Invite = () => {
   const handleCloseModal = () => {
     setConfirmModal(false);
   };
+
+  const handleOpenInfoModal = () => {
+    setClientinfoModal(true);
+  }
+
+  const handleCloseInfoModal = () => {
+    setClientinfoModal(false);
+  }
 
   const getContract = async () => {
     const { data } = await axios.get(
@@ -172,13 +183,13 @@ const Invite = () => {
   const { data, isFetching } = useQuery("contract-invite", getContract, {
     onSuccess: (data) => {
       removeUser();
-      console.log("data: ", data);
       setUser({
         loggedIn: false,
         isAgent: false,
         isShadow: true,
       });
       setFields(data.fields);
+      setClientInfo(data.client_info);
       if (
         Boolean(data.invite[0].approvedAt) &&
         Boolean(data.invite[0].file[0])
@@ -198,7 +209,7 @@ const Invite = () => {
           firstname: data.firstname,
           lastname: data.lastname,
           address: data.address,
-          gender: data.gender,
+          gender: "MALE",
           phoneNumber: data.phoneNumber,
           country: data.country,
           city: data.city,
@@ -270,8 +281,26 @@ const Invite = () => {
           handleAction={handleSignContract}
           loading={isSigning}
         />
+        <ClientInfoModal
+          open={clientinfoModal}
+          handleClose={handleCloseInfoModal}
+          data={clientInfo}
+        />
         <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb:4, gap: 3}} >
-          <Box sx={{ display: "flex", justifyContent: "right" }}>
+          <Box sx={{ display: "flex", justifyContent: "right", gap: 2 }}>
+            <Button variant="contained" 
+              size="large"
+              sx={{
+                bgcolor: colors.themeBlue,
+                textTransform: "none",
+                fontFamily: fonts.medium,
+                minWidth: 120,
+                borderRadius: 1,
+              }}
+              onClick={handleOpenInfoModal}
+            >
+              View Client Info
+            </Button>
             <Button variant="contained" 
               size="large"
               sx={{

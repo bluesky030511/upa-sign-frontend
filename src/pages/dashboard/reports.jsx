@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { colors, fonts } from "../../../utils/theme";
+import { colors, fonts } from "../../utils/theme";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
@@ -16,27 +16,28 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import format from "date-fns/format";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import Tooltip from "@mui/material/Tooltip";
-import axios from "axios";
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import { visuallyHidden } from "@mui/utils";
 
-import { useGetContractById } from "../../../hooks/data-hook";
-import InviteModal from "../../../components/modals/invite-modal";
-import IconButton from "@mui/material/IconButton";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import DownloadIcon from '@mui/icons-material/Download';
-import { Loader } from "../../../shared-components/loader/loader";
-import { API_ENDPOINTS, BASE_URL } from "../../../utils/variables";
-import { StyledTableCell, StyledTableRow } from "./documents-listing";
-import SubscriptionAlert from "../../../components/alerts/subscription-alert";
-import EmptyFeedback from "../../../shared-components/empty/empty-feedback";
-import { getComparator } from "./documents-listing";
-import SearchInput from "../../../components/inputs/search-input";
+import { useGetContractById, useGetSignedContractById, useGetAllContract } from "../../hooks/data-hook";
+import DashboardLayout from "../../components/dashboard/layout";
+import InviteModal from "../../components/modals/invite-modal";
+import AssignSignatureModal from "../../components/modals/assign-signature-modal";
+import { Loader } from "../../shared-components/loader/loader";
+import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
+import { StyledTableCell, StyledTableRow } from "./documents/documents-listing";
+import SubscriptionAlert from "../../components/alerts/subscription-alert";
+import EmptyFeedback from "../../shared-components/empty/empty-feedback";
+import { getComparator } from "./documents/documents-listing";
+import SearchInput from "../../components/inputs/search-input";
 
 const columns = [
   {
     id: "firstname",
     label: "Name",
-    width: "20%",
+    width: "30%",
     align: "center",
     type: "string",
   },
@@ -103,9 +104,6 @@ const EnhancedTableHead = (props) => {
             </TableSortLabel>
           </StyledTableCell>
         ))}
-        <StyledTableCell align="center" sx={{ width: "16%" }}>
-          Phone
-        </StyledTableCell>
         <StyledTableCell align="center" sx={{ width: "16%" }}></StyledTableCell>
       </TableRow>
     </TableHead>
@@ -115,7 +113,7 @@ const EnhancedTableHead = (props) => {
 const stableSort = (array, comparator) => {
   if (Array.isArray(array)) {
     const stabilizedThis = array.map((el, index) => [
-      { ...el, firstname: el.customer.firstname, email: el.customer.email },
+      { ...el, firstname: el.firstname, email: el.email },
       index,
     ]);
     stabilizedThis.sort((a, b) => {
@@ -131,42 +129,51 @@ const stableSort = (array, comparator) => {
   return [];
 };
 
-function filterList(list, query) {
-  if (!query || !list.length) {
+function filterList(list, query, queryFilter) {
+  if (!list.length || queryFilter === "ALL" ) {
     return list;
   }
-  const regex = new RegExp(`${query.trim()}`, "i");
+  let regex = "------------------------------";
+  if(query)
+    regex = new RegExp(`${query.trim()}`, "i");
   return list.filter(
     (item) =>
-      item.customer.firstname.search(regex) >= 0 ||
-      (Boolean(item.customer.lastname) &&
-        item.customer.lastname.search(regex) >= 0) ||
-      item.customer.email.search(regex) >= 0
+      item.firstname.search(regex) >= 0 ||
+      (Boolean(item.lastname) &&
+        item.lastname.search(regex) >= 0) ||
+      item.email.search(regex) >= 0 ||
+      item.status.search(queryFilter) >= 0
   );
 }
 
-const DocumentDetails = () => {
+const ReportsList = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  // const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("firstname");
-  const [type, setType] = useState("string");
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [order, setOrder] = useState("desc");
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [type, setType] = useState("date");
   const [searchText, setSearchText] = useState("");
-  const { isFetching, data, refetch } = useGetContractById(id);
+  const { isFetching, data, refetch } = useGetAllContract();
+  const [inviteData, setInviteData] = useState({});
+  const [filter, setFilter] = useState("ALL");
+
+  const handleFilter = (e) => {
+    setFilter(e.target.value);
+  }
 
   const visibleRows = useMemo(() => {
     if (data) {
-      const filteredList = filterList(data, searchText);
+      const filteredList = filterList(data, searchText, filter);
       return stableSort(
         filteredList,
         getComparator(order, orderBy, type)
       ).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }
     return [];
-  }, [data, searchText, order, orderBy, page, rowsPerPage]);
+  }, [data, searchText, order, orderBy, page, rowsPerPage, filter]);
 
   const handleRequestSort = (event, property, type) => {
     const isAsc = orderBy === property && order === "asc";
@@ -184,67 +191,50 @@ const DocumentDetails = () => {
     setPage(0);
   };
 
-  const downloadDoc = async (file) => {
-    try {
-      const url = `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${file}`;
-
-      const response = await axios.get(url, { responseType: 'blob' });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-  
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.setAttribute(
-        'download',
-        `${file}.pdf`
-      );
-  
-      document.body.appendChild(link);
-      link.click();
-  
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error('Error downloading document:', error);
-    }
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
   const handleSearch = (e) => {
     setSearchText(e.target.value);
   };
+
+  const handleClose = () => {
+    setInviteData({});
+    setOpen(false);
+  };
+
+  const handleOpen = (data) => {
+    setInviteData(data)
+    setOpen(true);
+  };
+
   return (
-    <>
-      <InviteModal
+    <DashboardLayout>
+      <SubscriptionAlert />
+      <AssignSignatureModal 
         open={open}
         handleClose={handleClose}
-        id={id}
-        refetch={refetch}
+        inviteData={inviteData}
       />
-      <SubscriptionAlert />
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          sx={{
-            bgcolor: colors.themeBlue,
-            textTransform: "none",
-            fontFamily: fonts.medium,
-          }}
-          startIcon={<AddRoundedIcon />}
-          onClick={() => navigate(`/contract/${id}`)}
-        >
-          Invite
-        </Button>
-      </Box>
       <ListingWrapper>
         <div className="search-container">
+        <FormControl size="small"
+            sx={{ mr: "10px" }}
+            variant="standard"
+          >
+            <Select
+              value={filter}
+              onChange={handleFilter}
+              sx={{
+                boxShadow: "none",
+                textTransform: "none",
+                fontSize: "16px",
+                fontFamily: fonts.medium,
+                color: colors.foreBlack,
+              }}
+            >
+              <MenuItem value="ALL">ALL</MenuItem>
+              <MenuItem value="APPROVED">APPROVED</MenuItem>
+              <MenuItem value="PENDING">PENDING</MenuItem>
+            </Select>
+          </FormControl>
           <SearchInput
             placeholder="Search"
             id="search-contracts"
@@ -256,7 +246,7 @@ const DocumentDetails = () => {
           <div className="loader-container">
             <Loader size={48} />
           </div>
-        ) : data && data.length ? (
+        ) : (
           <Paper sx={{ boxShadow: "none", overflow: "hidden" }}>
             <TableContainer
               component={Paper}
@@ -286,12 +276,13 @@ const DocumentDetails = () => {
                       <StyledTableCell
                         align="center"
                         sx={{
-                          maxWidth: 100,
+                          width: "20%",
+                          maxWidth: 200,
                         }}
                       >
-                        {`${invite.customer.firstname} ${
-                          Boolean(invite.customer.lastname)
-                            ? invite.customer.lastname
+                        {`${invite.firstname} ${
+                          Boolean(invite.lastname)
+                            ? invite.lastname
                             : ""
                         }`}
                       </StyledTableCell>
@@ -302,7 +293,7 @@ const DocumentDetails = () => {
                         }}
                       >
                         <Tooltip
-                          title={invite.customer.email}
+                          title={invite.email}
                           slotProps={{
                             tooltip: {
                               sx: {
@@ -312,7 +303,7 @@ const DocumentDetails = () => {
                             },
                           }}
                         >
-                          <span>{invite.customer.email}</span>
+                          <span>{invite.email}</span>
                         </Tooltip>
                       </StyledTableCell>
                       <StyledTableCell align="center" sx={{ maxWidth: "8%" }}>
@@ -332,11 +323,8 @@ const DocumentDetails = () => {
                           )}
                       </StyledTableCell>
                       <StyledTableCell align="center" sx={{ maxWidth: "16%" }}>
-                        {invite.customer.phoneNumber}
-                      </StyledTableCell>
-                      <StyledTableCell align="center" sx={{ maxWidth: "16%" }}>
-                      {invite.file && (
-                          <Box sx={{display:"flex", alignContent:"center", justifyContent:'center', gap: 1}}>
+                        <Box sx={{display:"flex", alignContent:"center", justifyContent:'center', gap: 1}}>
+                          {invite.file && (
                             <a
                               href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${invite.file}`}
                             >
@@ -349,8 +337,7 @@ const DocumentDetails = () => {
                                   textTransform: "none",
                                   px: { xs: 1, sm: "17px" },
                                   py: { xs: "2px", sm: "6px" },
-                                  fontSize: "12px",
-                                  height: "40px",
+                                  fontSize: "11px",
                                   fontFamily: fonts.medium,
                                   "&:hover": {
                                     bgcolor: colors.translucentGreen,
@@ -365,22 +352,39 @@ const DocumentDetails = () => {
                                 }}
                                 endIcon={<VisibilityOutlinedIcon />}
                               >
-                                Preview
+                                {invite.status == "APPROVED" ? "View" : "Preview"}
                               </Button>
                             </a>
-                            {Boolean(invite.approvedAt) && (<IconButton
+                          )}
+                          {invite.status == "PENDING" && (
+                            <Button
+                              id="basic-menu"
                               sx={{
                                 bgcolor: colors.translucentGreen,
                                 boxShadow: "none",
                                 color: colors.foreGreen,
-                                borderRadius: 2,
+                                textTransform: "none",
+                                px: { xs: 1, sm: "17px" },
+                                py: { xs: "2px", sm: "6px" },
+                                fontSize: "11px",
+                                fontFamily: fonts.medium,
+                                "&:hover": {
+                                  bgcolor: colors.translucentGreen,
+                                },
+                                "& .MuiButton-endIcon": {
+                                  marginLeft: 1,
+                                  marginRight: 0,
+                                  "& svg": {
+                                    fontSize: 16,
+                                  },
+                                },
                               }}
-                              onClick={() => downloadDoc(invite.file)}
+                              onClick={() => {handleOpen(invite);}}
                             >
-                              <DownloadIcon size="large" />
-                            </IconButton>)}
-                          </Box>
-                        )}
+                              Assign
+                            </Button>
+                          )}
+                        </Box>
                       </StyledTableCell>
                     </StyledTableRow>
                   ))}
@@ -388,31 +392,23 @@ const DocumentDetails = () => {
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 15]}
+              rowsPerPageOptions={[20, 50, 100]}
               component="div"
               count={data.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Invites per page"
+              labelRowsPerPage="Reportss per page"
             />
           </Paper>
-        ) : (
-          <div className="loader-container">
-            <EmptyFeedback
-              message="You haven't invited anyone to sign this contract."
-              btnText="Invite"
-              action={() => navigate(`/contract/${id}`)}
-            />
-          </div>
         )}
       </ListingWrapper>
-    </>
+    </DashboardLayout>
   );
 };
 
-export default DocumentDetails;
+export default ReportsList;
 
 const ListingWrapper = styled.div`
   background-color: ${colors.white};

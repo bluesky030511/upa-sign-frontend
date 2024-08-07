@@ -20,6 +20,16 @@ const getSignedContractById = async (id) => {
   return data;
 }
 
+const getAllContract = async () => {
+  const { data } = await http.post(`${BASE_URL}${API_ENDPOINTS.CONTRACT}/get-all-invite`);
+  return data;
+}
+
+const getAllIssue = async () => {
+  const { data } = await http.get(`${BASE_URL}${API_ENDPOINTS.USERS}/get-all-issues`);
+  return data;
+}
+
 // Delete Contract
 const deleteContract = async (id) => {
   const { data } = await http.delete(`${API_ENDPOINTS.CONTRACT}/${id}`);
@@ -60,7 +70,6 @@ const getTemplates = async () => {
 
 // Sign Contract
 const signContract = async (input) => {
-    console.log("input.data: ", input.data);
     const { data } = await axios.post(
       `${BASE_URL}${API_ENDPOINTS.CONTRACT}/invite/${input.contractId}`, //${input.inviteId}/status`,
       {...input.data, inviteId: input.inviteId},
@@ -106,6 +115,14 @@ export const useGetContractById = (id) => {
 
 export const useGetSignedContractById = (id) => {
   return useQuery("get-signed-contract-by-id", () => getSignedContractById(id));
+}
+
+export const useGetAllContract = () => {
+  return useQuery("get-all-invite", () => getAllContract());
+}
+
+export const useGetAllIssue = () => {
+  return useQuery("get-all-issues", () => getAllIssue());
 }
 
 export const useDeleteContract = () => {
@@ -175,6 +192,42 @@ export const useCreateTemplate = () => {
   return useMutation(createTemplate);
 }
 
+export const useSubmitIssue = () => {
+  return useMutation(submitIssue);
+}
+
+const submitIssue = async (userData) => {
+  const {data} = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/create-issue`, userData);
+  return data;
+}
+
+const updateIssueStatus = async (userData) => {
+  const {data} = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/update-status/${userData.id}`, userData.value);
+  return data;
+}
+
+export const useUpdateIssueStatus = () => {
+  return useMutation(updateIssueStatus);
+}
+
+const sendMail = async (userData) => {
+  const {data} = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/send-mail`, userData);
+}
+
+export const useSendMail = () => {
+  return useMutation(sendMail);
+}
+
+export const useVerifyUser = () => {
+  return useMutation(verifyUser);
+}
+
+const verifyUser = async (userData) => {
+  const { data } = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/verify-user`, userData);
+  return data;
+};
+
+
 export const addAccessPermission = async (userData) => {
   const { data } = await http.post(`${BASE_URL}${API_ENDPOINTS.USERS}/add-access`, userData);
   return data;
@@ -182,6 +235,15 @@ export const addAccessPermission = async (userData) => {
 
 export const useAddAccessPermission = () => {
   return useMutation(addAccessPermission);
+}
+
+export const assignSignature = async (userData) => {
+  const { data } = await http.post(`${BASE_URL}${API_ENDPOINTS.CONTRACT}/${userData.contractId}/assign-invite`, userData.data);
+  return data;
+}
+
+export const useAssignSignature = () => {
+  return useMutation(assignSignature);
 }
 
 export const deleteAccessPermission = async (userData) => {
@@ -200,6 +262,15 @@ export const getAccessUserList = async () => {
 
 export const useGetAccessUserList = () => {
   return useQuery("accessUserList", getAccessUserList);
+}
+
+export const getTemplateFields = async (id) => {
+  const { data } = await http.get(`${BASE_URL}${API_ENDPOINTS.TEMPLATE}/edit/${id}`);
+  return data;
+}
+
+export const useGetTemplateFields = (id) => {
+  return useQuery("getTemplateFields", () => getTemplateFields(id));
 }
 
 export const deletePlaceholder = async (id) => {

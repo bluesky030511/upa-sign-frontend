@@ -20,6 +20,7 @@ import {
 } from "@mui/icons-material";
 import DvrIcon from "@mui/icons-material/Dvr";
 import styled from "styled-components";
+import BugReportIcon from '@mui/icons-material/BugReport';
 import { Box } from "@mui/system";
 
 import { colors } from "../../../utils/theme";
@@ -99,10 +100,10 @@ const LeftDrawer = (props) => {
                   to="/sign-documents"
                   item={{ name: "Sign Documents", icon: <AutoAwesomeMosaicOutlined /> }}
                 />
-                <CustomLink
+                {/* <CustomLink
                   to="/Placeholders"
                   item={{ name: "Placeholders", icon: <PlaceOutlined /> }}
-                />
+                /> */}
               </>
             )}
 
@@ -135,9 +136,26 @@ const LeftDrawer = (props) => {
                   to="/sign-documents"
                   item={{ name: "Sign Documents", icon: <AutoAwesomeMosaicOutlined /> }}
                 />
+                <CustomLink 
+                  to="/reports"
+                  item={{ name: "Reports", icon: <AutoAwesomeMosaicOutlined /> }}
+                />
+                <CustomLink 
+                  to="/ticket"
+                  item={{ name: "Tickets", icon: <AutoAwesomeMosaicOutlined /> }}
+                />
                 <CustomLink
                   to="/users"
                   item={{ name: "Users", icon: <Settings /> }}
+                />
+              </>
+            )}
+            {(user.role === "AGENT" ||
+              user.role === "CUSTOMER") && (
+              <>
+                <CustomLink
+                  to="/submit-issue"
+                  item={{ name: "Submit Issue", icon: <BugReportIcon /> }}
                 />
               </>
             )}
@@ -149,10 +167,10 @@ const LeftDrawer = (props) => {
                   to="/profile"
                   item={{ name: "Profile", icon: <Settings /> }}
                 />
-                <CustomLink
+                {/* <CustomLink
                   to="/tutorial"
                   item={{ name: "Tutorial", icon: <DvrIcon /> }}
-                />
+                /> */}
               </>
             )}
           </List>
