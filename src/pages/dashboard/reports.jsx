@@ -130,7 +130,7 @@ const stableSort = (array, comparator) => {
 };
 
 function filterList(list, query, queryFilter) {
-  if (!list.length || queryFilter === "ALL" ) {
+  if (!list.length || (queryFilter === "ALL" && !query) ) {
     return list;
   }
   let regex = "------------------------------";
