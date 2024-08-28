@@ -24,7 +24,7 @@ const schema = yup.object({
   //   .string()
   //   .required("Please enter your email")
   //   .email("Please enter valid email"),
-  password: yup.string().required("Please enter password"),
+  // password: yup.string().required("Please enter password"),
 });
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -37,7 +37,7 @@ const AuthModal = ({ open, id, handleClose, handleAction, inviteData }) => {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       email: inviteData.email,
-      password: "",
+      // password: "",
     },
     resolver: yupResolver(schema),
   });
@@ -49,23 +49,23 @@ const AuthModal = ({ open, id, handleClose, handleAction, inviteData }) => {
   } = useVerifyUser();
 
   const onSubmit = (values) => {
-    VerifyUser(
-      {
-        email: inviteData.email,
-        password: values.password,
-      },
-      {
-        onSuccess: () => {
+    // VerifyUser(
+    //   {
+    //     email: inviteData.email,
+    //     // password: values.password,
+    //   },
+    //   {
+    //     onSuccess: () => {
           reset();
-          showSuccessToast("Customer verified");
+          // showSuccessToast("Customer verified");
           handleClose();
           handleAction();
-        },
-        onError: (error) => {
-          showErrorToast(error.response.data.message);
-        }
-      }
-    );
+    //     },
+    //     onError: (error) => {
+    //       showErrorToast(error.response.data.message);
+    //     }
+    //   }
+    // );
   };
 
   return (
@@ -131,7 +131,7 @@ const AuthModal = ({ open, id, handleClose, handleAction, inviteData }) => {
                   />
                 )}
               />
-              <Controller
+              {/* <Controller
                 name="password"
                 control={control}
                 render={({field, fieldState}) => (
@@ -142,7 +142,7 @@ const AuthModal = ({ open, id, handleClose, handleAction, inviteData }) => {
                         error={fieldState.error && fieldState.error.message}
                     />
                 )}
-            />
+              /> */}
             </div>
             <ErrorAlert
               show={isError}

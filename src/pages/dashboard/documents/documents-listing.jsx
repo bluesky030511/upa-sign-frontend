@@ -211,8 +211,8 @@ const DocumentsListing = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
-  const [type, setType] = useState("string");
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [type, setType] = useState("date");
   const [searchText, setSearchText] = useState("");
   const { isFetching, isSuccess, data } = useGetContracts({
     name: searchText,

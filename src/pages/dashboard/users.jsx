@@ -253,7 +253,7 @@ function filterList(list, query, queryFilter) {
         item.lastname.search(regex) >= 0) ||
       item.email.search(regex) >= 0 ||
       item.role.search(regex) >= 0 ||
-      item.status.search(queryFilter) >= 0
+      item.role.search(queryFilter) >= 0
   );
 }
 
@@ -263,8 +263,8 @@ const Users = () => {
   const [searchText, setSearchText] = useState("");
   const { isFetching, isSuccess, data, refetch } = useGetUsers();
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("firstname");
-  const [type, setType] = useState("string");
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [type, setType] = useState("date");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [openModal, setOpenModal] = useState(false);
@@ -349,9 +349,9 @@ const Users = () => {
                 }}
               >
                 <MenuItem value="ALL">ALL</MenuItem>
-                <MenuItem value="APPROVED">VERIFIED</MenuItem>
-                <MenuItem value="PENDING">PENDING</MenuItem>
-                <MenuItem value="DISABLED">DISABLED</MenuItem>
+                <MenuItem value="ADMIN">ADMIN</MenuItem>
+                <MenuItem value="AGENT">AGENT</MenuItem>
+                <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
               </Select>
             </FormControl>
             <SearchInput

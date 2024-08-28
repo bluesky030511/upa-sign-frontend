@@ -281,11 +281,11 @@ const Invite = () => {
           handleAction={handleSignContract}
           loading={isSigning}
         />
-        <ClientInfoModal
+        {/* <ClientInfoModal
           open={clientinfoModal}
           handleClose={handleCloseInfoModal}
           data={clientInfo}
-        />
+        /> */}
         <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", mb:4, gap: 3}} >
           <Box sx={{ display: "flex", justifyContent: "right", gap: 2 }}>
             <Button variant="contained" 
