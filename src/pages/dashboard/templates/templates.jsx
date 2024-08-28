@@ -35,20 +35,21 @@ import { API_ENDPOINTS, S3_BUCKET_URL } from "../../../utils/variables";
 import ContractModal from "../../../components/modals/contract-modal";
 import SubscriptionAlert from "../../../components/alerts/subscription-alert";
 import { useSubscription } from "../../../context/subscription.context";
+import SearchInput from "../../../components/inputs/search-input";
 import { isSubscribed } from "../../../utils/helper";
 import ContractDetailsModal from "../../../components/modals/contract-details-modal";
 import { useNavigate } from "react-router-dom";
 
 const columns = [
   {
-    id: "name",
+    id: "firstname",
     label: "Name",
     width: "20%",
     align: "center",
     type: "string",
   },
   {
-    id: "name",
+    id: "agentName",
     label: "Agent Name",
     width: "20%",
     align: "center",
@@ -128,10 +129,11 @@ function filterList(list, query) {
   const regex = new RegExp(`${query.trim()}`, "i");
   return list.filter(
     (item) =>
-      item.customer.firstname.search(regex) >= 0 ||
-      (Boolean(item.customer.lastname) &&
-        item.customer.lastname.search(regex) >= 0) ||
-      item.customer.email.search(regex) >= 0
+      item.name.search(regex) >= 0 ||
+      (Boolean(item.lastname) &&
+        item.lastname.search(regex) >= 0) ||
+      item.creatorName.search(regex) >= 0
+
   );
 }
 
@@ -153,9 +155,9 @@ const Templates = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("firstname");
+  const [orderBy, setOrderBy] = useState("createdAt");
   const [searchText, setSearchText] = useState("");
-  const [type, setType] = useState("string");
+  const [type, setType] = useState("date");
 
   const visibleRows = useMemo(() => {
     if (data) {
@@ -227,6 +229,10 @@ const Templates = () => {
     });
   };
 
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+  };
+
   return (
     <DashboardLayout>
       {isFetching ? (
@@ -267,6 +273,14 @@ const Templates = () => {
             open={showGuidelines}
             handleClose={handleCloseGuideLine}
           />
+          <div className="search-container">
+            <SearchInput
+              placeholder="Search"
+              id="search-contracts"
+              value={searchText}
+              onChange={handleSearch}
+            />
+          </div>
           {user.role === "ADMIN" ? null : <SubscriptionAlert />}
           {user && (user.role === "ADMIN" || user.role === "AGENT") && (
             <Box

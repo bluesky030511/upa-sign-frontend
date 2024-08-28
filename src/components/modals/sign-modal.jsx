@@ -73,7 +73,7 @@ const SignModal = ({ open, handleClose, handleAction, loading, actionText, handl
                 {actionText ? "Remote" : "Confirm"}
               </PrimaryButton>
             </div>
-            <div className="btn-container">
+            <div className="btn-container" style={{ width: '80%' }}>
               <PrimaryButton
                 onClick={handleInPerson}
                 sx={{
@@ -81,6 +81,7 @@ const SignModal = ({ open, handleClose, handleAction, loading, actionText, handl
                   boxShadow: "none",
                   color: colors.foreBlack,
                   textTransform: "none",
+                  width: '80%',
                   py: "4px",
                   border: "2px solid",
                   borderColor: colors.foreBlack,

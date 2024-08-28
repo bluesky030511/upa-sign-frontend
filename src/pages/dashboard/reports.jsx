@@ -152,7 +152,7 @@ const ReportsList = () => {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [order, setOrder] = useState("desc");
+  const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("createdAt");
   const [type, setType] = useState("date");
   const [searchText, setSearchText] = useState("");

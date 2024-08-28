@@ -25,6 +25,7 @@ import InsuranceForm from '../../components/steps/InsuranceForm';
 import { useGetPlaceholdersByContractId, useInviteCustomer } from '../../hooks/data-hook';
 import SignModal from '../../components/modals/sign-modal';
 import AuthModal from '../../components/modals/auth-modal';
+import ClientInfoModal from "../../components/modals/clientinfo-modal";
 import { useToast } from '../../context/toast.context';
 import dayjs, { Dayjs } from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -159,11 +160,13 @@ const InviteByAgent = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
   const [authModal, setAuthModal] = useState(false);
+  const [clientinfoModal, setClientinfoModal] = useState(false);
   const [url, setUrl] = useState(null);
   const navigate = useNavigate();
   const { showSuccessToast, showErrorToast } = useToast();
   const [fields, setFields] = useState([]);
   const [step, setStep] = useState(0);
+  const [clientInfo, setClientInfo] = useState({});
 
   pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
 
@@ -196,6 +199,14 @@ const InviteByAgent = () => {
   const handleOpenModal = () => {
     setConfirmModal(true);
   };
+
+  const handleOpenInfoModal = () => {
+    setClientinfoModal(true);
+  }
+
+  const handleCloseInfoModal = () => {
+    setClientinfoModal(false);
+  }
 
 
   const handleStep = async (values) => {
@@ -231,6 +242,8 @@ const InviteByAgent = () => {
       client_month_of_loss: String(new Date(values.dateOfLoss).getMonth() + 1),
       client_year_of_loss: String(new Date(values.dateOfLoss).getFullYear() % 100),
     };
+    
+    setClientInfo(data);
 
     setStep(1);
     await fields.forEach(field => {
@@ -350,6 +363,11 @@ const InviteByAgent = () => {
               loading={isInviting}
               actionText="Would you rather sign the contract with your client remotely or meet in person?"
             />
+            <ClientInfoModal
+              open={clientinfoModal}
+              handleClose={handleCloseInfoModal}
+              data={clientInfo}
+            />
             <AuthModal 
               open={authModal}
               handleClose={handleCloseAhtuModal}
@@ -383,7 +401,20 @@ const InviteByAgent = () => {
               />
             )}</>)}
             {step === 1 && (<Box sx={{ display:"flex", flexDirection:"column", justifyContent:"center", mb:4, gap:3 }}>
-              <Box sx={{ display:"flex", justifyContent:"right" }} >
+              <Box sx={{ display:"flex", justifyContent:"right", gap: 2 }} >
+                <Button variant="contained" 
+                  size="large"
+                  sx={{
+                    bgcolor: colors.themeBlue,
+                    textTransform: "none",
+                    fontFamily: fonts.medium,
+                    minWidth: 120,
+                    borderRadius: 1,
+                  }}
+                  onClick={handleOpenInfoModal}
+                >
+                  View Client Info
+                </Button>
                 <Button variant="contained"
                   size='large'
                   sx={{

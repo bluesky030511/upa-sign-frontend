@@ -13,11 +13,14 @@ import * as yup from "yup";
 import { useCreateContract } from "../../hooks/data-hook";
 import { colors, fonts } from "../../utils/theme";
 import PrimaryInput from "../inputs/primary-input";
+import IconButton from "@mui/material/IconButton";
+import DownloadIcon from '@mui/icons-material/Download';
 import PrimaryButton from "../buttons/primary-button";
 import ErrorAlert from "../alerts/error-alert";
 import { useToast } from "../../context/toast.context";
 import { useUI } from "../../context/ui.context";
 import { Grid, Typography } from "@mui/material";
+import jsPDF from "jspdf";
 
 const schema = yup.object({
   name: yup.string().required("Please enter contract name"),
@@ -28,6 +31,27 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const ClientInfoModal = ({ open, handleClose, data }) => {
+  const generatePDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+
+    doc.text(`Client Information:`, 50, 40);
+    doc.text(`Name: ${data.client_full_name}`, 20, 60);
+    doc.text(`Email: ${data.client_email}`, 20, 70);
+    doc.text(`Address: ${data.client_full_address}`, 20, 80);
+    doc.text(`Phone Number: ${data.client_phone_number}`, 20, 90);
+    doc.text(`Insurance Company: ${data.client_insurance_company}`, 20, 100);
+    doc.text(`Policy Number: ${data.client_policy_number}`, 20, 110);
+    doc.text(`Cause of Loss: ${data.client_cause_of_loss}`, 20, 120);
+    doc.text(`Claim: ${data.client_claim}`, 20, 130);
+    doc.text(`Date of Loss: ${data.client_date_of_loss}`, 20, 140);
+    doc.text(`Mortgage: ${data.client_mortgage}`, 20, 150);
+    doc.text(`Initials: ${data.client_initials}`, 20, 160);
+    doc.text(`Contingency Fee: ${data.client_insu}`, 20, 170);
+    doc.text(`Loss Address: ${data.client_policy_number}`, 20, 180);
+
+    doc.save("client_information.pdf");
+  }
+
   return (
     <Dialog
       open={open}
@@ -72,9 +96,22 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
           </Box>
           <div className="input-container">
             <div className="input-container" style={{ alignContent: "center" }}>
-              <h3 style={{ textAlign: "center", paddingBottom: "24px" }}>
+              <h3 style={{ textAlign: "center" }}>
                 Client Information
               </h3>
+              <div style={{ display:"flex", justifyContent: "right", marginRight: "20px", paddingBottom: "20px" }}>
+                <IconButton
+                    sx={{
+                      bgcolor: colors.white,
+                      boxShadow: "none",
+                      color: colors.black,
+                      borderRadius: 2,
+                    }}
+                    onClick={() => generatePDF()}
+                  >
+                    <DownloadIcon size="large" />
+                  </IconButton>
+              </div>
 
               <Box display="flex" justifyContent="center" alignItems="center">
                 <Grid
@@ -109,7 +146,7 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
-                      {data ? data.client_address : ""}
+                      {data ? data.client_full_address : ""}
                     </Typography>{" "}
                   </Grid>
                   {/* Fourth Field and Value */}
