@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useState, useEffect} from "react";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { colors, fonts } from "../../../utils/theme";
@@ -32,7 +32,13 @@ const schema = yup.object({
   country: yup.string().required("Please enter your country"),
   state: yup.string().required("Please enter your state"),
   zipCode: yup.string().required("Please enter your zip code"),
-  license: yup.string().required("Please enter your license"),
+  // license: yup.string().required("Please enter your license"),
+  // licenses: yup.array().of(
+  //   yup.object().shape({
+  //     region: yup.string(),
+  //     number: yup.string(),
+  //   })
+  // ),
 });
 
 const SettingUser = () => {
@@ -54,6 +60,7 @@ const SettingUser = () => {
       zipCode: "",
       status: "",
       license: "",
+      // licenses: [],
     },
     resolver: yupResolver(schema),
   });
@@ -62,6 +69,24 @@ const SettingUser = () => {
   var signedLastName = watch("lastname") ? watch("lastname").replace(/[0-9]/g, "") : '';
 
   const { mutate: Update, isLoading } = useUpdateUserProfile();
+
+  const [licenses, setLicenses] = useState([{ region: '', number: '' }]); 
+
+  useEffect(() => {
+    setLicenses( [{ region: '', number: '' }]);
+  }, [])
+
+  const addLicense = () => {
+    setLicenses([...licenses, { region: '', number: '' }]);
+  };
+
+  const handleLicenseChange = (index, field, value) => {
+    const newLicenses = licenses.map((license, i) => (
+      i === index ? { ...license, [field]: value } : license
+    ));
+    setLicenses(newLicenses);
+  };
+
 
   const onSubmit = async (data) => {
     await Update(
@@ -79,7 +104,8 @@ const SettingUser = () => {
         state: data.state,
         country: data.country,
         zipCode: data.zipCode,
-        license: data.license,
+        license: "12341234",
+        licenses: licenses,
       },
       {
         onSuccess: (data) => {
@@ -296,7 +322,7 @@ const SettingUser = () => {
                 />
               )}
             />
-            <Controller
+            {/* <Controller
               name="license"
               control={control}
               render={({ field, fieldState }) => (
@@ -306,7 +332,53 @@ const SettingUser = () => {
                   helperText={fieldState.error && fieldState.error.message}
                 />
               )}
-            />
+            /> */}
+            <div>
+              {licenses.length > 0 ? (
+                licenses.map((license, index) => (
+                  <Grid container key={index} spacing={2}>
+                    <Grid item lg={5} xs={12}>
+                      <PrimaryInput
+                        placeholder="License region"
+                        value={license.region}
+                        onChange={(e) => handleLicenseChange(index, 'region', e.target.value)}
+                      />
+                    </Grid>
+                    <Grid item lg={7} xs={12}>
+                      <PrimaryInput
+                        placeholder="License number"
+                        value={license.number}
+                        onChange={(e) => handleLicenseChange(index, 'number', e.target.value)}
+                      />
+                    </Grid>
+                  </Grid>
+                ))
+              ) : (
+                <p>No licenses available</p>
+              )}
+              <div className="change-password-wrap">
+                <Button
+                  sx={{
+                    textTransform: "none",
+                    "& a": {
+                      fontFamily: fonts.medium,
+                      color: colors.foreBlack,
+                      fontSize: 12,
+                      transition: "color 0.2s ease-in-out",
+                    },
+                    "&:hover": {
+                      bgcolor: "transparent",
+                    },
+                    "&:hover a": {
+                      color: colors.themeBlue,
+                    },
+                  }}
+                  onClick={addLicense}
+                >
+                  Add License
+                </Button>
+              </div>
+            </div>
             <Controller
               name="country"
               control={control}
