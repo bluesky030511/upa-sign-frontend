@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Box from "@mui/material/Box";
@@ -19,7 +19,8 @@ import PrimaryButton from "../buttons/primary-button";
 import ErrorAlert from "../alerts/error-alert";
 import { useToast } from "../../context/toast.context";
 import { useUI } from "../../context/ui.context";
-import { Grid, Typography } from "@mui/material";
+import { Grid, Typography, Button, TextField } from "@mui/material";
+import { useGetUserProfile, useGetUserData, useGetUserProfilebyEmail} from '../../hooks/user-hook';
 import jsPDF from "jspdf";
 
 const schema = yup.object({
@@ -30,26 +31,61 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-const ClientInfoModal = ({ open, handleClose, data }) => {
+const ClientInfoModal = ({ open, handleClose }) => {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState(false);
+  const [visibleRows, setVisibleRows] = useState([]);
+  const [ deleteEmail, setDeleteEmail ] = useState('');
+  const { showSuccessToast, showErrorToast } = useToast();
+  const [data, setData] = useState({});
+
+  const { mutate: GetUserProfile, isLoading: isFetching, isSuccess } = useGetUserData();
+  const { mutate: GetUserProfilebyEmail, isLoading } = useGetUserProfilebyEmail();
+
   const generatePDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
 
     doc.text(`Client Information:`, 50, 40);
-    doc.text(`Name: ${data.client_full_name}`, 20, 60);
-    doc.text(`Email: ${data.client_email}`, 20, 70);
-    doc.text(`Address: ${data.client_full_address}`, 20, 80);
-    doc.text(`Phone Number: ${data.client_phone_number}`, 20, 90);
-    doc.text(`Insurance Company: ${data.client_insurance_company}`, 20, 100);
-    doc.text(`Policy Number: ${data.client_policy_number}`, 20, 110);
-    doc.text(`Cause of Loss: ${data.client_cause_of_loss}`, 20, 120);
-    doc.text(`Claim: ${data.client_claim}`, 20, 130);
-    doc.text(`Date of Loss: ${data.client_date_of_loss}`, 20, 140);
-    doc.text(`Mortgage: ${data.client_mortgage}`, 20, 150);
-    doc.text(`Initials: ${data.client_initials}`, 20, 160);
-    doc.text(`Contingency Fee: ${data.client_insu}`, 20, 170);
-    doc.text(`Loss Address: ${data.client_policy_number}`, 20, 180);
-
+    doc.text(`Name: ${data ? data.firstname : ""} ${data ? data.lastname : ""}`, 20, 60);
+    doc.text(`Email: ${data ? data.email : ""}`, 20, 70);
+    doc.text(`Address: ${data ? data.address : ""} ${data ? data.city : ""} ${data ? data.state : ""} ${data ? data.country : ""} `, 20, 80);
+    doc.text(`Phone Number: ${data ? data.phoneNumber : ""}`, 20, 90);
+    
     doc.save("client_information.pdf");
+  }
+
+
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+    setError(false); 
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleAddClick = () => {
+    if (!validateEmail(email)) {
+      setError(true);
+    } else {
+      setError(false);
+      getUserProfilebyEmail(email)
+    }
+  };
+
+  const getUserProfilebyEmail = (email) => {
+    GetUserProfilebyEmail({
+      email}, {
+        onSuccess: (data) => {
+          console.log("data: ", data);
+            setData(data);       
+        },
+        onError: (error) => {
+          showErrorToast(error.response.data.message);
+        }
+    });
   }
 
   return (
@@ -99,16 +135,42 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
               <h3 style={{ textAlign: "center" }}>
                 Client Information
               </h3>
-              <div style={{ display:"flex", justifyContent: "right", marginRight: "20px", paddingBottom: "20px" }}>
-                <IconButton
-                    sx={{
-                      bgcolor: colors.white,
-                      boxShadow: "none",
-                      color: colors.black,
-                      borderRadius: 2,
-                    }}
-                    onClick={() => generatePDF()}
+              <div style={{ display:"flex", justifyContent: "right", marginRight: "20px", paddingBottom: "20px", marginTop:"25px", gap:3 }}>
+                <div className="btn-container" style={{ display:"flex", justifyContent:"center", alignItems:"center" }}>
+                  <TextField 
+                    variant="standard"
+                    size="small"
+                    label="User Email"
+                    type="email"
+                    value={email}
+                    sx={{ pr: 2 }}
+                    error={error}
+                    helperText={error ? 'Please enter a valid email' : ''}
+                    onChange={(event) => handleEmailChange(event)}
+                  />
+                  <Button 
+                    variant="contained" 
+                    sx={{ 
+                      backgroundColor: colors.themeBlue, 
+                      fontFamily: fonts.medium, 
+                      textTransform: "none",
+                      maxHeight: "40px"
+                    }} 
+                    onClick={handleAddClick}
                   >
+                    Find Client
+                  </Button>
+                </div>
+                <IconButton
+                  sx={{
+                    bgcolor: colors.white,
+                    boxShadow: "none",
+                    color: colors.black,
+                    borderRadius: 2,
+                    pl: "10px"
+                  }}
+                  onClick={() => generatePDF()}
+                >
                     <DownloadIcon size="large" />
                   </IconButton>
               </div>
@@ -119,6 +181,7 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                   spacing={2}
                   justifyContent="center"
                   alignItems="center"
+                  sx={{ pl: "50px", pb:"30px", pt: "50px" }}
                   // Adjust this style as needed
                 >
                   {/* First Field and Value */}
@@ -127,7 +190,7 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
-                      {data ? data.client_full_name : ""}
+                      {data ? data.firstname : ""} {data ? data.lastname : ""}
                     </Typography>{" "}
                   </Grid>
 
@@ -137,7 +200,7 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
-                      {data ? data.client_email : ""}
+                      {data ? data.email : ""}
                     </Typography>
                   </Grid>
                   {/* Third Field and Value */}
@@ -146,7 +209,7 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
-                      {data ? data.client_full_address : ""}
+                      {data ? data.address : ""} {data ? data.city : ""} {data ? data.state : ""} {data ? data.country : ""} 
                     </Typography>{" "}
                   </Grid>
                   {/* Fourth Field and Value */}
@@ -155,7 +218,7 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
-                      {data ? data.client_phone_number : ""}
+                      {data ? data.phoneNumber : ""}
                     </Typography>{" "}
                   </Grid>
                   {/* Fifth Field and Value */}
@@ -168,86 +231,86 @@ const ClientInfoModal = ({ open, handleClose, data }) => {
                     </Typography>{" "}
                   </Grid> */}
                   {/* Sixth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Insurance Company:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_insurance_company : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Seventh Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Policy Number:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_policy_number : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Eighth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Cause of Loss:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_cause_of_loss : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Nineth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Claim:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_claim : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Nineth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Date of Loss:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_date_of_loss : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Nineth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Mortgage:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_mortgage : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Nineth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Initials:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_initials : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Nineth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Contingency Fee:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_contingency_fee : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                   {/* Nineth Field and Value */}
-                  <Grid item xs={4}>
+                  {/* <Grid item xs={4}>
                     <Typography variant="subtitle1">Loss Address:</Typography>
                   </Grid>
                   <Grid item xs={8}>
                     <Typography variant="body1">
                       {data ? data.client_loss_full_address : ""}
                     </Typography>{" "}
-                  </Grid>
+                  </Grid> */}
                 </Grid>
               </Box>
             </div>
@@ -275,6 +338,14 @@ const SendDialog = styled.div`
         font-family: ${fonts.medium};
         font-size: 1.75rem;
       }
+    }
+    .btn-container {
+      margin-top: 24px;
+      margin-bottom: 24px;
+      width: 100%;
+      display: flex;
+      justify-content: end;
+      padding-right: 30px;
     }
   }
 `;

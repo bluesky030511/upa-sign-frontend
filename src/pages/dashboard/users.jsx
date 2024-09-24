@@ -426,7 +426,7 @@ const Users = () => {
                                 {row.role}
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                {`${row.status === 'APPROVED' ? 'VERIFIED' : row.status}`}
+                                {`${row.status === 'APPROVED' ? 'VERIFIED' : 'DISABLED' ? 'DEACTIVATED' : row.status}`}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {row.invite_count}

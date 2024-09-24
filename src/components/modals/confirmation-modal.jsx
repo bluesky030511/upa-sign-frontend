@@ -1,33 +1,98 @@
-import React from "react";
+import axios from "axios";
+import React, {useRef, useEffect, useState} from "react";
 import Dialog from "@mui/material/Dialog";
+import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
 import DialogContent from "@mui/material/DialogContent";
 import PrimaryButton from "../buttons/primary-button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import Tooltip from "@mui/material/Tooltip";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
 import { useDeleteContract, useSignContract } from "../../hooks/data-hook";
+import { useQuery } from "react-query";
 import { useQueryClient } from "react-query";
 import { isComplete } from "../../utils/helper";
 import { useUI } from "../../context/ui.context";
 import { useToast } from "../../context/toast.context";
 
-const ConfirmationModal = ({ open, handleClose, id, inviteId, type }) => {
+const ConfirmationModal = ({ open, handleClose, id, inviteId, type, accessToken }) => {
   const confirm = type === "CONFIRM";
-  const { user } = useUI();
+  const { user, setUser, removeUser } = useUI();
   const { showSuccessToast } = useToast();
+  const [fields, setFields] = useState([]);
   const { mutate: DeleteContract, isLoading } = useDeleteContract();
   const { mutate: SignContract, isLoading: isSigning } = useSignContract();
+  const [inviteData, setInviteData] = useState({});
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const handleInviteData = (values) => {
+    setInviteData({ ...inviteData, ...values });
+  };
+
+  const getContract = async () => {
+    if(!accessToken || accessToken == "") return null;
+    const { data } = await axios.get(
+      `${BASE_URL}${API_ENDPOINTS.CONTRACT}/${id}`,
+      {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return data;
+  };
+
+  const getProfile = async () => {
+    if(!accessToken || accessToken == "") return null;
+    const { data } = await axios.get(`${BASE_URL}${API_ENDPOINTS.PROFILE}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  };
+  const { data, isFetching } = useQuery("contract-invite", getContract, {
+    onSuccess: (data) => {
+      setFields(data.fields);
+    },
+  });
+
+  const { isFetching: isProfileFetching } = useQuery(
+    "customer-profile",
+    getProfile,
+    {
+      onSuccess: (data) => {
+        handleInviteData({
+          email: data.email,
+          firstname: data.firstname,
+          lastname: data.lastname,
+          address: data.address,
+          gender: "MALE",
+          phoneNumber: data.phoneNumber,
+          country: data.country,
+          city: data.city,
+          state: data.state,
+        });
+      },
+    }
+  );
+
   const handleAction = () => {
     if (confirm) {
       SignContract(
         {
           contractId: id,
           inviteId: inviteId,
+          accessToken: accessToken || "",
           data: {
             status: "APPROVED",
+            ...inviteData,
+            ...{fields:fields},
           },
         },
         {

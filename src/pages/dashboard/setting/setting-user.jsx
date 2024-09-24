@@ -245,7 +245,7 @@ const SettingUser = () => {
                     <MenuItem value="">Status</MenuItem>
                     <MenuItem value="APPROVED">Verified</MenuItem>
                     <MenuItem value="PENDING">Pending</MenuItem>
-                    <MenuItem value="DISABLED">Disabled</MenuItem>
+                    <MenuItem value="DISABLED">Deactivate</MenuItem>
                   </Select>
                   <span className="error-text">
                     {fieldState.error && fieldState.error.message}

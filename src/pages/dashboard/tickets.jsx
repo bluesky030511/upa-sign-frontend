@@ -38,6 +38,13 @@ import SearchInput from "../../components/inputs/search-input";
 
 const columns = [
   {
+    id: "ticketnum",
+    label: "Ticket Number",
+    width: "20%",
+    align: "center",
+    type: "string",
+  },
+  {
     id: "firstname",
     label: "Name",
     width: "10%",
@@ -279,6 +286,27 @@ const TicketList = () => {
                     <StyledTableRow key={index}>
                       <StyledTableCell align="center" sx={{ width: "2%" }}>
                         {index + 1}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        align="center"
+                        sx={{
+                          width: "10%",
+                          maxWidth: 164,
+                        }}
+                      >
+                        <Tooltip
+                          title={issue.ticketnum}
+                          slotProps={{
+                            tooltip: {
+                              sx: {
+                                fontFamily: fonts.medium,
+                                fontSize: 12,
+                              },
+                            },
+                          }}
+                        >
+                          <span>{issue.ticketnum}</span>
+                        </Tooltip>
                       </StyledTableCell>
                       <StyledTableCell
                         align="center"
