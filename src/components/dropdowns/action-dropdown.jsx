@@ -9,7 +9,7 @@ import ConfirmationModal from "../modals/confirmation-modal";
 import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
 import { useUI } from "../../context/ui.context";
 
-const ActionDropDown = ({ id, file, inviteId, signed }) => {
+const ActionDropDown = ({ id, file, inviteId, signed, accessToken }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState({
     open: false,
@@ -45,6 +45,7 @@ const ActionDropDown = ({ id, file, inviteId, signed }) => {
         handleClose={closeConfirmationModal}
         type={confirmationModal.type}
         inviteId={inviteId}
+        accessToken={accessToken}
       />
       <Button
         id="basic-menu"

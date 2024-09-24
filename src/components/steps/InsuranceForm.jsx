@@ -10,7 +10,8 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { colors, fonts } from "../../utils/theme";
 import PrimaryInput from "../inputs/primary-input";
 import PrimaryButton from "../buttons/primary-button";
-import { FormHelperText } from "@mui/material";
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import { useUI } from "../../context/ui.context";
 
 const schema = yup.object({
   insuranceCompany: yup.string().required("Please enter insurance company"),
@@ -33,6 +34,17 @@ const schema = yup.object({
   // publicAdjusterLicense: yup.string().required("Please enter Public Adjuster License number"),
 });
 const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }) => {
+  const { user, setUser } = useUI();
+  const [licenses, setLicenses] = useState([{ region: '', number: '' }]); 
+  const [licnese, setLicense] = useState("");
+
+  useEffect(() => {
+    if( user.licenses )
+      setLicenses(user.licenses.map(license => JSON.parse(license)))
+    else
+      setLicenses( [{ region: '', number: '' }]);
+  }, [])
+  console.log("licneses: ", licenses);
   const [additionalFields, setAdditionalFields] = useState([]);
   useEffect(() => {
     setAdditionalFields(prevFields => {
@@ -64,9 +76,14 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
   });
 
   const onSubmit =(data) => {
-    handleInviteData(data);
-    handleOpenModal(data);
+    console.log("license: ", licnese);
+    handleInviteData({...data, publicAdjusterLicense: licnese});
+    handleOpenModal({...data, publicAdjusterLicense: licnese});
   };
+
+  const handleChange = (event) => {
+    setLicense(event.target.value)
+  }
   return (
     <Form className="profile-box" onSubmit={handleSubmit(onSubmit)}>
       <h3>Insurance</h3>
@@ -247,17 +264,59 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
           />
         )}
       />
-      {/* <Controller
+      <Controller
         name="publicAdjusterLicense"
         control={control}
         render={({ field, fieldState }) => (
-          <PrimaryInput
-            placeholder="Public adjuster license #"
-            {...field}
-            helperText={fieldState.error && fieldState.error.message}
-          />
+          <FormControl variant="standard" sx={{ width:"100%" }} >
+            <InputLabel sx={{ 
+              px: "20px", 
+              py:"15px", 
+              fontFamily: fonts.medium, 
+              fontSize: "16px",  
+            }} 
+            >License Number</InputLabel>
+          <Select 
+            value={licnese}
+            label="License Number"
+            onChange={handleChange}
+            inputProps={{
+              sx: {
+                py: "17px",
+                px: "20px",
+                color: colors.foreBlack,
+                fontFamily: fonts.medium,
+                fontSize: "16px",
+                bgcolor: colors.translucentBlue,
+                borderRadius: "7px",
+                "&::placeholder": {
+                  color: colors.fadeBlack,
+                },
+              },
+            }}
+            sx={{
+              mt: "25px",
+              "& .MuiFilledInput-underline:before, & .MuiFilledInput-underline:after":
+                {
+                  display: "none",
+                },
+              "& .MuiInputBase-root, & .MuiFilledInput-root.Mui-focused": {
+                bgcolor: "transparent",
+              },
+              "& .MuiInputBase-root:hover": {
+                bgcolor: "transparent",
+              },
+              "& .MuiInputBase-root:focus": {
+                bgcolor: "transparent",
+              },
+              width: "100%"
+            }}
+          >
+            {licenses.map(license => <MenuItem value={license.number}>{license.region} : {license.number}</MenuItem>)}
+          </Select>
+          </FormControl>
         )}
-      /> */}
+      />
       <Controller
         name="contingencyFee"
         control={control}

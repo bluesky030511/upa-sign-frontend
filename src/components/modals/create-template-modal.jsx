@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as React from 'react';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -21,13 +21,18 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CloseIcon from '@mui/icons-material/Close';
+import { useUI } from "../../context/ui.context";
 
 
 const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, setState, teams, setTeams }) => {
-
+  const { user } = useUI();
   const handleChange = (event) => {
     setState(event.target.value);
   };
+
+  useEffect(() => {
+    if(user.isAgent) setState("private");
+  }, [])
 
   const addUser = () => {
     setTeams([
@@ -67,23 +72,31 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
           <div className="icon-circle">
             <CheckRoundedIcon sx={{ color: colors.checkGreen, fontSize: 56 }} />
           </div>
-          <h4>Share Template?</h4>
           {/* <p>{'Are you sure you want to sign this contract?'}</p> */}
-          <FormControl>
-            <FormLabel >{'Do you want to create this template as private or public?'}</FormLabel>
-            <RadioGroup
-              row
-              name="row-radio-buttons-group"
-              value={state}
-              onChange={handleChange}
-              sx={{ display:'flex', justifyContent:'center' }}
-            >
-              <FormControlLabel value="private" control={<Radio />} label="Private" />
-              <FormControlLabel value="public" control={<Radio />} label="Public" />
-              <FormControlLabel value="share" control={<Radio />} label="Share" />
-            </RadioGroup>
-          </FormControl>
-          <Divider flexItem/>
+          {!user.isAgent && (<>
+            <h4>Share Template?</h4>
+            <FormControl>
+              <FormLabel >{'Do you want to create this template as private or public?'}</FormLabel>
+              <RadioGroup
+                row
+                name="row-radio-buttons-group"
+                value={state}
+                onChange={handleChange}
+                sx={{ display:'flex', justifyContent:'center' }}
+              >
+                {/* <FormControlLabel value="private" control={<Radio />} label="Private" /> */}
+                <FormControlLabel value="public" control={<Radio />} label="Public" />
+                <FormControlLabel value="share" control={<Radio />} label="Share" />
+              </RadioGroup>
+            </FormControl>
+            <Divider flexItem/>
+          </>)}
+          {user.isAgent && (<>
+            <h4>Create Template</h4>
+            <p>{'Do you want to create this template'}</p>
+
+          </>)}
+          
           {state == "share" && (<div className="field-wrap" >
             <p>{'Please add user\'s email that give access'}</p>
             <div className="btn-container">

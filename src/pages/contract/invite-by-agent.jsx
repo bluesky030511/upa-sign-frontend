@@ -188,7 +188,7 @@ const InviteByAgent = () => {
   };
 
   const handleInviteData = (values) => {
-    setInviteData({ ...inviteData, ...values });
+    setInviteData({ ...inviteData, ...values});
   };
 
   const getContract = async () => {
@@ -238,6 +238,7 @@ const InviteByAgent = () => {
       client_loss_state: values.lossState,
       client_loss_zipCode: values.lossZipCode,
       agent_initials: values.agentInitials,
+      agent_public_adjuster_license: values.publicAdjusterLicense,
       client_day_of_loss: String(new Date(values.dateOfLoss).getDate()),
       client_month_of_loss: String(new Date(values.dateOfLoss).getMonth() + 1),
       client_year_of_loss: String(new Date(values.dateOfLoss).getFullYear() % 100),
@@ -247,7 +248,7 @@ const InviteByAgent = () => {
 
     setStep(1);
     await fields.forEach(field => {
-      if(field.name.includes("client") || field.name == "agent_initials") {
+      if(field.name.includes("client") || field.name == "agent_initials" || field.name == "agent_public_adjuster_license") {
         field.value = data[field.name] ? data[field.name] : field.value;
       }
       if(values[field.id]) {
@@ -289,7 +290,7 @@ const InviteByAgent = () => {
         agent_email: data.agent.email,
         agent_city: data.agent.city,
         agent_state: data.agent.state,
-        agent_public_adjuster_license: data.agent.license,
+        // agent_public_adjuster_license: data.agent.license,
 
         agent_zipCode: data.agent.zipCode,
         agent_gender: "MALE",
@@ -336,7 +337,7 @@ const InviteByAgent = () => {
             navigate(`/documents/details/${contractId}`)
           }
           else
-            navigate(data.url);
+            navigate(`/documents/details/${contractId}`)
         },
         onError: (error, variables, context) => {
           showErrorToast(error.response.data.message);
@@ -366,7 +367,7 @@ const InviteByAgent = () => {
             <ClientInfoModal
               open={clientinfoModal}
               handleClose={handleCloseInfoModal}
-              data={clientInfo}
+              // data={clientInfo}
             />
             <AuthModal 
               open={authModal}
@@ -374,7 +375,7 @@ const InviteByAgent = () => {
               inviteData={inviteData}
               handleAction={() => onSubmit('InPerson')}
             />
-            {step === 0 && (<><Box sx={{ width: 500, mb: 4 }}>
+            {step === 0 && (<><Box sx={{ width: 500, mb: 2 }}>
               <Stepper activeStep={activeStep} alternativeLabel>
                 <Step sx={{ "& svg": { width: 24, height: 24 } }}>
                   <StepLabel>Contact</StepLabel>
@@ -383,6 +384,22 @@ const InviteByAgent = () => {
                   <StepLabel>Insurance</StepLabel>
                 </Step>
               </Stepper>
+            </Box>
+            <Box sx={{ display:"flex", justifyContent:"right", width:"80%", pr:"10px", mb:"50px" }} >
+                <Button variant="contained" 
+                  size="large"
+                  sx={{
+                    justifyContent:'right',
+                    bgcolor: colors.themeBlue,
+                    textTransform: "none",
+                    fontFamily: fonts.medium,
+                    minWidth: 120,
+                    borderRadius: 1,
+                  }}
+                  onClick={handleOpenInfoModal}
+                >
+                  View Client Info
+                </Button>
             </Box>
             {activeStep === 0 && (
               <ContactForm

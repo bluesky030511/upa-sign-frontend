@@ -375,6 +375,7 @@ const DocumentsListing = () => {
                           new Date(row.createdAt),
                           "dd MMM, yyyy hh:mm a"
                         );
+                        console.log("row, index: ", row, index);
                         return (
                           <StyledTableRow key={index}>
                             <StyledTableCell align="center">
@@ -404,6 +405,36 @@ const DocumentsListing = () => {
                                 <Box 
                                   sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}
                                 >
+                                  {!user.isAgent && (<a
+                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
+                                  >
+                                    <Button
+                                      id="basic-menu"
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        textTransform: "none",
+                                        px: { xs: "8px", sm: "17px" },
+                                        py: { xs: "2px", sm: "6px" },
+                                        fontSize: "11px",
+                                        fontFamily: fonts.medium,
+                                        "&:hover": {
+                                          bgcolor: colors.translucentGreen,
+                                        },
+                                        "& .MuiButton-endIcon": {
+                                          marginLeft: 1,
+                                          marginRight: 0,
+                                          "& svg": {
+                                            fontSize: 16,
+                                          },
+                                        },
+                                      }}
+                                      endIcon={<VisibilityOutlinedIcon />}
+                                    >
+                                      Preview
+                                    </Button>
+                                  </a>)}
                                   <ActionDropDown
                                     id={row.id}
                                     file={
@@ -421,6 +452,8 @@ const DocumentsListing = () => {
                                         ? false
                                         : row.invite[0].status === "APPROVED"
                                     }
+                                    
+                                    accessToken={row.invite[0] && row.invite[0].accessToken ? row.invite[0].accessToken : "" }
                                   />
                                   {user.isAgent && (<Button
                                     sx={{
@@ -444,17 +477,19 @@ const DocumentsListing = () => {
                                   >
                                     Invite
                                   </Button>)}
-                                  { row.invite.length > 0 && row.invite[0].file && (<IconButton
-                                    sx={{
-                                      bgcolor: colors.translucentGreen,
-                                      boxShadow: "none",
-                                      color: colors.foreGreen,
-                                      borderRadius: 2,
-                                    }}
-                                    onClick={() => downloadDoc(row.invite[0].file)}
-                                  >
-                                    <DownloadIcon size="large" />
-                                  </IconButton>)}
+                                  {user.isAgent && row.invite.length > 0 && row.invite[0].file && row.invite[0].status === "SIGNED" && 
+                                    (<IconButton
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        borderRadius: 2,
+                                      }}
+                                      onClick={() => downloadDoc(row.invite[0].file)}
+                                    >
+                                      <DownloadIcon size="large" />
+                                    </IconButton>)
+                                  }
                                   {/* {user.isAgent && (
                                     <a
                                     href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
