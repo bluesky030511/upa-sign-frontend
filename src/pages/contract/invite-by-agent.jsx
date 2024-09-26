@@ -24,6 +24,8 @@ import ContactForm from '../../components/steps/ContactForm';
 import InsuranceForm from '../../components/steps/InsuranceForm';
 import { useGetPlaceholdersByContractId, useInviteCustomer } from '../../hooks/data-hook';
 import SignModal from '../../components/modals/sign-modal';
+import AuthModal from '../../components/modals/auth-modal';
+import ClientInfoModal from "../../components/modals/clientinfo-modal";
 import { useToast } from '../../context/toast.context';
 import dayjs, { Dayjs } from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -85,8 +87,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
               <TextField 
                 variant="outlined"
                 defaultValue={field.value == 'count' ? 0 : field.value }
-                label={field.name == "agent_public_adjuster_license" ? 
-                "Agent public adjuster license" : field.name == "agent_initials" ? 
+                label={field.name == "agent_initials" ? 
                 "Agent initials" : field.dataLabel}
                 size="small"
                 sx={{ 
@@ -96,7 +97,7 @@ const DroppablePage = ({ pageNumber, width, fields, setFields }) => {
                 }}
                 // type={ field.name == 'count' ? 'number' : 'text' }
                 InputProps={{ 
-                  readOnly: true //field.name == "text" || field.name == "agent_public_adjuster_license" || field.name == "agent_initials" || field.name == "month" || field.name == "count"  ? false : true 
+                  readOnly: true //field.name == "text" || field.name == "agent_initials" || field.name == "month" || field.name == "count"  ? false : true 
                 }}
                 onChange={event => {handleText(event, field);}}
               />
@@ -158,11 +159,14 @@ const InviteByAgent = () => {
   const [inviteData, setInviteData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
+  const [authModal, setAuthModal] = useState(false);
+  const [clientinfoModal, setClientinfoModal] = useState(false);
   const [url, setUrl] = useState(null);
   const navigate = useNavigate();
   const { showSuccessToast, showErrorToast } = useToast();
   const [fields, setFields] = useState([]);
   const [step, setStep] = useState(0);
+  const [clientInfo, setClientInfo] = useState({});
 
   pdfjs.GlobalWorkerOptions.workerSrc =  `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`; 
 
@@ -184,7 +188,7 @@ const InviteByAgent = () => {
   };
 
   const handleInviteData = (values) => {
-    setInviteData({ ...inviteData, ...values });
+    setInviteData({ ...inviteData, ...values});
   };
 
   const getContract = async () => {
@@ -195,6 +199,15 @@ const InviteByAgent = () => {
   const handleOpenModal = () => {
     setConfirmModal(true);
   };
+
+  const handleOpenInfoModal = () => {
+    setClientinfoModal(true);
+  }
+
+  const handleCloseInfoModal = () => {
+    setClientinfoModal(false);
+  }
+
 
   const handleStep = async (values) => {
     const data = {
@@ -208,7 +221,7 @@ const InviteByAgent = () => {
       client_state: inviteData.state,
       client_city: inviteData.city,
       client_zipCode: inviteData.zipCode,
-      client_gender: inviteData.gender,
+      client_gender: "MALE",
       client_insurance_company: values.insuranceCompany,
       client_policy_number: values.policyNumber,
       client_claim: values.claimNo,
@@ -218,7 +231,6 @@ const InviteByAgent = () => {
       client_date_of_loss: new Date(values.dateOfLoss).toDateString(),
       client_mortgage: values.mortgage,
       client_initials: values.initials,
-      // client_public_adjuster_license: values.publicAdjusterLicense,
       client_contingency_fee: `${values.contingencyFee}%`,
       client_loss_full_address: `${values.lossAddress}, ${values.lossCity}, ${values.lossState}, ${values.lossZipCode}` || 'N/A',
       client_loss_street_address:values.lossAddress,
@@ -227,15 +239,19 @@ const InviteByAgent = () => {
       client_loss_zipCode: values.lossZipCode,
       agent_initials: values.agentInitials,
       agent_public_adjuster_license: values.publicAdjusterLicense,
+      client_day_of_loss: String(new Date(values.dateOfLoss).getDate()),
+      client_month_of_loss: String(new Date(values.dateOfLoss).getMonth() + 1),
+      client_year_of_loss: String(new Date(values.dateOfLoss).getFullYear() % 100),
     };
+    
+    setClientInfo(data);
 
     setStep(1);
     await fields.forEach(field => {
-      if(field.name.includes("client") || field.name == "agent_public_adjuster_license" || field.name == "agent_initials") {
+      if(field.name.includes("client") || field.name == "agent_initials" || field.name == "agent_public_adjuster_license") {
         field.value = data[field.name] ? data[field.name] : field.value;
       }
       if(values[field.id]) {
-        console.log("value", values[field.id]);
         if (field.name == "date")
           field.value =  new Date(values[field.id]).toDateString();
         else if (field.name == "time") 
@@ -251,6 +267,15 @@ const InviteByAgent = () => {
     setConfirmModal(false);
   };
 
+  const handleCloseAhtuModal = () => {
+    setAuthModal(false);
+  }
+
+  const handleInPerson = () => {
+    setConfirmModal(false);
+    setAuthModal(true);
+  }
+
   const { data, isLoading } = useQuery('contract-invite', getContract, {
     onSuccess: async (data) => {
       setUrl(`${BASE_URL}/${data.template.filename}`);
@@ -265,9 +290,10 @@ const InviteByAgent = () => {
         agent_email: data.agent.email,
         agent_city: data.agent.city,
         agent_state: data.agent.state,
-        // agent_country: data.agent.country,
+        // agent_public_adjuster_license: data.agent.license,
+
         agent_zipCode: data.agent.zipCode,
-        agent_gender: data.agent.gender,
+        agent_gender: "MALE",
       }
       await data.fields.forEach(field => {
         if(field.name.includes("agent")) {
@@ -283,7 +309,7 @@ const InviteByAgent = () => {
 
   const { data: placeholders } = useGetPlaceholdersByContractId(contractId)
 
-  const onSubmit = () => {
+  const onSubmit = (method) => {
     const knownFields = [ 'email', 'firstname', 'lastname', 'address', 'gender', 'phoneNumber',  'city', 'state', 'zipCode', 'insuranceCompany', 'policyNumber', 
       'claimNo', 'dateOfLoss', 'causeOfLoss', 'status', 'mortgage', 'initials', 'contingencyFee', 'lossAddress', 'lossCity', 'lossState', 'lossZipCode' ];
     let additionalFields = {}
@@ -299,14 +325,19 @@ const InviteByAgent = () => {
         input: {
           ...inviteData,
           ...additionalFields,
-          ...{fields: fields}
+          ...{fields: fields},
+          method: method
         },
       },
       {
-        onSuccess: () => {
-          showSuccessToast("Invite sent");
-          handleCloseModal();
-          navigate(`/documents/details/${contractId}`)
+        onSuccess: (data) => {
+          if(method != 'InPerson') {
+            showSuccessToast("Invite sent");
+            handleCloseModal();
+            navigate(`/documents/details/${contractId}`)
+          }
+          else
+            navigate(`/documents/details/${contractId}`)
         },
         onError: (error, variables, context) => {
           showErrorToast(error.response.data.message);
@@ -328,11 +359,23 @@ const InviteByAgent = () => {
             <SignModal
               open={confirmModal}
               handleClose={handleCloseModal}
-              handleAction={onSubmit}
+              handleAction={() => onSubmit('Remote')}
+              handleInPerson={handleInPerson}
               loading={isInviting}
-              actionText="Are you sure you want to send invite?"
+              actionText="Would you rather sign the contract with your client remotely or meet in person?"
             />
-            {step === 0 && (<><Box sx={{ width: 500, mb: 4 }}>
+            <ClientInfoModal
+              open={clientinfoModal}
+              handleClose={handleCloseInfoModal}
+              // data={clientInfo}
+            />
+            <AuthModal 
+              open={authModal}
+              handleClose={handleCloseAhtuModal}
+              inviteData={inviteData}
+              handleAction={() => onSubmit('InPerson')}
+            />
+            {step === 0 && (<><Box sx={{ width: 500, mb: 2 }}>
               <Stepper activeStep={activeStep} alternativeLabel>
                 <Step sx={{ "& svg": { width: 24, height: 24 } }}>
                   <StepLabel>Contact</StepLabel>
@@ -341,6 +384,22 @@ const InviteByAgent = () => {
                   <StepLabel>Insurance</StepLabel>
                 </Step>
               </Stepper>
+            </Box>
+            <Box sx={{ display:"flex", justifyContent:"right", width:"80%", pr:"10px", mb:"50px" }} >
+                <Button variant="contained" 
+                  size="large"
+                  sx={{
+                    justifyContent:'right',
+                    bgcolor: colors.themeBlue,
+                    textTransform: "none",
+                    fontFamily: fonts.medium,
+                    minWidth: 120,
+                    borderRadius: 1,
+                  }}
+                  onClick={handleOpenInfoModal}
+                >
+                  View Client Info
+                </Button>
             </Box>
             {activeStep === 0 && (
               <ContactForm
@@ -359,7 +418,20 @@ const InviteByAgent = () => {
               />
             )}</>)}
             {step === 1 && (<Box sx={{ display:"flex", flexDirection:"column", justifyContent:"center", mb:4, gap:3 }}>
-              <Box sx={{ display:"flex", justifyContent:"right" }} >
+              <Box sx={{ display:"flex", justifyContent:"right", gap: 2 }} >
+                <Button variant="contained" 
+                  size="large"
+                  sx={{
+                    bgcolor: colors.themeBlue,
+                    textTransform: "none",
+                    fontFamily: fonts.medium,
+                    minWidth: 120,
+                    borderRadius: 1,
+                  }}
+                  onClick={handleOpenInfoModal}
+                >
+                  View Client Info
+                </Button>
                 <Button variant="contained"
                   size='large'
                   sx={{
@@ -370,8 +442,9 @@ const InviteByAgent = () => {
                     borderRadius: 1,
                   }} 
                   onClick={handleOpenModal}
+                  
                 >
-                  Invite
+                  {isInviting ? <Loader /> : "Invite"}
                 </Button>
               </Box>
               {url && <Document file={url} onLoadSuccess={onDocumentLoadSuccess} >

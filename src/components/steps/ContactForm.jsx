@@ -19,7 +19,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
     firstname: yup.string().required("Please enter first name"),
     lastname: yup.string().required("Please enter last name"),
     address: yup.string().required("Please enter your address"),
-    gender: yup.string().required("Please enter your gender"),
+    // gender: yup.string().required("Please enter your gender"),
     email: yup
       .string()
       .required("Please enter your email")
@@ -36,7 +36,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
     defaultValues: {
       firstname: (inviteData && inviteData.firstname) || "",
       lastname: (inviteData && inviteData.lastname) || "",
-      gender: (inviteData && inviteData.gender) || "",
+      // gender: (inviteData && inviteData.gender) || "",
       address: (inviteData && inviteData.address) || "",
       email: (inviteData && inviteData.email) || "",
       phoneNumber: (inviteData && inviteData.phoneNumber) || "",
@@ -170,7 +170,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
           />
         </Grid>
       </Grid>
-      <Controller
+      {/* <Controller
         name="gender"
         control={control}
         render={({ field, fieldState }) => (
@@ -204,7 +204,7 @@ const ContactForm = ({ handleNext, handleInviteData, inviteData, additionalField
             </span>
           </>
         )}
-      />
+      /> */}
       {additionalFields && additionalFields.length > 0 && additionalFields.map((fl) => {
         return (
           <Controller

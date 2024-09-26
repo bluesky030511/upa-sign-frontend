@@ -16,6 +16,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Box, Button } from "@mui/material";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { visuallyHidden } from "@mui/utils";
+import IconButton from "@mui/material/IconButton";
+import axios from "axios";
+import DownloadIcon from '@mui/icons-material/Download';
 
 import { colors, fonts } from "../../../utils/theme";
 import { useGetContracts } from "../../../hooks/data-hook";
@@ -206,10 +209,10 @@ const DocumentsListing = () => {
   const { user } = useUI();
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
-  const [type, setType] = useState("string");
+  const [orderBy, setOrderBy] = useState("createdAt");
+  const [type, setType] = useState("date");
   const [searchText, setSearchText] = useState("");
   const { isFetching, isSuccess, data } = useGetContracts({
     name: searchText,
@@ -288,6 +291,31 @@ const DocumentsListing = () => {
     }
   }, []);
 
+  const downloadDoc = async (file) => {
+    try {
+      const url = `${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${file}`;
+
+      const response = await axios.get(url, { responseType: 'blob' });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+  
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute(
+        'download',
+        `${file}.pdf`
+      );
+  
+      document.body.appendChild(link);
+      link.click();
+  
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+    }
+  }
+
   return (
     <>
       <>
@@ -302,7 +330,7 @@ const DocumentsListing = () => {
         />
         <SubscriptionAlert />
         <ListingWrapper>
-          <div className="permission-container">
+          {/* <div className="permission-container">
             <Button
               variant="contained" 
               sx={{ 
@@ -314,7 +342,7 @@ const DocumentsListing = () => {
             >
               Access Permission
             </Button>
-          </div>
+          </div> */}
           <div className="search-container">
             <SearchInput
               placeholder="Search"
@@ -347,6 +375,7 @@ const DocumentsListing = () => {
                           new Date(row.createdAt),
                           "dd MMM, yyyy hh:mm a"
                         );
+                        console.log("row, index: ", row, index);
                         return (
                           <StyledTableRow key={index}>
                             <StyledTableCell align="center">
@@ -376,6 +405,36 @@ const DocumentsListing = () => {
                                 <Box 
                                   sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}
                                 >
+                                  {!user.isAgent && (<a
+                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
+                                  >
+                                    <Button
+                                      id="basic-menu"
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        textTransform: "none",
+                                        px: { xs: "8px", sm: "17px" },
+                                        py: { xs: "2px", sm: "6px" },
+                                        fontSize: "11px",
+                                        fontFamily: fonts.medium,
+                                        "&:hover": {
+                                          bgcolor: colors.translucentGreen,
+                                        },
+                                        "& .MuiButton-endIcon": {
+                                          marginLeft: 1,
+                                          marginRight: 0,
+                                          "& svg": {
+                                            fontSize: 16,
+                                          },
+                                        },
+                                      }}
+                                      endIcon={<VisibilityOutlinedIcon />}
+                                    >
+                                      Preview
+                                    </Button>
+                                  </a>)}
                                   <ActionDropDown
                                     id={row.id}
                                     file={
@@ -393,6 +452,8 @@ const DocumentsListing = () => {
                                         ? false
                                         : row.invite[0].status === "APPROVED"
                                     }
+                                    
+                                    accessToken={row.invite[0] && row.invite[0].accessToken ? row.invite[0].accessToken : "" }
                                   />
                                   {user.isAgent && (<Button
                                     sx={{
@@ -416,38 +477,105 @@ const DocumentsListing = () => {
                                   >
                                     Invite
                                   </Button>)}
+                                  {user.isAgent && row.invite.length > 0 && row.invite[0].file && row.invite[0].status === "SIGNED" && 
+                                    (<IconButton
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        borderRadius: 2,
+                                      }}
+                                      onClick={() => downloadDoc(row.invite[0].file)}
+                                    >
+                                      <DownloadIcon size="large" />
+                                    </IconButton>)
+                                  }
+                                  {/* {user.isAgent && (
+                                    <a
+                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.file}`}
+                                  >
+                                    {/* <Button
+                                      id="basic-menu"
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        textTransform: "none",
+                                        px: { xs: "4px", sm: "17px" },
+                                        py: { xs: "2px", sm: "6px" },
+                                        fontSize: "11px",
+                                        fontFamily: fonts.medium,
+                                        "&:hover": {
+                                          bgcolor: colors.translucentGreen,
+                                        },
+                                        "& .MuiButton-endIcon": {
+                                          marginLeft: 1,
+                                          marginRight: 0,
+                                          "& svg": {
+                                            fontSize: 16,
+                                          },
+                                        },
+                                      }}
+                                    >
+                                      Preview
+                                    </Button> */}
+                                    {/* <IconButton sx={{ 
+                                      // bgcolor: colors.translucentGreen,
+                                      py: { xs: "2px", sm: "6px" },
+                                      color: colors.foreGreen 
+                                    }}>
+                                      <VisibilityIcon />
+                                    </IconButton>
+                                  </a> */}
+                                  {/* )
+                                  } */}
                                 </Box>
                               ) : (
-                                <a
-                                  href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
+                                <Box 
+                                  sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}
                                 >
-                                  <Button
-                                    id="basic-menu"
+                                  <a
+                                    href={`${BASE_URL}${API_ENDPOINTS.FILE}/f/view/preview.pdf?id=${row.invite[0].file}`}
+                                  >
+                                    <Button
+                                      id="basic-menu"
+                                      sx={{
+                                        bgcolor: colors.translucentGreen,
+                                        boxShadow: "none",
+                                        color: colors.foreGreen,
+                                        textTransform: "none",
+                                        px: { xs: "8px", sm: "17px" },
+                                        py: { xs: "2px", sm: "6px" },
+                                        fontSize: "11px",
+                                        fontFamily: fonts.medium,
+                                        "&:hover": {
+                                          bgcolor: colors.translucentGreen,
+                                        },
+                                        "& .MuiButton-endIcon": {
+                                          marginLeft: 1,
+                                          marginRight: 0,
+                                          "& svg": {
+                                            fontSize: 16,
+                                          },
+                                        },
+                                      }}
+                                      endIcon={<VisibilityOutlinedIcon />}
+                                    >
+                                      Preview
+                                    </Button>
+                                  </a>
+                                  <IconButton
                                     sx={{
                                       bgcolor: colors.translucentGreen,
                                       boxShadow: "none",
                                       color: colors.foreGreen,
-                                      textTransform: "none",
-                                      px: { xs: "8px", sm: "17px" },
-                                      py: { xs: "2px", sm: "6px" },
-                                      fontSize: "11px",
-                                      fontFamily: fonts.medium,
-                                      "&:hover": {
-                                        bgcolor: colors.translucentGreen,
-                                      },
-                                      "& .MuiButton-endIcon": {
-                                        marginLeft: 1,
-                                        marginRight: 0,
-                                        "& svg": {
-                                          fontSize: 16,
-                                        },
-                                      },
+                                      borderRadius: 2,
                                     }}
-                                    endIcon={<VisibilityOutlinedIcon />}
+                                    onClick={() => downloadDoc(row.invite[0].file)}
                                   >
-                                    Preview
-                                  </Button>
-                                </a>
+                                    <DownloadIcon size="large" />
+                                  </IconButton>
+                                </Box>
                               )}
                             </StyledTableCell>
                           </StyledTableRow>
@@ -457,7 +585,7 @@ const DocumentsListing = () => {
                 </Table>
               </TableContainer>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 15]}
+                rowsPerPageOptions={[20, 50, 100]}
                 component="div"
                 count={data.length}
                 rowsPerPage={rowsPerPage}

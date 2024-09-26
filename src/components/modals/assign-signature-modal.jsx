@@ -1,12 +1,65 @@
-import React from "react";
+import { useState } from "react";
+import * as React from 'react';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import styled from "styled-components";
 import { colors, fonts } from "../../utils/theme";
 import PrimaryButton from "../buttons/primary-button";
+import Divider from '@mui/material/Divider';
+import { 
+  TextField, 
+  Button,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import { useAssignSignature } from "../../hooks/data-hook";
+import { useToast } from "../../context/toast.context";
 
-const SignModal = ({ open, handleClose, handleAction, loading, actionText, handleInPerson }) => {
+const AssignSignatureModal = ({ open, handleClose, handleAction, inviteData }) => {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState(false);
+  const { mutate: AssignSignature, isLoading } = useAssignSignature();
+  const { showSuccessToast, showErrorToast } = useToast();
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+    setError(false); 
+  };
+
+  const assignSignature = () => {
+    AssignSignature({
+      contractId: inviteData.contractId,
+      data: {
+        agentEmail: email,
+        ...inviteData,
+      },
+    }, {
+      onSuccess: (data) => {
+        setEmail('');
+        handleClose();
+      },
+      onError: (error) => {
+        showErrorToast(error.response.data.message);
+      }
+    });
+  }
+
+  const handleAddClick = () => {
+    if (!validateEmail(email)) {
+      setError(true);
+    } else {
+      setError(false);
+      assignSignature();
+    }
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   
   return (
     <Dialog
@@ -21,44 +74,29 @@ const SignModal = ({ open, handleClose, handleAction, loading, actionText, handl
     >
       <DialogContent>
         <SuccessContent>
-          <div className="icon-circle">
-            <CheckRoundedIcon sx={{ color: colors.checkGreen, fontSize: 56 }} />
-          </div>
-          <h4>Confirm?</h4>
-          <p>{actionText ? actionText : 'Are you sure you want to sign this contract?'}</p>
-          {!actionText &&(<div className="btn-container">
-              <PrimaryButton
-                onClick={handleAction}
-                sx={{
-                  bgcolor: "transparent",
-                  boxShadow: "none",
-                  color: colors.checkGreen,
-                  textTransform: "none",
-                  py: "4px",
-                  border: "2px solid",
-                  borderColor: colors.checkGreen,
-                  borderRadius: "24px",
-                  "&:hover": {
-                    bgcolor: "transparent",
-                    boxShadow: "none",
-                  },
-                }}
-                isLoading={loading}
-              >
-                {actionText ? "Remote" : "Confirm"}
-              </PrimaryButton>
-            </div>)}
-          {actionText &&(
+          <h4>{'Would you like to assign this pending document to another person for signature?'}</h4>
+          <Divider flexItem/>
+            <div className="btn-container">
+              <TextField 
+                variant="standard"
+                size="small"
+                label="User Email"
+                type="email"
+                value={email}
+                sx={{ pr: 2, width: "80%" }}
+                error={error}
+                helperText={error ? 'Please enter a valid email' : ''}
+                onChange={(event) => handleEmailChange(event)}
+              />
+            </div>  
           <div className="btn-wrap">
-            <div className="btn-container" style={{ width: '80%' }}>
+            <div className="btn-container">
               <PrimaryButton
-                onClick={handleAction}
                 sx={{
                   bgcolor: "transparent",
                   boxShadow: "none",
                   color: colors.checkGreen,
                   textTransform: "none",
-                  width: '80%',
                   py: "4px",
                   border: "2px solid",
                   borderColor: colors.checkGreen,
@@ -68,20 +106,20 @@ const SignModal = ({ open, handleClose, handleAction, loading, actionText, handl
                     boxShadow: "none",
                   },
                 }}
-                isLoading={loading}
+                isLoading={isLoading}
+                onClick={handleAddClick}
               >
-                {actionText ? "Remote" : "Confirm"}
+                Confirm
               </PrimaryButton>
             </div>
-            <div className="btn-container" style={{ width: '80%' }}>
+            <div className="btn-container">
               <PrimaryButton
-                onClick={handleInPerson}
+                onClick={handleClose}
                 sx={{
                   bgcolor: "transparent",
                   boxShadow: "none",
                   color: colors.foreBlack,
                   textTransform: "none",
-                  width: '80%',
                   py: "4px",
                   border: "2px solid",
                   borderColor: colors.foreBlack,
@@ -92,17 +130,17 @@ const SignModal = ({ open, handleClose, handleAction, loading, actionText, handl
                   },
                 }}
               >
-                In person
+                Cancel
               </PrimaryButton>
             </div>
-          </div>)}
+          </div>
         </SuccessContent>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default SignModal;
+export default AssignSignatureModal;
 
 const SuccessContent = styled.div`
   display: flex;
@@ -122,7 +160,7 @@ const SuccessContent = styled.div`
   }
   h4 {
     font-family: ${fonts.regular};
-    font-size: 28px;
+    font-size: 20px;
     color: ${colors.black};
     margin-block: 24px;
   }
@@ -151,5 +189,22 @@ const SuccessContent = styled.div`
     display: flex;
     justify-content: center;
     // padding-right: 30px;
+  }
+  .field-wrap {
+    margin-top: 20px;
+    width: 100%;
+    // display: flex;
+    min-height: 100px;
+    .btn-container {
+      display: flex;
+      justify-content: right;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .field-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
   }
 `;

@@ -24,7 +24,7 @@ const schema = yup.object({
   firstname: yup.string().required("Please enter first name"),
   lastname: yup.string().required("Please enter last name"),
   address: yup.string().required("Please enter user address"),
-  gender: yup.string().required("Please enter user gender"),
+  // gender: yup.string().required("Please enter user gender"),
   password: yup.string().required("Please enter user password"),
   email: yup
     .string()
@@ -44,7 +44,7 @@ const AddUser = () => {
     defaultValues: {
       firstname: "",
       lastname: "",
-      gender: "",
+      // gender: "",
       role: "",
       address: "",
       email: "",
@@ -70,7 +70,7 @@ const AddUser = () => {
       firstname: data.firstname,
       lastname: data.lastname,
       email: data.email,
-      gender: data.gender,
+      gender: "MALE",
       role: data.role,
       address: data.address,
       phoneNumber: data.phoneNumber,
@@ -104,7 +104,7 @@ const AddUser = () => {
                 position: "relative",
               }}
             >
-              <div className="avatar-container">
+              {/* <div className="avatar-container">
                 <div className="profile-avatar">
                   <img
                     src={
@@ -117,7 +117,7 @@ const AddUser = () => {
                     alt="profile"
                   />
                 </div>
-              </div>
+              </div> */}
               <Grid container spacing={2}>
                 <Grid item lg={6} xs={12}>
                   <Controller
@@ -148,7 +148,7 @@ const AddUser = () => {
                   />
                 </Grid>
               </Grid>
-              <Controller
+              {/* <Controller
                 name="gender"
                 control={control}
                 render={({ field, fieldState }) => (
@@ -182,7 +182,7 @@ const AddUser = () => {
                     </span>
                   </>
                 )}
-              />
+              /> */}
               <Controller
                 name="role"
                 control={control}

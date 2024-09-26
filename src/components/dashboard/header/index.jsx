@@ -10,6 +10,7 @@ import Toolbar from "@mui/material/Toolbar";
 import MenuItem from "@mui/material/MenuItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
+import PersonIcon from '@mui/icons-material/Person';
 
 import BrandLogo from "../../../assets/images/logo black upa-03.svg";
 import { colors, fonts } from "../../../utils/theme";
@@ -104,17 +105,19 @@ const DashboardHeader = ({ handleDrawerToggle, width }) => {
                 sx={{
                   boxShadow: "0px 0px 10px -4px rgba(0,0,0,0.35)",
                   border: "1px solid",
-                  borderColor: colors.translucentBlue,
+                  borderColor: colors.themeBlue,
+                  backgroundColor: colors.themeBlue
                 }}
-                src={
-                  user.gender
-                    ? user.gender === "MALE"
-                      ? ProfileAvatar
-                      : ProfileFemaleAvatar
-                    : ProfileAvatar
-                }
+                // src={ProfileAvatar
+                //   // user.gender
+                //   //   ? user.gender === "MALE"
+                //   //     ? ProfileAvatar 
+                //   //     : ProfileFemaleAvatar
+                //   //   : ProfileAvatar
+                // }
               >
-                <Person />
+                {/* <Person /> */}
+                <PersonIcon />
               </Avatar>
             </Button>
             <Popover

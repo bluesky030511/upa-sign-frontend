@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useState, useEffect} from "react";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
 import { colors, fonts } from "../../../utils/theme";
@@ -21,7 +21,7 @@ const schema = yup.object({
   firstname: yup.string().required("Please enter first name"),
   lastname: yup.string().required("Please enter last name"),
   address: yup.string().required("Please enter your address"),
-  gender: yup.string().required("Please enter your gender"),
+  // gender: yup.string().required("Please enter your gender"),
   status: yup.string().required("Please enter valid status"),
   email: yup
     .string()
@@ -32,6 +32,13 @@ const schema = yup.object({
   country: yup.string().required("Please enter your country"),
   state: yup.string().required("Please enter your state"),
   zipCode: yup.string().required("Please enter your zip code"),
+  // license: yup.string().required("Please enter your license"),
+  // licenses: yup.array().of(
+  //   yup.object().shape({
+  //     region: yup.string(),
+  //     number: yup.string(),
+  //   })
+  // ),
 });
 
 const SettingUser = () => {
@@ -42,7 +49,7 @@ const SettingUser = () => {
     defaultValues: {
       firstname: "",
       lastname: "",
-      gender: "",
+      // gender: "",
       role: "",
       address: "",
       email: "",
@@ -51,7 +58,9 @@ const SettingUser = () => {
       state: "",
       country: "",
       zipCode: "",
-      status: ""
+      status: "",
+      license: "",
+      // licenses: [],
     },
     resolver: yupResolver(schema),
   });
@@ -61,6 +70,24 @@ const SettingUser = () => {
 
   const { mutate: Update, isLoading } = useUpdateUserProfile();
 
+  const [licenses, setLicenses] = useState([{ region: '', number: '' }]); 
+
+  useEffect(() => {
+    setLicenses( [{ region: '', number: '' }]);
+  }, [])
+
+  const addLicense = () => {
+    setLicenses([...licenses, { region: '', number: '' }]);
+  };
+
+  const handleLicenseChange = (index, field, value) => {
+    const newLicenses = licenses.map((license, i) => (
+      i === index ? { ...license, [field]: value } : license
+    ));
+    setLicenses(newLicenses);
+  };
+
+
   const onSubmit = async (data) => {
     await Update(
       {
@@ -68,7 +95,7 @@ const SettingUser = () => {
         firstname: data.firstname,
         lastname: data.lastname,
         email: data.email,
-        gender: data.gender,
+        gender: "MALE",
         role: data.role,
         address: data.address,
         phoneNumber: data.phoneNumber,
@@ -77,6 +104,8 @@ const SettingUser = () => {
         state: data.state,
         country: data.country,
         zipCode: data.zipCode,
+        license: "12341234",
+        licenses: licenses,
       },
       {
         onSuccess: (data) => {
@@ -109,7 +138,7 @@ const SettingUser = () => {
               position: "relative",
             }}
           >
-            <div className="avatar-container">
+            {/* <div className="avatar-container">
               <div className="profile-avatar">
                 <img
                   src={
@@ -122,7 +151,7 @@ const SettingUser = () => {
                   alt="profile"
                 />
               </div>
-            </div>
+            </div> */}
             <Grid container spacing={2}>
               <Grid item lg={6} xs={12}>
                 <Controller
@@ -153,7 +182,7 @@ const SettingUser = () => {
                 />
               </Grid>
             </Grid>
-            <Controller
+            {/* <Controller
               name="gender"
               control={control}
               render={({ field, fieldState }) => (
@@ -187,7 +216,7 @@ const SettingUser = () => {
                   </span>
                 </>
               )}
-            />
+            /> */}
             <Controller
               name="status"
               control={control}
@@ -216,7 +245,7 @@ const SettingUser = () => {
                     <MenuItem value="">Status</MenuItem>
                     <MenuItem value="APPROVED">Verified</MenuItem>
                     <MenuItem value="PENDING">Pending</MenuItem>
-                    <MenuItem value="DISABLED">Disabled</MenuItem>
+                    <MenuItem value="DISABLED">Deactivate</MenuItem>
                   </Select>
                   <span className="error-text">
                     {fieldState.error && fieldState.error.message}
@@ -293,6 +322,63 @@ const SettingUser = () => {
                 />
               )}
             />
+            {/* <Controller
+              name="license"
+              control={control}
+              render={({ field, fieldState }) => (
+                <PrimaryInput
+                  placeholder="Enter your license"
+                  {...field}
+                  helperText={fieldState.error && fieldState.error.message}
+                />
+              )}
+            /> */}
+            <div>
+              {licenses.length > 0 ? (
+                licenses.map((license, index) => (
+                  <Grid container key={index} spacing={2}>
+                    <Grid item lg={5} xs={12}>
+                      <PrimaryInput
+                        placeholder="License region"
+                        value={license.region}
+                        onChange={(e) => handleLicenseChange(index, 'region', e.target.value)}
+                      />
+                    </Grid>
+                    <Grid item lg={7} xs={12}>
+                      <PrimaryInput
+                        placeholder="License number"
+                        value={license.number}
+                        onChange={(e) => handleLicenseChange(index, 'number', e.target.value)}
+                      />
+                    </Grid>
+                  </Grid>
+                ))
+              ) : (
+                <p>No licenses available</p>
+              )}
+              <div className="change-password-wrap">
+                <Button
+                  sx={{
+                    textTransform: "none",
+                    "& a": {
+                      fontFamily: fonts.medium,
+                      color: colors.foreBlack,
+                      fontSize: 12,
+                      transition: "color 0.2s ease-in-out",
+                    },
+                    "&:hover": {
+                      bgcolor: "transparent",
+                    },
+                    "&:hover a": {
+                      color: colors.themeBlue,
+                    },
+                  }}
+                  onClick={addLicense}
+                >
+                  Add License
+                </Button>
+              </div>
+            </div>
             <Controller
               name="country"
               control={control}

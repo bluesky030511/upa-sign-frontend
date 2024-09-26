@@ -9,7 +9,7 @@ import ConfirmationModal from "../modals/confirmation-modal";
 import { API_ENDPOINTS, BASE_URL } from "../../utils/variables";
 import { useUI } from "../../context/ui.context";
 
-const ActionDropDown = ({ id, file, inviteId, signed }) => {
+const ActionDropDown = ({ id, file, inviteId, signed, accessToken }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState({
     open: false,
@@ -45,6 +45,7 @@ const ActionDropDown = ({ id, file, inviteId, signed }) => {
         handleClose={closeConfirmationModal}
         type={confirmationModal.type}
         inviteId={inviteId}
+        accessToken={accessToken}
       />
       <Button
         id="basic-menu"
@@ -93,7 +94,7 @@ const ActionDropDown = ({ id, file, inviteId, signed }) => {
           },
         }}
       >
-        <MenuItem
+        {/* <MenuItem
           sx={{
             borderBottom: "1px solid rgba(0,0,0,0.1)",
             p: 0,
@@ -112,7 +113,7 @@ const ActionDropDown = ({ id, file, inviteId, signed }) => {
           >
             Preview
           </a>
-        </MenuItem>
+        </MenuItem> */}
         {user.isAgent && (
           <MenuItem
             sx={{

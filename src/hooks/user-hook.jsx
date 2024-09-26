@@ -42,6 +42,20 @@ const getProfile = async (id) => {
     return data;
 };
 
+const getUserProfile = async (input) => {
+    const {data} = await http.get(API_ENDPOINTS.PROFILE, {
+        params: {
+            id: input.id,
+        },
+    });
+    return data;
+};
+
+const getUserProfilebyEmail = async (input) => {
+    const {data} = await http.post(`${API_ENDPOINTS.PROFILE}/byemail`, input);
+    return data;
+};
+
 // Get Subscription
 const getSubscription = async () => {
     const {data} = await http.get(API_ENDPOINTS.SUBSCRIPTION);
@@ -96,6 +110,14 @@ export const useGetProfile = ({id, onSuccess, onError}) => {
 export const useGetUserProfile = ({id}) => {
     return useQuery("userProfile", () => getProfile(id));
   };
+
+export const useGetUserProfilebyEmail = () => {
+    return useMutation(getUserProfilebyEmail);
+}
+
+  export const useGetUserData = () => {
+    return useMutation(getUserProfile);
+}
 
 export const useGetSubscription = ({
                                        subscriptionSuccess,
