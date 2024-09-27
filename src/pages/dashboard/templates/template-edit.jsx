@@ -323,7 +323,6 @@ const TemplateEdit = () => {
 
   const createTemplate = () => {
     const targetRect = document.getElementById('pdfContainer').getBoundingClientRect();
-    console.log("creating...");
     CreateTemplate({ 
       id: id, 
       tempData: { 
@@ -335,7 +334,6 @@ const TemplateEdit = () => {
     }, {
       onSuccess: () => {
         handleCloseModal();
-        console.log("Success...");
         navigate("/templates");
       },
       onError: (error) => {

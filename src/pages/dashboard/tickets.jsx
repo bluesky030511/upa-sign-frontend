@@ -225,7 +225,6 @@ const TicketList = () => {
       },
       {
         onSuccess: () => {
-          console.log("Success...");
         },
         onError: (error) => {
           showErrorToast(error.response.data.message);

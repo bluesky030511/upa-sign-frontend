@@ -68,7 +68,6 @@ const ConfirmationModal = ({ open, handleClose, id, inviteId, type, accessToken 
     getProfile,
     {
       onSuccess: (data) => {
-        console.log("data: ", data);
         if(data != null) 
           handleInviteData({
             email: data.email,
