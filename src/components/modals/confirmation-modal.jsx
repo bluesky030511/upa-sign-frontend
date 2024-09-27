@@ -58,7 +58,8 @@ const ConfirmationModal = ({ open, handleClose, id, inviteId, type, accessToken 
   };
   const { data, isFetching } = useQuery("contract-invite", getContract, {
     onSuccess: (data) => {
-      setFields(data.fields);
+      if(data != null)
+        setFields(data.fields);
     },
   });
 
@@ -67,17 +68,19 @@ const ConfirmationModal = ({ open, handleClose, id, inviteId, type, accessToken 
     getProfile,
     {
       onSuccess: (data) => {
-        handleInviteData({
-          email: data.email,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          address: data.address,
-          gender: "MALE",
-          phoneNumber: data.phoneNumber,
-          country: data.country,
-          city: data.city,
-          state: data.state,
-        });
+        console.log("data: ", data);
+        if(data != null) 
+          handleInviteData({
+            email: data.email,
+            firstname: data.firstname,
+            lastname: data.lastname,
+            address: data.address,
+            gender: "MALE",
+            phoneNumber: data.phoneNumber,
+            country: data.country,
+            city: data.city,
+            state: data.state,
+          });
       },
     }
   );

@@ -30,8 +30,10 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
     setState(event.target.value);
   };
 
+  console.log("user: ", user);
+  console.log("user.role: ", user.role);
   useEffect(() => {
-    if(user.isAgent) setState("private");
+    if(user.role == "AGENT") setState("private");
   }, [])
 
   const addUser = () => {
@@ -73,7 +75,7 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
             <CheckRoundedIcon sx={{ color: colors.checkGreen, fontSize: 56 }} />
           </div>
           {/* <p>{'Are you sure you want to sign this contract?'}</p> */}
-          {!user.isAgent && (<>
+          {user.role == "ADMIN" && (<>
             <h4>Share Template?</h4>
             <FormControl>
               <FormLabel >{'Do you want to create this template as private or public?'}</FormLabel>
@@ -82,7 +84,7 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
                 name="row-radio-buttons-group"
                 value={state}
                 onChange={handleChange}
-                sx={{ display:'flex', justifyContent:'center' }}
+                sx={{ display:'flex', justifyContent:'space-around' }}
               >
                 {/* <FormControlLabel value="private" control={<Radio />} label="Private" /> */}
                 <FormControlLabel value="public" control={<Radio />} label="Public" />
@@ -91,7 +93,7 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
             </FormControl>
             <Divider flexItem/>
           </>)}
-          {user.isAgent && (<>
+          {user.role == "AGENT" && (<>
             <h4>Create Template</h4>
             <p>{'Do you want to create this template'}</p>
 
