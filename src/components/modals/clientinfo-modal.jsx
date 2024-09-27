@@ -79,7 +79,6 @@ const ClientInfoModal = ({ open, handleClose }) => {
     GetUserProfilebyEmail({
       email}, {
         onSuccess: (data) => {
-          console.log("data: ", data);
             setData(data);       
         },
         onError: (error) => {

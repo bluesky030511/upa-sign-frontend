@@ -30,8 +30,6 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
     setState(event.target.value);
   };
 
-  console.log("user: ", user);
-  console.log("user.role: ", user.role);
   useEffect(() => {
     if(user.role == "AGENT") setState("private");
   }, [])
@@ -78,7 +76,7 @@ const CreateTemplateModal = ({ open, handleClose, handleAction, loading, state, 
           {user.role == "ADMIN" && (<>
             <h4>Share Template?</h4>
             <FormControl>
-              <FormLabel >{'Do you want to create this template as private or public?'}</FormLabel>
+              <FormLabel >{'Would you like to make this template public or share it with specific agents?'}</FormLabel>
               <RadioGroup
                 row
                 name="row-radio-buttons-group"

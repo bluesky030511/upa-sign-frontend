@@ -375,7 +375,6 @@ const DocumentsListing = () => {
                           new Date(row.createdAt),
                           "dd MMM, yyyy hh:mm a"
                         );
-                        console.log("row, index: ", row, index);
                         return (
                           <StyledTableRow key={index}>
                             <StyledTableCell align="center">
