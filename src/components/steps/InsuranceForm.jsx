@@ -44,7 +44,6 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
     else
       setLicenses( [{ region: '', number: '' }]);
   }, [])
-  console.log("licneses: ", licenses);
   const [additionalFields, setAdditionalFields] = useState([]);
   useEffect(() => {
     setAdditionalFields(prevFields => {
@@ -76,7 +75,6 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
   });
 
   const onSubmit =(data) => {
-    console.log("license: ", licnese);
     handleInviteData({...data, publicAdjusterLicense: licnese});
     handleOpenModal({...data, publicAdjusterLicense: licnese});
   };

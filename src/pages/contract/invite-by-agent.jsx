@@ -303,7 +303,6 @@ const InviteByAgent = () => {
       setFields(data.fields);
     },
     onerror: (error) => {
-      console.log(error)
     }
   });
 
