@@ -40,7 +40,7 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
 
   useEffect(() => {
     if( user.licenses )
-      setLicenses(user.licenses.map(license => JSON.parse(license)))
+      setLicenses(user.licenses.map(license => { return typeof license == "string" ? JSON.parse(license) : license}))
     else
       setLicenses( [{ region: '', number: '' }]);
   }, [])
