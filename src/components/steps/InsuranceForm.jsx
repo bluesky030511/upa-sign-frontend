@@ -12,6 +12,7 @@ import PrimaryInput from "../inputs/primary-input";
 import PrimaryButton from "../buttons/primary-button";
 import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
 import { useUI } from "../../context/ui.context";
+import { isString } from "react-pdf/dist/esm/shared/utils";
 
 const schema = yup.object({
   insuranceCompany: yup.string().required("Please enter insurance company"),
@@ -38,9 +39,10 @@ const InsuranceForm = ({ handleInviteData, handleOpenModal, inviteData, fields }
   const [licenses, setLicenses] = useState([{ region: '', number: '' }]); 
   const [licnese, setLicense] = useState("");
 
+  console.log("", user.licenses);
   useEffect(() => {
     if( user.licenses )
-      setLicenses(user.licenses.map(license => JSON.parse(license)))
+      setLicenses(user.licenses.map(license => { return typeof license == "string" ? JSON.parse(license) : license}))
     else
       setLicenses( [{ region: '', number: '' }]);
   }, [])
